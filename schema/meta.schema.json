@@ -1,0 +1,334 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "meta",
+  "$comment": "Implements CONTRACT-001 1.0.0 in docs/data-contract.md.",
+  "type": "object",
+  "properties": {
+    "contract_version": {
+      "const": "1.0.0"
+    },
+    "site": {
+      "enum": [
+        "tan_hoi",
+        "bang_rakam"
+      ]
+    },
+    "generated_utc": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "Z$"
+    },
+    "timezone": {
+      "enum": [
+        "Asia/Ho_Chi_Minh",
+        "Asia/Bangkok"
+      ]
+    },
+    "grid": {
+      "type": "object",
+      "properties": {
+        "epsg": {
+          "enum": [
+            32648,
+            32647
+          ]
+        },
+        "cell_m": {
+          "const": 250
+        },
+        "n_cells": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "epsg",
+        "cell_m",
+        "n_cells"
+      ]
+    },
+    "method": {
+      "type": "object",
+      "properties": {
+        "rule": {
+          "enum": [
+            "Q0",
+            "Q1"
+          ]
+        },
+        "hh_db_max": {
+          "type": "number",
+          "not": {
+            "const": -9999
+          }
+        },
+        "hv_db_max": {
+          "type": "number",
+          "not": {
+            "const": -9999
+          }
+        },
+        "single_flip_filter": {
+          "type": "boolean"
+        },
+        "frozen_utc": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "Z$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "rule",
+        "hh_db_max",
+        "hv_db_max",
+        "single_flip_filter",
+        "frozen_utc"
+      ]
+    },
+    "acquisitions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "i": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "acq_utc": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "Z$"
+          },
+          "date_local": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "track": {
+            "type": "string",
+            "pattern": "^\\d{3}[AD]$"
+          },
+          "frame": {
+            "type": "string",
+            "pattern": "^\\d{3}$"
+          },
+          "crid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "valid_share": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "rule": {
+            "enum": [
+              "Q0",
+              "Q1"
+            ]
+          },
+          "hh_db_max": {
+            "type": "number",
+            "not": {
+              "const": -9999
+            }
+          },
+          "hv_db_max": {
+            "type": "number",
+            "not": {
+              "const": -9999
+            }
+          },
+          "backdrop": {
+            "type": "string",
+            "pattern": "^backdrop/\\d{8}_\\d{3}[ad]_hh\\.webp$"
+          }
+        },
+        "required": [
+          "i",
+          "acq_utc",
+          "date_local",
+          "track",
+          "frame",
+          "crid",
+          "valid_share",
+          "rule",
+          "hh_db_max",
+          "hv_db_max",
+          "backdrop"
+        ]
+      },
+      "minItems": 0
+    },
+    "backdrop": {
+      "type": "object",
+      "properties": {
+        "db_min": {
+          "const": -25
+        },
+        "db_max": {
+          "const": -5
+        },
+        "corners": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              }
+            ],
+            "items": false,
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "minItems": 4,
+          "maxItems": 4
+        }
+      },
+      "required": [
+        "db_min",
+        "db_max",
+        "corners"
+      ]
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "skipped": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "acq_utc": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "Z$"
+          },
+          "track": {
+            "type": "string",
+            "pattern": "^\\d{3}[AD]$"
+          },
+          "frame": {
+            "type": "string",
+            "pattern": "^\\d{3}$"
+          },
+          "crid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "granule": {
+            "type": "string",
+            "pattern": "^[^/\\\\]+\\.h5$"
+          },
+          "reason": {
+            "enum": [
+              "read_error",
+              "missing_hv",
+              "other"
+            ]
+          },
+          "detail": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_.]*$"
+          }
+        },
+        "required": [
+          "acq_utc",
+          "track",
+          "frame",
+          "crid",
+          "granule",
+          "reason",
+          "detail"
+        ]
+      },
+      "minItems": 0
+    }
+  },
+  "required": [
+    "contract_version",
+    "site",
+    "generated_utc",
+    "timezone",
+    "grid",
+    "method",
+    "acquisitions",
+    "backdrop",
+    "sources",
+    "skipped"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "site": {
+            "const": "tan_hoi"
+          }
+        },
+        "required": [
+          "site"
+        ]
+      },
+      "then": {
+        "properties": {
+          "timezone": {
+            "const": "Asia/Ho_Chi_Minh"
+          },
+          "grid": {
+            "properties": {
+              "epsg": {
+                "const": 32648
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "site": {
+            "const": "bang_rakam"
+          }
+        },
+        "required": [
+          "site"
+        ]
+      },
+      "then": {
+        "properties": {
+          "timezone": {
+            "const": "Asia/Bangkok"
+          },
+          "grid": {
+            "properties": {
+              "epsg": {
+                "const": 32647
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+# Paths are relative to this file. Use the exported AOI after the data handoff.
+# Before that handoff, place the H4A source AOI at the configured path locally.
+# Copy the BANG-2 land-cover CSV into runtime/tan_hoi/ for S1–S5.
+# S7 takes --landcover explicitly; see docs/quan-6-code.md for all inputs.
+site = "tan_hoi"
+timezone = "Asia/Ho_Chi_Minh"
+
+[grid]
+epsg = 32648
+cell_size_m = 250
+# Thứ tự: min easting, min northing, max easting, max northing (m).
+bbox_utm_m = [511500, 1113000, 529250, 1129250]
+
+[catalog]
+collections = ["NISAR_L2_GCOV_PROVISIONAL_V1", "NISAR_L2_GCOV_V1"]
+mode = "DHDH"
+required_polarizations = ["HH", "HV"]
+# Ngày địa phương, bao gồm cả hai đầu; khoảng ảnh đã kiểm ở spec mục 3.2.
+# Khi tra ảnh mới (QUAN-8), mở rộng end_date_local; không tự chốt ở 27/10.
+start_date_local = 2026-08-11
+end_date_local = 2026-10-27
+keep_latest_crid_per_acquisition = true
+output_file = "../../runtime/tan_hoi/catalog.csv"
+
+[[catalog.passes]]
+track = "047"
+direction = "D"
+frame = "083"
+
+[[catalog.passes]]
+track = "148"
+direction = "D"
+frame = "083"
+
+[[catalog.passes]]
+track = "083"
+direction = "A"
+frame = "007"
+
+[boundary]
+file = "../../data/tan_hoi/aoi.geojson"
+epsg = 4326
+osm_relation_id = 15449921
+cell_inclusion = "center_in_boundary"
+
+[read]
+gcov_group = "/science/LSAR/GCOV/grids/frequencyA"
+layers = ["HHHH", "HVHV"]
+token_file_env = "EARTHDATA_TOKEN_FILE"
+cache_dir = "../../cache/tan_hoi"
+network_retries = 2
+
+[thresholds]
+# Ngưỡng ban đầu theo spec Q3; phép so sánh nghiêm ngặt < ở cả hai kênh.
+hh_db = -14.0
+hv_db = -20.0
+min_valid_pixel_fraction = 0.70
+filter_single_anomaly = true
+
+[references.water]
+# This window is outside the commune grid; S1 reads it separately (H4A).
+status = "selected_before_classification"
+confirmation_owner = "Tân"
+epsg = 32648
+bbox_utm_m = [526535, 1169325, 526865, 1169655]
+selection_basis = "Nearest all-class-80 WorldCover 2021 330m square to original H0 river reference, before NISAR classification; 2021 landcover is not current ground truth."
+min_pixels = 1000
+
+[references.stable]
+status = "selected_before_classification"
+confirmation_owner = "Tân"
+epsg = 32648
+bbox_utm_m = [520000, 1122500, 520250, 1122750]
+selection_basis = "Highest builtup_share in BANG-2 independent WorldCover 2021 table, 0.8532 builtup,0.1015tree,0water; chosen before NISAR classification."
+
+[dswx]
+tiles = ["T48PWS"]
+# Chỉ đọc dữ liệu kiểm chứng sau H3-KHOA-PHUONG-PHAP.
+
+[readiness]
+s0_inputs_complete = true
+later_stage_missing = []
+# No unresolved config values; local AOI/landcover/catalog/cache files are still required.
+
+[landcover]
+file = "../../runtime/tan_hoi/tan_hoi_landcover.csv"
