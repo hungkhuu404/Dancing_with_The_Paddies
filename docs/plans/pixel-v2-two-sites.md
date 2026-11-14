@@ -4,7 +4,7 @@ Task MIG-WEB-TWO-SITES-005; human owner Quoc, actor Codex. Consumers: published 
 
 ## Scope and conditions
 
-Migrate the current reviewed frontend while preserving backend source, configuration, schema and all 28 published input files. Real observations must match CONTRACT-001 2.0.0; incompatible/missing observations fail visibly. Bang Rakam illustration is the explicit allowed stub, never a replacement for missing real Tân Hội data. Its source registry is generated under web/public/data/, not committed to data/. Existing source checkout and old product checkout remain untouched.
+Migrate the current reviewed frontend while preserving backend source, configuration, schema and all 28 published input files. Real observations must match CONTRACT-001 2.0.0; incompatible/missing observations fail visibly. Bang Rakam illustration is the explicit allowed stub, never a replacement for missing real Tân Hội data. Its source registry is generated under web/public/data/, not committed to data/. Existing source checkout and old product checkout remain untouched. Legacy unused development fixture exports/fallback are omitted; the manual fixture CLI rejects published-site targets before creating any files.
 
 Merge requires source/provenance review, backend cross-file checks, frontend tests/build, browser interaction checks, committed-input and exact-output gates, clean scope/secret review and green PR CI. No hosting workflow or Nasa production deployment is included.
 
@@ -23,7 +23,7 @@ Merge requires source/provenance review, backend cross-file checks, frontend tes
 
 ## Verification
 
-- 141/141 Node tests pass; locked npm installation and production build pass. Existing large-chunk warning remains. Main scene bundle 742.21 KB / 301.69 KB gzip; map 1,094.22 KB / 299.50 KB gzip. Runtime bundle hashes match the reviewed source build.
+- 142/142 Node tests pass; locked npm installation and production build pass. Existing large-chunk warning remains. Main scene bundle 742.21 KB / 301.69 KB gzip; map 1,094.22 KB / 299.50 KB gzip. Runtime bundle hashes match the reviewed source build.
 - The backend pipeline/export/verify.py passes all eight real-data schemas and cross-file checks: 2,344 cells, 20 acquisitions, cell IDs, chronology/timezone, state/null correspondence, indicators, area totals, backdrop limits and every summary pass. Its unmeasured transport/overlay placeholders are not presented as completed validation.
 - All 28 committed real inputs are unchanged; public/data and dist/data exactly match them plus the independently regenerated, explicit Bang Rakam illustration. An extra task-owned output is rejected; removing it restores a passing gate.
 - Edge/CDP checks pass for both landscapes, Thai models/wet/night behaviour, labels, embedded map, 24 calendar rows and 20 method rows. All four entrypoints reject intercepted v1 metadata. Both standalone maps render cells and respond to status/arrival/duration and date/season controls. Captures of Tân Hội, calendar and map were opened and visually inspected.

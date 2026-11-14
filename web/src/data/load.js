@@ -14,17 +14,6 @@ export async function json(url) {
   return r.json();
 }
 
-/** layout.json, else the dev fixture. Validates the parts the scene relies on. */
-export async function loadLayout() {
-  let layout, source = 'layout.json';
-  try { layout = await json(BASE + 'scene/layout.json'); }
-  catch { layout = await json(BASE + 'scene/_fixture.json'); source = '_fixture.json'; }
-  if (!layout.passes?.length) throw new Error('layout has no passes');
-  normalizeLayout(layout);
-  layout.source = source;
-  return layout;
-}
-
 /** Defaults + cleaning for a layout.json (the window layout or one commune tile). n: number of passes. */
 export function normalizeLayout(layout, n = layout.passes?.length || 0) {
   layout.passes?.sort((a, b) => a.date.localeCompare(b.date));

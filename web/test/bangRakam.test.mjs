@@ -49,3 +49,13 @@ test('source building centroids replace duplicate illustrative houses, respect t
  const l={houses:[{x:1,z:1},{x:50,z:50}],trees:[]},tile={x:0,z:0},sources=[{x:2,z:2,rot:0,osm_id:'way/1'},{x:1000,z:0,rot:0,osm_id:'way/2'}],schools=[{ring:[[40,40],[60,40],[60,60],[40,60],[40,40]]}];
  const result=sourceHouseLayout(l,tile,sources,schools);assert.equal(result.houses.length,1);assert.equal(result.houses[0].osm_id,'way/1');assert.equal(l.houses.length,2);assert.deepEqual(sourceHouseLayout(result,tile,sources,schools),result);
 });
+
+// A manual development command must never replace the real published site.
+test('fixture CLI rejects published-site output before creating files',async()=>{
+ const {execFileSync}=await import('node:child_process');
+ const {fileURLToPath}=await import('node:url');
+ const out=mkdtempSync(join(tmpdir(),'published-no-fixture-'));
+ try{for(const args of [[],['--site','tan_hoi']]){assert.throws(()=>execFileSync(process.execPath,[fileURLToPath(new URL('../scripts/make-contract-fixture.mjs',import.meta.url)),out,...args],{stdio:'pipe'}),/Published sites do not allow synthetic water exports/);}
+ const {readdirSync}=await import('node:fs');assert.deepEqual(readdirSync(out),[]);
+ }finally{rmSync(out,{recursive:true,force:true});}
+});
