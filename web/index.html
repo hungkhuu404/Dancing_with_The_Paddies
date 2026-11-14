@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Flood Calendar in Tân Hội</title>
+    <meta name="description" content="Flood Calendar concept: NISAR radar shows when flood water came into each field block of Tân Hội, An Giang, how long it stayed, and whether it is still there." />
+  </head>
+  <body>
+    <div id="loading" role="status" aria-live="polite"><p class="kicker">Flood Calendar · Tân Hội</p><h1>Preparing the commune</h1><p id="loading-facts">Reading scene and observation metadata</p><p id="loading-stage">Loading the landscape</p></div>
+    <canvas id="gl" aria-label="3D view of the rice fields of Tân Hội during the 2026 flood season. Use the season strip to change the radar pass; click a field for its flood record."></canvas>
+    <div id="fallback" class="fallback" hidden></div>
+
+    <header id="title" class="title" aria-hidden="true">
+      <p class="kicker">After the harvest</p>
+      <h1>Tân Hội</h1>
+      <p class="lede">An Giang, Vietnam</p>
+    </header>
+
+    <div id="ui" class="ui">
+      <header class="app-bar">
+        <div class="brand"><h1 class="brand-title">Flood Calendar</h1><p class="brand-sub">Illustrated Tân Hội</p></div>
+        <nav id="scene-views" aria-label="Scene view" aria-describedby="view-control-note"><p id="view-control-note" class="control-note">Choose how to view the fields</p></nav>
+        <nav class="app-actions" aria-label="Tools">
+          <a class="map-action" href="/map/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6Zm6-3v15M15 6v15"/></svg>Map</a>
+          <button id="menu-btn" type="button" title="Tools" aria-label="Open tools" aria-expanded="false" aria-controls="tools-panel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+        </nav>
+      </header>
+      <section id="light-control" class="light-control" aria-label="Scene lighting"><div id="tod" class="tod"></div><p id="light-control-note" class="control-note">Adjust the scene lighting</p></section>
+      <button id="whole-btn" class="reset-view" type="button" aria-label="Show the whole commune"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5M8 12h8M12 8v8"/></svg><span>Reset view</span></button>
+      <section id="tools-panel" class="tools-panel" aria-labelledby="tools-title" hidden>
+        <div class="drawer-heading"><h2 id="tools-title">Tools</h2><button id="tools-close" class="icon-close" aria-label="Close tools" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+        <section class="tools-section presentation-section"><h3>Presentation</h3><div id="presentation-tools"></div></section>
+        <details class="tools-section"><summary>Scene settings</summary><button id="sound-btn" class="setting-toggle" type="button" aria-pressed="false">Ambient sound <span aria-hidden="true">Off</span></button></details>
+        <section class="tools-section tool-links"><button type="button" data-dialog="help-dialog">Navigation help</button><button type="button" data-dialog="sources-dialog">Sources &amp; methods</button></section>
+      </section>
+      <div id="timeline" class="timeline"></div>
+      <aside id="card" class="card"></aside>
+      <footer class="credit"><span id="data-src"></span><button type="button" data-dialog="sources-dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></svg>Sources</button></footer>
+    </div>
+    <dialog id="sources-dialog" class="info-dialog" aria-labelledby="sources-title"><div class="drawer-heading"><h2 id="sources-title">Sources &amp; methods</h2><button class="icon-close" data-close-dialog type="button" aria-label="Close sources"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="dialog-content">
+        <h3>Water observations</h3><p>Each field uses the 250 m block at its centre. Observation dates bound a transition; they do not give its exact time. Radar does not measure water depth.</p>
+        <h3>Scene and imagery</h3><p>On date changes, an illustrated sweep briefly emphasizes fields observed with water. This emphasis does not represent radar brightness.</p><p>
+        The radar view uses a fixed NISAR HH reference from 27 Oct 2026. Object responses are illustrative. Imagery is from EOxCloudless 2016 and contains modified Copernicus Sentinel data (CC BY 4.0). Map features are credited to © OpenStreetMap contributors (ODbL).
+        Scene ecology, architecture, traffic and irrigation are illustrative. They do not measure depth or gate operations. <a href="/impostors/manifest.json">Asset provenance</a> and <a href="/scene/infrastructure.json">OSM infrastructure</a> provide the source details.
+        Atlas geography: <a href="https://www.naturalearthdata.com/">Natural Earth</a> (public domain). Weather: <a href="https://open-meteo.com/">Open-Meteo</a> / ERA5 (CC BY 4.0); optical metadata: Sentinel-2 via Earth Search. Astronomy: SunCalc, Vladimir Agafonkin (BSD-2-Clause). Stars and radar ray paths are illustrative.</p><h3>Selected acquisition weather</h3><p id="weather-source-note"></p>
+    </div></dialog>
+    <dialog id="help-dialog" class="info-dialog" aria-labelledby="help-title"><div class="drawer-heading"><h2 id="help-title">Explore the fields</h2><button class="icon-close" data-close-dialog type="button" aria-label="Close help"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="dialog-content"><dl class="help-list"><div><dt>Select a field</dt><dd>Click or tap a field to read its water record.</dd></div><div><dt>Change the date</dt><dd>Select an image on the season strip. Use its arrow buttons or arrow keys to step through images.</dd></div><div><dt>Move around</dt><dd>Drag to pan. Right-drag to rotate. Scroll or pinch to zoom.</dd></div><div><dt>Keyboard</dt><dd>W/A/S/D to move, H to reset the view, 1/2/3 to switch views, Escape to close a panel.</dd></div></dl></div></dialog>
+    <div id="ride-pad" class="ride-pad" hidden>
+      <p class="ride-hint">Use W/S to paddle and A/D to turn. Drag to look around. Press <kbd>Esc</kbd> to leave.</p>
+      <div class="ride-keys">
+        <button type="button" data-k="a" aria-label="Turn left">◀</button>
+        <button type="button" data-k="w" aria-label="Paddle forward">▲</button>
+        <button type="button" data-k="s" aria-label="Paddle back">▼</button>
+        <button type="button" data-k="d" aria-label="Turn right">▶</button>
+        <button type="button" data-exit class="ride-exit">Leave the boat</button>
+      </div>
+    </div>
+    <div id="lens-label" class="lens-label" aria-hidden="true">NISAR HH, 27 Oct 2026</div>
+    <div id="lens-handle" class="lens-handle" aria-hidden="true"></div>
+    <script type="module" src="/src/entry.js"></script>
+  </body>
+</html>

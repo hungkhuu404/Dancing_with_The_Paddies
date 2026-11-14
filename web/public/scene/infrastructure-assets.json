@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "source": "web/src/world/infrastructureShapes.js",
+      "type": "original procedural Three.js geometry",
+      "author": "Flood Calendar project contributors",
+      "license": "Original project work; no third-party model or image incorporated",
+      "generation": "Deterministic indexed geometry with vertex colors; no generated AI imagery",
+      "coordinates": "metres, +Y up, +Z front, feet at y=0; bridge span along +X",
+      "measurement_status": "Architecture, dimensions, colors, traffic and irrigation are illustrative, not surveyed or inferred from radar"
+    },
+    {
+      "source": "web/public/scene/infrastructure.json",
+      "type": "OpenStreetMap-derived vector metadata",
+      "license": "ODbL-1.0",
+      "attribution": "OpenStreetMap contributors",
+      "url": "https://www.openstreetmap.org/copyright",
+      "provenance": "Endpoint, queries, source IDs, source tags and acquisition timestamps are in infrastructure.json"
+    },
+    {
+      "source": "web/src/world/infrastructure.js",
+      "type": "runtime text textures and illustrative flow shader",
+      "font": "Self-hosted IBM Plex Sans; existing OFL package attribution applies",
+      "generation": "Canvas text from source names and procedural shader code; no external image"
+    }
+  ]
+}

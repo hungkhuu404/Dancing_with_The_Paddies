@@ -1,0 +1,318 @@
+{
+  "generated_by": "scratchpad scripts/assets/build_*.py (Blender 5.3) + @gltf-transform/cli 4.5.1 optimize --compress meshopt --texture-compress webp",
+  "units": "metres, +Y up, origin at base centre (boat: waterline centre)",
+  "front_axis": "+Z (houses front/door, boat bow, egret bill)",
+  "decoder": "EXT_meshopt_compression -> GLTFLoader.setMeshoptDecoder(MeshoptDecoder)",
+  "total_bytes": 989196,
+  "models": [
+    {
+      "file": "palm_a.glb",
+      "kind": "palm",
+      "height_m": 12.64,
+      "footprint_m": [
+        9.6,
+        9.51
+      ],
+      "bbox_min_m": [
+        -6.15,
+        0.0,
+        -5.18
+      ],
+      "bbox_max_m": [
+        3.45,
+        12.64,
+        4.33
+      ],
+      "tris": 5458,
+      "bytes": 284336,
+      "clips": [],
+      "materials": [
+        "Palm_Frond",
+        "Palm_Misc",
+        "Palm_Trunk"
+      ],
+      "alpha_mask_materials": [
+        "Palm_Frond"
+      ],
+      "notes": "Coconut palm, gentle lean. Fronds: alpha-MASK cards (Palm_Frond), trunk tiled colour+normal map.",
+      "license": "Original procedural work generated in Blender 5.3 by script (textures painted procedurally, no third-party textures)."
+    },
+    {
+      "file": "palm_b.glb",
+      "kind": "palm",
+      "height_m": 10.0,
+      "footprint_m": [
+        9.12,
+        9.55
+      ],
+      "bbox_min_m": [
+        -1.89,
+        0.0,
+        -3.56
+      ],
+      "bbox_max_m": [
+        7.23,
+        10.0,
+        5.99
+      ],
+      "tris": 5574,
+      "bytes": 284792,
+      "clips": [],
+      "materials": [
+        "Palm_Frond",
+        "Palm_Misc",
+        "Palm_Trunk"
+      ],
+      "alpha_mask_materials": [
+        "Palm_Frond"
+      ],
+      "notes": "Coconut palm, strong canal-bank lean then curving up; 3 dry hanging fronds.",
+      "license": "Original procedural work generated in Blender 5.3 by script (textures painted procedurally, no third-party textures)."
+    },
+    {
+      "file": "banana.glb",
+      "kind": "banana",
+      "height_m": 4.0,
+      "footprint_m": [
+        4.31,
+        4.29
+      ],
+      "bbox_min_m": [
+        -2.51,
+        -0.0,
+        -2.55
+      ],
+      "bbox_max_m": [
+        1.8,
+        4.0,
+        1.73
+      ],
+      "tris": 2059,
+      "bytes": 50180,
+      "clips": [],
+      "materials": [
+        "Banana_Leaf",
+        "Banana_Stem"
+      ],
+      "alpha_mask_materials": [
+        "Banana_Leaf"
+      ],
+      "notes": "Banana clump (4 pseudostems), torn alpha-MASK leaves, dry hanging leaves, fruit bunch + bud.",
+      "license": "Original procedural work generated in Blender 5.3 by script (textures painted procedurally, no third-party textures)."
+    },
+    {
+      "file": "bush.glb",
+      "kind": "bush",
+      "height_m": 2.13,
+      "footprint_m": [
+        2.3,
+        2.25
+      ],
+      "bbox_min_m": [
+        -1.14,
+        -0.01,
+        -1.11
+      ],
+      "bbox_max_m": [
+        1.16,
+        2.13,
+        1.13
+      ],
+      "tris": 388,
+      "bytes": 31692,
+      "clips": [],
+      "materials": [
+        "Bush_Leaf",
+        "Bush_Core"
+      ],
+      "alpha_mask_materials": [
+        "Bush_Leaf"
+      ],
+      "notes": "Dense tropical shrub: alpha-MASK leaf cards with outward (spherical) normals around a dark core.",
+      "license": "Original procedural work generated in Blender 5.3 by script (textures painted procedurally, no third-party textures)."
+    },
+    {
+      "file": "house_0.glb",
+      "kind": "house",
+      "height_m": 4.9,
+      "footprint_m": [
+        9.29,
+        10.22
+      ],
+      "bbox_min_m": [
+        -4.4,
+        -0.0,
+        -4.11
+      ],
+      "bbox_max_m": [
+        4.89,
+        4.9,
+        6.1
+      ],
+      "tris": 1922,
+      "bytes": 86048,
+      "clips": [],
+      "materials": [
+        "house_0_atlas",
+        "Roof_Tin",
+        "Window_Glass"
+      ],
+      "alpha_mask_materials": [],
+      "notes": "Pastel plaster house, gable roof parallel to front, front veranda on 4 posts, 2 water jars. Front = +Z.",
+      "license": "Original procedural work generated in Blender 5.3 by script (textures painted procedurally, no third-party textures)."
+    },
+    {
+      "file": "house_1.glb",
+      "kind": "house",
+      "height_m": 4.4,
+      "footprint_m": [
+        9.09,
+        9.0
+      ],
+      "bbox_min_m": [
+        -3.79,
+        0.0,
+        -4.5
+      ],
+      "bbox_max_m": [
+        5.3,
+        4.4,
+        4.5
+      ],
+      "tris": 1814,
+      "bytes": 77512,
+      "clips": [],
+      "materials": [
+        "house_1_atlas",
+        "Roof_Tin",
+        "Window_Glass"
+      ],
+      "alpha_mask_materials": [],
+      "notes": "Weathered wooden plank house, gable to front, open kitchen lean-to on +X. Front = +Z.",
+      "license": "Original procedural work generated in Blender 5.3 by script (textures painted procedurally, no third-party textures)."
+    },
+    {
+      "file": "house_2.glb",
+      "kind": "house",
+      "height_m": 5.34,
+      "footprint_m": [
+        7.03,
+        13.14
+      ],
+      "bbox_min_m": [
+        -3.51,
+        -1.7,
+        -3.7
+      ],
+      "bbox_max_m": [
+        3.51,
+        5.34,
+        9.44
+      ],
+      "tris": 2024,
+      "bytes": 85028,
+      "clips": [],
+      "materials": [
+        "house_2_atlas",
+        "Roof_Tin",
+        "Window_Glass"
+      ],
+      "alpha_mask_materials": [],
+      "notes": "Stilt house (nha san), floor +1.35 m; porch + steps down to a wooden landing at y=-0.35 on piles to y=-1.7, landing extends to z=+9.4 (front = +Z). Put canal water at about y=-0.5..-0.8.",
+      "license": "Original procedural work generated in Blender 5.3 by script (textures painted procedurally, no third-party textures)."
+    },
+    {
+      "file": "boat.glb",
+      "kind": "boat",
+      "height_m": 1.3,
+      "footprint_m": [
+        1.42,
+        5.6
+      ],
+      "bbox_min_m": [
+        -0.91,
+        -0.07,
+        -2.8
+      ],
+      "bbox_max_m": [
+        0.5,
+        1.3,
+        2.8
+      ],
+      "tris": 2672,
+      "bytes": 50420,
+      "clips": [
+        "row"
+      ],
+      "materials": [
+        "Boat_Wood",
+        "Rower"
+      ],
+      "alpha_mask_materials": [],
+      "notes": "Xuong ba la ~5.6 m, bow = +Z, origin at waterline centre (hull bottom y=-0.05). Seated rower with non la + paddle; clip \"row\" (2 s loop) animates nodes rower_hips / rower_shoulders.",
+      "license": "Original procedural work generated in Blender 5.3 by script (textures painted procedurally, no third-party textures)."
+    },
+    {
+      "file": "egret.glb",
+      "kind": "egret",
+      "height_m": 0.9,
+      "footprint_m": [
+        1.5,
+        0.69
+      ],
+      "bbox_min_m": [
+        -0.75,
+        0.0,
+        -0.31
+      ],
+      "bbox_max_m": [
+        0.75,
+        0.9,
+        0.38
+      ],
+      "tris": 616,
+      "bytes": 31796,
+      "clips": [
+        "fly",
+        "idle"
+      ],
+      "materials": [
+        "Egret_Body",
+        "Egret_Wing"
+      ],
+      "alpha_mask_materials": [
+        "Egret_Wing"
+      ],
+      "notes": "White egret, skinned (11 bones). Rest/idle: standing, feet at origin, bill = +Z. \"fly\": 0.67 s flap loop, neck folded, legs trailing. \"idle\": 3 s, wings scaled to 0 (folded into body), neck/head motion.",
+      "license": "Original procedural work generated in Blender 5.3 by script (textures painted procedurally, no third-party textures)."
+    },
+    {
+      "file": "rice_tuft.glb",
+      "kind": "rice_tuft",
+      "height_m": 0.41,
+      "footprint_m": [
+        0.44,
+        0.41
+      ],
+      "bbox_min_m": [
+        -0.24,
+        -0.0,
+        -0.23
+      ],
+      "bbox_max_m": [
+        0.2,
+        0.41,
+        0.18
+      ],
+      "tris": 394,
+      "bytes": 7392,
+      "clips": [],
+      "materials": [
+        "Rice_Tuft"
+      ],
+      "alpha_mask_materials": [],
+      "notes": "Post-harvest stubble clump + green regrowth blades, vertex colours only, for instancing.",
+      "license": "Original procedural work generated in Blender 5.3 by script (textures painted procedurally, no third-party textures)."
+    }
+  ]
+}
