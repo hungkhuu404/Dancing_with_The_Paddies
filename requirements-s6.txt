@@ -1,0 +1,12 @@
+-r requirements.txt
+# S6 raster readers and optional report figures; pinned to the checked environment.
+affine==3.0.1
+click==8.5.1
+contourpy==1.4.0
+cycler==0.12.1
+fonttools==4.68.0
+kiwisolver==1.5.1
+matplotlib==3.11.2
+pyparsing==3.3.3
+python-dateutil==4.0.0
+rasterio==1.5.2

@@ -1,0 +1,87 @@
+[
+  {
+    "id": "spec_wwnww",
+    "input": "WWNWW",
+    "expected": "WWWWW"
+  },
+  {
+    "id": "spec_nnwnn",
+    "input": "NNWNN",
+    "expected": "NNNNN"
+  },
+  {
+    "id": "last_unchanged",
+    "input": "NNNNW",
+    "expected": "NNNNW"
+  },
+  {
+    "id": "simultaneous",
+    "input": "NNWNWW",
+    "expected": "NNNWWW"
+  },
+  {
+    "id": "skip_missing",
+    "input": "NW-NW",
+    "expected": "NN-WW"
+  },
+  {
+    "id": "empty",
+    "input": "",
+    "expected": ""
+  },
+  {
+    "id": "all_missing",
+    "input": "---",
+    "expected": "---"
+  },
+  {
+    "id": "one",
+    "input": "W",
+    "expected": "W"
+  },
+  {
+    "id": "two",
+    "input": "NW",
+    "expected": "NW"
+  },
+  {
+    "id": "first_unchanged",
+    "input": "WNNNN",
+    "expected": "WNNNN"
+  },
+  {
+    "id": "missing_edges",
+    "input": "-WWNWW-",
+    "expected": "-WWWWW-"
+  },
+  {
+    "id": "unchanged_missing",
+    "input": "N--NWW",
+    "expected": "N--NWW"
+  },
+  {
+    "id": "all_water",
+    "input": "WWWW",
+    "expected": "WWWW"
+  },
+  {
+    "id": "all_dry",
+    "input": "NNNN",
+    "expected": "NNNN"
+  },
+  {
+    "id": "single_pass_not_until_converged",
+    "input": "NWNWN",
+    "expected": "NNWNN"
+  },
+  {
+    "id": "one_valid_with_gaps",
+    "input": "--W--",
+    "expected": "--W--"
+  },
+  {
+    "id": "two_valid_with_gaps",
+    "input": "N---W",
+    "expected": "N---W"
+  }
+]
