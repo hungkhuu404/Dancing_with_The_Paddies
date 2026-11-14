@@ -1,0 +1,202 @@
+/* Floating controls. Paper tint provides a contrast floor over the live scene. */
+.map-workspace{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;border-radius:0;background:#EEF0EC;overflow:hidden}
+.map-workspace::backdrop{background:#1B211F}
+.map-workspace iframe{width:100%;height:100%;display:block;border:0}
+.map-workspace-loading{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:14px;background:#EEF0EC;color:#1B211F;font:14px 'IBM Plex Sans',sans-serif}
+.map-workspace-loading button{padding:12px 18px;border:1px solid #1b211f40;border-radius:24px;background:none;color:inherit;font:inherit;cursor:pointer}
+.map-is-open #ui,.map-is-open .view-key,.map-is-open .story-caption,.map-is-open .tour-stop{visibility:hidden}
+:root {
+  --glass-fill:rgba(238,240,236,.66);
+  --glass-panel:rgba(238,240,236,.84);
+  --glass-edge:rgba(255,255,255,.68);
+  --glass-blur:18px;
+  --panel-blur:22px;
+  --muted:#293A30;
+  --motion-ease:cubic-bezier(.2,.8,.2,1);
+  --glass-shadow:0 4px 20px #1020191a,inset 0 1px 0 #ffffffa8,inset 0 -1px 0 #ffffff30;
+}
+body[data-quality=low]{--glass-blur:10px;--panel-blur:12px}
+
+.brand,.signature-views,.app-actions,.timeline,.reset-view,.credit button {
+  background:var(--glass-fill);
+  border:1px solid var(--glass-edge);
+  box-shadow:var(--glass-shadow);
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(1.12);
+  backdrop-filter:blur(var(--glass-blur)) saturate(1.12);
+}
+.card,.tools-panel,.view-key,.info-dialog,.story-caption,.tour-stop {
+  background:var(--glass-panel);
+  border:1px solid var(--glass-edge);
+  border-radius:20px;
+  box-shadow:var(--glass-shadow);
+  -webkit-backdrop-filter:blur(var(--panel-blur)) saturate(1.1);
+  backdrop-filter:blur(var(--panel-blur)) saturate(1.1);
+}
+
+/* The header is a transparent carrier for three independent glass islands. */
+.app-bar {
+  top:max(16px,env(safe-area-inset-top));left:20px;right:20px;
+  padding:0;min-height:54px;gap:12px;
+  grid-template-columns:1fr auto 1fr;
+  background:none;border:0;border-radius:0;box-shadow:none;
+  pointer-events:none;
+}
+.app-bar>*{pointer-events:auto}
+.brand{justify-self:start;padding:8px 16px;border-radius:22px;min-width:176px}
+.brand-title{font-size:21px;line-height:1.1;letter-spacing:-.015em}
+.brand-sub{font-size:11px;margin-top:3px;line-height:1.3;color:var(--muted)}
+#scene-views{grid-area:auto;justify-self:center}
+.signature-views{position:relative;isolation:isolate;padding:3px;gap:2px;border-radius:27px}
+.signature-views button{position:relative;z-index:1;flex:none;min-height:44px;padding:0 14px;border-radius:23px;font-size:13px;background:none;white-space:nowrap}
+.signature-views button[aria-pressed=true]{background:none;color:var(--paper)}
+.signature-views button:hover:not([aria-pressed=true]){background:#ffffff3b}
+.view-selection{position:absolute;z-index:0;left:0;top:3px;bottom:3px;border-radius:23px;background:#1b211fee;pointer-events:none;transition:transform .26s var(--motion-ease),width .26s var(--motion-ease)}
+.app-actions{justify-self:end;gap:2px;padding:3px;border-radius:27px}
+.app-actions button{border-radius:23px}
+.map-action{font-size:13px;gap:8px;border:0;border-radius:23px;padding:0 12px}
+.map-action svg{width:18px;height:18px}
+.app-actions button:hover,.map-action:hover{background:#ffffff4d}
+#menu-btn[aria-expanded=true]{background:#1b211fee;color:var(--paper)}
+
+/* A compact acquisition dock sits at the edge, away from the centre of the map. */
+.timeline {
+  left:20px;right:auto;bottom:max(20px,env(safe-area-inset-bottom));transform:none;
+  width:min(560px,calc(100vw - 232px));padding:6px 8px 6px 14px;
+  grid-template-columns:116px minmax(100px,1fr) repeat(3,44px);
+  grid-template-rows:44px;gap:4px;border-radius:30px;
+}
+.tl-readout{grid-area:1/1;display:grid;align-content:center;align-items:center;gap:0;line-height:1.2}
+.tl-date{font-size:20px;letter-spacing:-.01em;line-height:1.2}
+.tl-counter{font-size:11px;margin-top:4px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tl-track,.tl-badge,.tl-badge:not(.is-real){display:none}
+.tl-strip{grid-area:1/2;height:44px;min-width:0;cursor:pointer;border-radius:14px}
+.tl-frames{align-items:center;gap:3px;height:44px}
+.tl-frame{height:26px;background:#ffffff26;border-radius:4px;transition:background .16s,transform .2s var(--motion-ease)}
+.tl-lab{display:none}
+.tl-bar{left:28%;right:28%;bottom:4px;height:calc(var(--f)*15px + 2px);background:var(--water-ui);opacity:1;transition:height .2s var(--motion-ease)}
+.tl-frame.is-on{background:#ffffff70}
+.tl-frame.is-preview{background:#ffffff80;transform:translateY(-2px)}
+.tl-head{top:6px;bottom:6px;border:1.5px solid var(--radar);border-radius:6px;transition:transform .24s var(--motion-ease)}
+.is-scrubbing .tl-head,.is-scrubbing .tl-bar{transition:none}
+.tl-prev{grid-area:1/3}.tl-play{grid-area:1/4}.tl-next{grid-area:1/5}
+.tl-prev,.tl-play,.tl-next{width:44px;height:44px;border:0;border-radius:50%;background:transparent}
+.tl-play{background:#1b211fee;color:var(--paper)}
+.tl-play:hover,.tl-play:active:not(:disabled){background:#293A30}
+.tl-prev:hover:not(:disabled),.tl-next:hover:not(:disabled){background:#ffffff59}
+.tl-prev:disabled,.tl-next:disabled{opacity:.35}
+.tl-preview{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translate(-50%,4px);white-space:nowrap;font-size:12px;padding:7px 11px;border:1px solid var(--glass-edge);border-radius:13px;background:var(--glass-panel);color:var(--ink);box-shadow:var(--glass-shadow);opacity:0;pointer-events:none;transition:opacity .15s,transform .18s var(--motion-ease)}
+.has-preview .tl-preview{opacity:1;transform:translate(-50%,0)}
+
+.reset-view{right:20px;bottom:max(20px,env(safe-area-inset-bottom));width:44px;min-height:44px;padding:0;justify-content:center;border-radius:50%}
+.reset-view span{display:none}
+.credit{left:auto;right:76px;bottom:max(20px,env(safe-area-inset-bottom));width:auto;gap:8px;font-size:12px;text-shadow:none;color:var(--ink);pointer-events:none}
+.credit button{pointer-events:auto;min-height:44px;padding:0 14px;display:flex;align-items:center;gap:7px;border-radius:23px;font-size:12px;color:var(--ink)}
+.credit button svg{width:16px;height:16px}
+.credit #data-src:not(:empty){max-width:220px;font-size:11px;padding:7px 10px;color:var(--radar);background:var(--silt);border-radius:12px}
+
+/* Contextual panels keep a stronger tint for sustained reading. */
+.tools-panel{top:82px;right:20px;left:auto;width:300px;max-height:calc(100dvh - 166px);padding:12px 18px}
+.drawer-heading h2{font-size:23px}
+.icon-close,.card-x{border-radius:50%}
+.card{top:82px;left:20px;right:auto;width:300px;max-height:calc(100dvh - 172px);padding:18px;transition:none}
+.card-title{font-size:27px}.card-kicker{font-size:11px}
+.block-facts>div{grid-template-columns:96px 1fr;padding:10px 0}
+.block-facts dd{font-size:13px;line-height:1.5}
+.card-link{border-radius:13px}
+.confirmation-note{background:#edb65a3d;border-radius:8px;border-left:0}
+.tools-section{margin-top:4px;padding:10px 0}
+.signature-tools button,.setting-toggle{border-color:#1b211f24;border-radius:13px}
+.info-dialog{padding:18px 22px}
+.info-dialog .drawer-heading{top:-18px;background:var(--glass-panel);border-radius:12px;padding:6px 0}
+.info-dialog::backdrop{background:#1b211f59;transition:background .18s}
+.view-key{top:82px;right:20px;width:266px;padding:12px 14px}
+.view-key>.world-view-caption,.view-key>#calendar-legend{background:none;border-radius:0}
+.view-key{opacity:1;transition:opacity .2s,display .2s allow-discrete}
+.view-key:has(.world-view-caption[hidden]):has(#calendar-legend[hidden]){opacity:0}
+@starting-style{.view-key{opacity:0}}
+.view-key #calendar-legend span{font-size:12px}.view-key #calendar-legend .legend-note{display:grid;gap:4px;font-size:11px}
+.story-caption{bottom:98px;width:min(620px,calc(100vw - 40px));font-size:14px;line-height:1.6}
+.story-caption strong,.story-caption span{display:block}.story-caption strong{font-weight:600;margin-bottom:4px}
+.tour-stop{top:82px;right:20px;min-height:44px;padding:9px 17px;border-radius:23px}
+.infrastructure-panel select{background:#eef0ec9c;border-radius:10px}
+
+/* Feedback stays within the control; nothing bounces or moves away from a tap. */
+button,a,summary,input[type=range] {transition:background .18s,color .18s,box-shadow .18s,transform .16s var(--motion-ease),border-color .18s}
+button:active:not(:disabled),a:active:not([aria-disabled=true]){transform:scale(.965)}
+.signature-views button:active:not(:disabled){background:#ffffff24}
+.card-link:hover{background:#293A30}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline-color:var(--radar);outline-offset:-4px}
+.card-link:focus-visible,.tl-play:focus-visible,.signature-views button[aria-pressed=true]:focus-visible{outline-color:var(--paper)}
+summary::after{transition:transform .2s var(--motion-ease)}
+.setting-toggle span{transition:color .18s}
+@supports(interpolate-size:allow-keywords){
+  details{interpolate-size:allow-keywords}
+  details::details-content{block-size:0;overflow:clip;opacity:0;transition:block-size .24s var(--motion-ease),opacity .18s,content-visibility .24s allow-discrete}
+  details[open]::details-content{block-size:auto;opacity:1}
+}
+
+@media(max-width:1000px){
+  .timeline{left:16px;width:min(520px,calc(100vw - 216px))}
+  .brand{min-width:162px;padding:8px 13px}.brand-title{font-size:20px}
+  .signature-views button{padding:0 12px}
+}
+@media(max-width:680px){
+  .app-bar{top:max(12px,env(safe-area-inset-top));left:12px;right:12px;grid-template-columns:1fr auto;grid-template-rows:52px 50px;gap:8px;min-height:0;padding:0}
+  .brand{display:block;min-width:0;padding:8px 13px}.brand-title{font-size:20px}.brand-sub{display:block;font-size:11px;margin-top:3px}
+  .app-actions{grid-area:1/2}.map-action{padding:0 10px}
+  #scene-views{grid-area:2/1/3/-1;justify-self:center;width:auto}
+  .signature-views button{flex:none;font-size:13px;padding:0 17px;min-height:44px}
+  .timeline{left:12px;right:12px;bottom:max(16px,env(safe-area-inset-bottom));width:auto;grid-template-columns:1fr repeat(3,44px);grid-template-rows:44px 24px;gap:2px 4px;padding:6px 10px 9px;border-radius:25px}
+  .tl-readout{grid-area:1/1}.tl-prev{grid-area:1/2}.tl-play{grid-area:1/3}.tl-next{grid-area:1/4}
+  .tl-strip{grid-area:2/1/3/-1;height:24px;border-radius:6px}
+  .tl-strip::before{content:'';position:absolute;inset:0 0 -8px;z-index:1}
+  .tl-frames{height:24px;gap:4px}.tl-frame{height:18px;border-radius:3px}
+  .tl-bar{bottom:3px;height:calc(var(--f)*10px + 2px)}
+  .tl-head{top:1px;bottom:1px;border-radius:4px}.tl-preview{bottom:calc(100% + 20px)}
+  .tl-date{font-size:20px}.tl-counter{font-size:11px;margin-top:2px}
+  .credit{display:none}.credit:has(#data-src:not(:empty)){display:flex;left:12px;right:12px;bottom:102px;justify-content:center}.credit:has(#data-src:not(:empty)) button{display:none}
+  .reset-view{right:12px;bottom:112px;width:44px;height:44px}
+  .tools-panel{top:132px;left:12px;right:12px;width:auto;max-height:calc(100dvh - 240px);padding:12px 18px}
+  .card{left:12px;right:12px;top:auto;bottom:112px;width:auto;max-height:calc(100dvh - 254px);padding:16px 18px}
+  .block-facts>div{grid-template-columns:100px 1fr;padding:9px 0}.card-title{font-size:27px}
+  .view-key{top:132px;left:12px;right:12px;width:auto}
+  .view-key>.world-view-caption,.view-key>#calendar-legend{position:static;width:auto;padding:0}
+  .story-caption{bottom:112px;width:calc(100vw - 24px);font-size:13px;padding:12px 15px}
+  .tour-stop{top:132px;right:12px}
+  body:has(#card:not([hidden])) .reset-view{display:none}
+}
+@media(max-height:500px) and (orientation:landscape){
+  .app-bar{top:8px;left:12px;right:12px;grid-template-columns:auto 1fr auto;grid-template-rows:50px;gap:8px;min-height:0;padding:0}
+  .brand{display:block;min-width:0;padding:7px 12px}.brand-title{font-size:18px}.brand-sub{display:block;font-size:10px}
+  #scene-views{grid-area:auto;width:auto;justify-self:center}.signature-views button{font-size:12px;padding:0 9px}
+  .app-actions{grid-area:auto}.map-action{font-size:12px;padding:0 8px}
+  .timeline{left:auto;right:12px;bottom:12px;width:calc(100vw - 288px);grid-template-columns:1fr repeat(3,44px);grid-template-rows:40px 16px;padding:5px 9px 8px;border-radius:24px;gap:2px 3px}
+  .tl-readout{grid-area:1/1}.tl-prev{grid-area:1/2}.tl-play{grid-area:1/3}.tl-next{grid-area:1/4}
+  .tl-date{font-size:18px}.tl-counter{font-size:10px}.tl-prev,.tl-play,.tl-next{width:44px;height:40px}
+  .tl-strip{grid-area:2/1/3/-1;height:16px}.tl-frames{height:16px}.tl-frame{height:16px}.tl-bar{bottom:3px;height:calc(var(--f)*8px + 2px)}.tl-head{top:-1px;bottom:-1px}.tl-lab{display:none}
+  .credit{display:none}.reset-view{bottom:96px;right:12px}
+  .card{left:12px;right:auto;top:70px;bottom:auto;width:252px;max-height:calc(100dvh - 82px)}
+  .tools-panel{top:70px;right:12px;left:auto;width:300px;max-height:calc(100dvh - 82px)}
+  .view-key{left:auto;top:70px;right:12px;width:252px}.tour-stop{top:70px}.story-caption{bottom:96px;width:calc(100vw - 32px)}
+}
+@media(max-width:620px) and (max-height:500px) and (orientation:landscape){
+  .brand{padding:7px 10px}.brand-title{font-size:17px}.brand-sub{font-size:9px}
+  .signature-views button{font-size:11px;padding:0 6px}.app-bar{gap:5px}.map-action{padding:0 7px;font-size:11px}
+  .card{width:228px;padding:15px}.block-facts>div{grid-template-columns:78px 1fr;gap:5px}.block-facts dd{font-size:12px}
+  .timeline{width:calc(100vw - 264px)}.tl-date{font-size:16px}
+}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  :root{--glass-fill:var(--paper);--glass-panel:var(--paper)}
+}
+@media(prefers-reduced-transparency:reduce),(prefers-contrast:more){
+  :root{--glass-fill:var(--paper);--glass-panel:var(--paper);--glass-edge:var(--radar)}
+  .brand,.signature-views,.app-actions,.timeline,.reset-view,.credit button,.card,.tools-panel,.view-key,.info-dialog,.story-caption,.tour-stop{-webkit-backdrop-filter:none;backdrop-filter:none}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important}
+  details::details-content{transition:none!important}
+}
+@media(forced-colors:active){
+  .brand,.signature-views,.app-actions,.timeline,.reset-view,.credit button,.card,.tools-panel,.view-key,.info-dialog,.story-caption,.tour-stop{background:Canvas;color:CanvasText;border:1px solid CanvasText;backdrop-filter:none;box-shadow:none}
+  .view-selection{background:Highlight}.signature-views button[aria-pressed=true]{color:HighlightText}
+}

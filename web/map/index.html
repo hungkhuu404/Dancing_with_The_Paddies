@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Flood Calendar | Map</title>
+    <meta name="description" content="Explore water arrival, flood duration and water recession across Tân Hội using NISAR observations." />
+  </head>
+  <body>
+    <header class="top">
+      <a class="brand" href="../" id="world-link"><span class="brand-name">Flood Calendar</span><span class="brand-site" id="site-name">Tân Hội</span></a>
+      <nav class="workspace-switch" aria-label="Workspace"><a href="../" id="back-world">Landscape</a><span aria-current="page">Map</span><a href="../calendar/" id="calendar-open" title="Water calendar">Calendar</a></nav>
+      <button class="text-button" id="about-open" type="button" aria-label="Method and limits" title="Method and limits"><span class="control-label">Method</span></button>
+    </header>
+
+    <main class="workspace" id="workspace">
+      <div id="map" class="map" role="region" aria-label="Water observations in Tân Hội. Select a block to inspect its record."></div>
+      <div class="map-loading" id="map-loading" role="status">Loading water observations</div>
+      <p id="errors" class="error-message" role="alert" hidden></p>
+
+      <section class="explorer surface" aria-labelledby="explorer-title">
+        <p class="eyebrow">Water observations</p>
+        <h1 id="explorer-title">Explore Tân Hội</h1>
+        <p class="intro">Select a 250 m block to read its water record.</p>
+        <div class="layer-tabs" id="questions" role="group" aria-label="Map layer">
+          <button type="button" data-mode="status" aria-pressed="true">Water status</button>
+          <button type="button" data-mode="onset" aria-pressed="false">Arrival</button>
+          <button type="button" data-mode="duration" aria-pressed="false">Duration</button>
+        </div>
+        <p class="layer-description" id="layer-description"></p>
+        <details class="map-key" id="map-key" open>
+          <summary>Legend <span id="scope-label">Season summary</span></summary>
+          <div id="legend" class="legend"></div>
+          <p class="key-note" id="key-note"></p>
+        </details>
+        <details class="map-options" id="map-options">
+          <summary>Overlays</summary>
+          <label><span>Radar image only</span><input type="checkbox" id="radar-only" /></label>
+          <label><span>Flooded over 30 days<small>Before the crop, if the IPCC factor applies</small></span><input type="checkbox" id="gt30" /></label>
+          <p class="key-note" id="gt30-note" hidden>Solid outline: confirmed. Dashed outline: possible. Season estimates.</p>
+        </details>
+      </section>
+
+      <div class="map-navigation surface" role="group" aria-label="Map navigation">
+        <button type="button" id="zoom-in" aria-label="Zoom in">+</button><button type="button" id="zoom-out" aria-label="Zoom out">−</button>
+        <button type="button" id="whole" aria-label="Show the whole commune"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button>
+      </div>
+
+      <aside id="panel" class="panel surface" aria-labelledby="block-title" hidden>
+        <button type="button" class="icon-button panel-close" id="panel-close" aria-label="Close block details"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+        <div id="panel-body"></div>
+      </aside>
+
+      <section class="date-dock surface" aria-label="Observation dates">
+        <div class="date-heading"><div><p class="eyebrow" id="date-context">Season summary</p><p id="tl-label" class="date-label" aria-live="polite"></p></div>
+          <button type="button" id="season" class="season-button" aria-pressed="true">Season</button>
+        </div>
+        <div class="date-controls">
+          <button type="button" class="icon-button" id="play" aria-label="Play observations" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="play-shape" d="m9 5 11 7-11 7Z"/><path class="pause-shape" d="M8 5v14M16 5v14"/></svg></button>
+          <button type="button" class="icon-button" id="prev" aria-label="Previous image"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button>
+          <div class="date-range"><label class="sr-only" for="date-slider">Observation date</label><input type="range" id="date-slider" min="0" max="19" value="19" step="1"/><div class="date-endpoints"><span id="date-start"></span><span id="date-end"></span></div></div>
+          <button type="button" class="icon-button" id="next" aria-label="Next image"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button>
+        </div>
+        <p id="date-note" class="date-note"></p>
+      </section>
+      <p class="selection-hint" id="selection-hint" role="status" hidden></p>
+    </main>
+
+    <dialog id="about-dialog" class="about-dialog" aria-labelledby="about-title">
+      <div class="dialog-heading"><h2 id="about-title">Reading the water record</h2><button type="button" class="icon-button" id="about-close" aria-label="Close data information"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+      <p>Each block covers 250 m by 250 m. Radar observations show open water, not water depth.</p>
+      <h3>Two ways to read the map</h3><p><strong>Season</strong> shows the record across all available observations. Choosing a date shows the latest valid water state on or before that date. A missing image does not mean the field was dry.</p>
+      <h3>Date ranges, not exact days</h3><p>Water can arrive or recede between satellite visits. The record keeps both date bounds. Radar can date the start early on dry, flat fields. Pale status colours indicate a single, unconfirmed observation.</p>
+      <h3>Validation</h3><p id="validation-status">Reference-agreement scores are not displayed in this interface. Read Method and limits for the interpretation.</p>
+      <h3>Sources</h3><p id="credit"></p><p>Base map: © OpenStreetMap contributors, served by OpenFreeMap. The map works without the external base layer.</p>
+    </dialog>
+    <script type="module" src="/src/map/main.js"></script>
+  </body>
+</html>

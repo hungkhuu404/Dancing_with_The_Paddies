@@ -1,0 +1,146 @@
+[
+  {
+    "file": "bamboo.glb",
+    "kind": "bamboo_clump",
+    "height_m": 11.25,
+    "footprint_m": [
+      12.4,
+      11.46
+    ],
+    "min_y_m": -0.02,
+    "tris": 5680,
+    "bytes": 307980,
+    "clips": [],
+    "alpha_mask_materials": [
+      "Bamboo_Leaf"
+    ],
+    "notes": "Bui tre: ~32 arching culms (5-sided, culm colour+normal map) with hanging alpha-MASK spray cards and a dense twiggy base. Foliage custom normals blended outward.",
+    "license": "Original work: procedural Blender 5.3 Python script (scratchpad world/scripts/veg), procedurally painted textures; no third-party models or textures."
+  },
+  {
+    "file": "tram.glb",
+    "kind": "melaleuca",
+    "height_m": 11.65,
+    "footprint_m": [
+      5.09,
+      4.8
+    ],
+    "min_y_m": -0.03,
+    "tris": 3320,
+    "bytes": 335432,
+    "clips": [],
+    "alpha_mask_materials": [
+      "Tram_Leaf"
+    ],
+    "notes": "Cay tram: slender pale papery trunk (colour+normal), narrow open crown of grey-green alpha-MASK twig cards; faint flood mark at ~0.85 m.",
+    "license": "Original work: procedural Blender 5.3 Python script (scratchpad world/scripts/veg), procedurally painted textures; no third-party models or textures."
+  },
+  {
+    "file": "areca.glb",
+    "kind": "areca_palm",
+    "height_m": 14.28,
+    "footprint_m": [
+      4.56,
+      4.85
+    ],
+    "min_y_m": -0.0,
+    "tris": 2748,
+    "bytes": 179492,
+    "clips": [],
+    "alpha_mask_materials": [
+      "Areca_Frond"
+    ],
+    "notes": "Cay cau: straight ringed trunk, green crownshaft, 11 pinnate fronds + 1 dry, two nut bunches.",
+    "license": "Original work: procedural Blender 5.3 Python script (scratchpad world/scripts/veg), procedurally painted textures; no third-party models or textures."
+  },
+  {
+    "file": "mango.glb",
+    "kind": "mango",
+    "height_m": 7.99,
+    "footprint_m": [
+      7.65,
+      7.67
+    ],
+    "min_y_m": -0.06,
+    "tris": 2492,
+    "bytes": 215376,
+    "clips": [],
+    "alpha_mask_materials": [
+      "Mango_Leaf"
+    ],
+    "notes": "Mango: short thick trunk, 4 limbs, dense dark lobed crown of alpha-MASK leaf-cluster cards around a dark inner core mesh.",
+    "license": "Original work: procedural Blender 5.3 Python script (scratchpad world/scripts/veg), procedurally painted textures; no third-party models or textures."
+  },
+  {
+    "file": "nipa.glb",
+    "kind": "nipa_palm",
+    "height_m": 4.61,
+    "footprint_m": [
+      6.34,
+      6.41
+    ],
+    "min_y_m": -0.5,
+    "tris": 2704,
+    "bytes": 166364,
+    "clips": [],
+    "alpha_mask_materials": [
+      "Nipa_Frond"
+    ],
+    "notes": "Dua nuoc clump: 4 plants of stiff pinnate fronds rising from below water. Origin = water level; frond bases extend to y=-0.35 (sink into the water plane).",
+    "license": "Original work: procedural Blender 5.3 Python script (scratchpad world/scripts/veg), procedurally painted textures; no third-party models or textures."
+  },
+  {
+    "file": "hyacinth.glb",
+    "kind": "water_hyacinth",
+    "height_m": 0.65,
+    "footprint_m": [
+      3.22,
+      2.21
+    ],
+    "min_y_m": -0.0,
+    "tris": 1844,
+    "bytes": 70720,
+    "clips": [],
+    "alpha_mask_materials": [
+      "Hyacinth_Leaf"
+    ],
+    "notes": "Luc binh floating mat ~3x2 m: rosettes of glossy round leaf cards with bulbous petioles, 5 lilac flower spikes. Origin at water surface (y=0).",
+    "license": "Original work: procedural Blender 5.3 Python script (scratchpad world/scripts/veg), procedurally painted textures; no third-party models or textures."
+  },
+  {
+    "file": "straw_pile.glb",
+    "kind": "straw_stack",
+    "height_m": 3.3,
+    "footprint_m": [
+      5.05,
+      4.84
+    ],
+    "min_y_m": -0.01,
+    "tris": 602,
+    "bytes": 324244,
+    "clips": [],
+    "alpha_mask_materials": [
+      "Straw_Wisp"
+    ],
+    "notes": "Dong rom: lumpy dome ~3.8 m wide with pole, tiled straw colour+normal, hanging alpha-MASK wisps and loose straw on the ground; greyer weathered top.",
+    "license": "Original work: procedural Blender 5.3 Python script (scratchpad world/scripts/veg), procedurally painted textures; no third-party models or textures."
+  },
+  {
+    "file": "reeds.glb",
+    "kind": "reeds",
+    "height_m": 1.33,
+    "footprint_m": [
+      1.01,
+      1.25
+    ],
+    "min_y_m": -0.0,
+    "tris": 642,
+    "bytes": 36572,
+    "clips": [],
+    "alpha_mask_materials": [
+      "Reed_Plume"
+    ],
+    "notes": "Canal-edge reed clump: vertex-coloured double-sided blades (some dry tips) + 6 stems with alpha-MASK plume cards.",
+    "license": "Original work: procedural Blender 5.3 Python script (scratchpad world/scripts/veg), procedurally painted textures; no third-party models or textures."
+  }
+]

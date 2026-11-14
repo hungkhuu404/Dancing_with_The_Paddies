@@ -1,0 +1,20 @@
+{
+  "source": "Natural Earth 1:50m land and river centre lines",
+  "license": "Public domain",
+  "terms": "https://www.naturalearthdata.com/about/terms-of-use/",
+  "revision": "ca96624a56bd078437bca8184e78163e5039ad19",
+  "urls": [
+    "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/ca96624a56bd078437bca8184e78163e5039ad19/geojson/ne_50m_land.geojson",
+    "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/ca96624a56bd078437bca8184e78163e5039ad19/geojson/ne_50m_rivers_lake_centerlines.geojson"
+  ],
+  "processing": "Clipped to 95-112 E, 5-24 N; rounded to 4 decimal places. Uniform extrusion is graphical, not terrain or water elevation.",
+  "planned_locations": {
+    "bang_rakam": {
+      "center": [
+        100.12,
+        16.75
+      ],
+      "source": "Research_log.md DEC-PLAN-015 proposed study centre; approximate, no boundary or observations supplied."
+    }
+  }
+}

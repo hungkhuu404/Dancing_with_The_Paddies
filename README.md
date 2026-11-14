@@ -4,7 +4,9 @@
 
 Team **Dancing with The Paddies** · NASA Space Apps Challenge 2026 · Challenge: *Dancing with the SARs*
 
-**Live site:** https://flood-calendar.pages.dev
+**Migration status:** The local web includes the Tân Hội landscape, map, location entrance, water calendar and Method and limits. It reads the existing public v1 data and H5 reference-comparison output; the interface does not report agreement scores. The S0/S7 tools, site configuration, schema and S1–S5 pixel pipeline are present. Exporting and integrating the pixel data, S6 code, Bang Rakam observations and H7 remain separate work. See [web instructions](web/README.md) and [scientific views](docs/plans/calendar-method.md).
+
+**Existing live site:** https://flood-calendar.pages.dev — this migration has not been deployed or verified against that site.
 
 ## What it does
 
@@ -18,16 +20,18 @@ Flood Calendar uses NISAR L-band radar to answer three questions for every 250 m
 
 Each NISAR track revisits every 12 days, so every date is a range between two images, never a single day.
 
-The site also has:
+The local web includes:
 
 - A map that can be replayed image by image, and a chart for any single cell.
-- A sound made from the data itself: a "listen" button for the whole commune or for one cell.
 - A layer for fields flooded more than 30 days before the season, relevant *if the IPCC emission factor is applied* (IPCC 2019, Table 5.13).
-- A second test site, Bang Rakam (Thailand). <!-- TODO: cập nhật theo mức Bang Rakam cuối cùng tại mốc khóa số liệu -->
+
+Data sonification and the second site, Bang Rakam (Thailand), are planned work and are not available in this checkout. Ambient 3D audio is illustrative, not the planned data sonification.
 
 What it does **not** do: it does not measure methane, and it cannot tell whether a field was sown right after the water left.
 
 ## How it works
+
+The table describes the pipeline code in this branch. The web reads the existing v1 public export rather than running the pipeline. S6 remains separate work; the pixel pipeline and v2 export have not yet replaced the public data.
 
 | Stage | What it does | Folder |
 | --- | --- | --- |
@@ -40,7 +44,7 @@ What it does **not** do: it does not measure methane, and it cannot tell whether
 | S6 Compare | Compare with OPERA DSWx-S1 | `pipeline/validate/` |
 | S7 Export | Write static files for the web | `pipeline/export/` |
 
-The default HH/HV thresholds are −14/−20 dB, with track-specific fallback where reference checks require it. For a valid cell, each pixel must be below both acquisition thresholds; the cell is water when at least 75% of jointly valid pixels meet them. A 50% lower threshold controls whether a dry singleton between water observations is filled. The pixel method was selected after examining OPERA DSWx-S1 agreement, so those numbers are post-hoc agreement, not independent validation or field accuracy.
+The existing v1 export records Q0 defaults of HH < −14 dB and HV < −20 dB, with per-acquisition Q1 overrides. Its H5 validation file is present, but the local web does not report agreement scores. The new pixel pipeline marks a cell as water when at least 75% of jointly valid pixels meet both acquisition thresholds. A 50% threshold controls whether a dry singleton between water observations is filled. The pixel method was selected after examining OPERA DSWx-S1 agreement; that agreement is post-hoc, not independent validation or field accuracy.
 
 The file format between the pipeline and the web is defined in [docs/data-contract.md](docs/data-contract.md).
 
@@ -48,15 +52,15 @@ The file format between the pipeline and the web is defined in [docs/data-contra
 
 | Path | Contents |
 | --- | --- |
-| `pipeline/core/` | S1–S5 |
-| `pipeline/catalog/`, `pipeline/export/` | S0, S7 |
-| `pipeline/validate/` | S6 |
-| `config/sites/` | One TOML file per site: area, EPSG, tracks and frames, reference areas, thresholds |
-| `schema/` | JSON Schema for every exported file |
-| `tests/` | Pipeline tests |
+| `pipeline/core/` | S1–S5 pixel pipeline |
+| `pipeline/catalog/`, `pipeline/export/` | S0 catalog and S7 export |
+| `pipeline/validate/` | Placeholder for S6; not migrated |
+| `config/sites/` | Site configuration |
+| `schema/` | JSON Schema for exported files |
+| `tests/` | Pipeline tests. Web tests are in `web/test/` |
 | `data/` | Exported data read by the web (`data/sites.json`, `data/{site}/`) |
-| `web/` | Static website (Vite, MapLibre GL JS, Three.js); `web/tools/` holds the generators for the 3D assets |
-| `web/src/sound/` | Sound generated from the data |
+| `web/` | Local static website (Vite, MapLibre GL JS, Three.js); asset generators are not migrated |
+| `web/src/sound/` | Not present; data sonification is not migrated |
 | `docs/` | Data contract and method notes |
 
 ## Quick start
@@ -67,15 +71,15 @@ Requires Node.js 24.
 
 ```bash
 cd web
-npm ci
-npm run dev      # local server; copies data/ into web/public/data/
+npm ci --ignore-scripts
+npm run dev -- --host 127.0.0.1  # syncs only allowlisted public files
 npm test
 npm run build    # static site in web/dist/
 ```
 
 ### Pipeline
 
-Requires Python 3.11+ and a NASA Earthdata token.
+The pipeline requires Python 3.11+. A NASA Earthdata token is required for network reads, but not for offline tests or the local web.
 
 ```bash
 python -m venv .venv
@@ -99,7 +103,7 @@ Never commit the token, the image cache or files with signed links.
 | Data | Provider | Use | Terms |
 | --- | --- | --- | --- |
 | NISAR L2 GCOV | NASA / ISRO, via ASF DAAC | Water detection (S1–S5) | NASA open data |
-| OPERA DSWx-S1 | NASA JPL (OPERA project) | Threshold tuning and comparison (S6) | NASA open data |
+| OPERA DSWx-S1 | NASA JPL (OPERA project) | H5 comparison and post-hoc pixel-method selection; S6 code remains separate | NASA open data |
 | ESA WorldCover 2021 | European Space Agency | Cropland mask | CC BY 4.0. © ESA WorldCover project 2021 / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium |
 | OpenStreetMap | OpenStreetMap contributors | Commune boundary, hamlet names, roads, bridges and places in the 3D scene | ODbL, © OpenStreetMap contributors |
 
@@ -110,6 +114,8 @@ Never commit the token, the image cache or files with signed links.
 <!-- TODO: thay bằng bản cuối "Validation and limits" khi khóa số liệu -->
 
 - The 75% pixel method and 50% temporal guard were selected after examining DSWx-S1; agreement is not an independent test and DSWx-S1 is not ground truth.
+- The local web does not report agreement scores. Its existing v1 data has not yet been replaced with the pixel output.
+- Bang Rakam, H7/final data and S6 pipeline code are not migrated.
 - One track revisits every 12 days, so water arrival and water leaving are date ranges.
 - Track 148 D does not cover about 13.5% of the commune's cells; the map uses each cell's latest valid image.
 - Water arrival may be dated early on dry, flat fields.

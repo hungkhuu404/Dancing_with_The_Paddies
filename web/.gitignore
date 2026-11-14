@@ -1,0 +1,5 @@
+node_modules/
+dist/
+.wrangler/
+# generated from reviewed public-data allowlist only; no fixture fallback
+public/data/
