@@ -31,13 +31,6 @@ export function sideLookingPosition(x,z,dir,height=1800,side=1,incidence=40,out=
   const offset=height*Math.tan(incidence*Math.PI/180)*side;
   out.x=x-dir[1]*offset;out.y=height;out.z=z+dir[0]*offset;return out;
 }
-export const TOUR_TEXT=[
-  ['The flood is let in','After harvest, planned flooding can bring sediment and help prepare the next rice season.'],
-  ['But the clouds stay','Clouds obscure optical views. Historical weather here is modelled reanalysis, not a photograph.'],
-  ['Radar sees water as dark','Smooth open water reflects radar away. Buildings can double-bounce; vegetation scatters.'],
-  ["One block’s season",'Each 250 m block gives a date interval, a duration range, and the latest observed state.'],
-  ['The whole commune, then other plains','The calendar uses observed acquisition dates. Open the map to inspect the evidence and its gaps.'],
-];
 export function tourPose(seconds,anchor,out={}) {
   const t=Math.max(0,Math.min(60,seconds)), i=Math.min(4,Math.floor(t/12)), u=ease((t-i*12-6)/6);
   const r=[1400,850,600,38,16000], p=[.65,.9,.9,1.1,.28], a=[-.5,.3,1,1.5,1.8];

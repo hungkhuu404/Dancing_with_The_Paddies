@@ -126,18 +126,28 @@
 
 /* Scientific reference views stay in the exploration tab. */
 :root .calendar-launch{position:fixed;top:78px;left:16px;z-index:25;display:flex;align-items:center;gap:7px;min-height:34px;padding:6px 12px;border-radius:18px;background:var(--ui-glass);border:1px solid var(--ui-line);color:var(--ui-ink);font:12px var(--sans);text-decoration:none;-webkit-backdrop-filter:var(--ui-filter);backdrop-filter:var(--ui-filter)}
-:root .card{top:122px;max-height:calc(100dvh - 198px)}
+:root .method-launch{position:fixed;top:120px;left:16px;z-index:25;display:flex;align-items:center;gap:7px;min-height:34px;padding:6px 12px;border-radius:18px;background:var(--ui-glass);border:1px solid var(--ui-line);color:var(--ui-ink);font:12px var(--sans);text-decoration:none;-webkit-backdrop-filter:var(--ui-filter);backdrop-filter:var(--ui-filter)}
+:root .card{top:164px;max-height:calc(100dvh - 240px)}
 :root .reference-workspace{padding:0;width:calc(100vw - 32px);max-width:1400px;height:calc(100dvh - 32px);max-height:none;border:1px solid #eef0ec44;border-radius:18px;overflow:hidden;background:#EEF0EC;box-shadow:0 20px 90px #09150f66}
 :root .reference-workspace::backdrop{background:#0c191f55;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 :root .reference-workspace iframe{display:block;width:100%;height:100%;border:0}
 :root .reference-close{position:absolute;top:8px;right:8px;z-index:5;width:36px;height:36px;min-height:36px;border:1px solid #1b211f33;border-radius:50%;background:#EEF0EC;color:#1B211F;font:24px/1 var(--sans)}
 :root .tools-panel a{color:var(--ui-ink);font:12px var(--sans);padding:8px 0}
-@media(max-width:700px){:root .calendar-launch{top:122px;left:10px;font-size:11px}:root .card{top:auto;max-height:calc(100dvh - 340px)}:root .reference-workspace{width:calc(100vw - 12px);height:calc(100dvh - 12px);border-radius:12px}:root #calendar-open{padding:6px;font-size:10px}}
-@media(max-height:500px) and (orientation:landscape){:root .calendar-launch{top:68px;left:10px}:root .card{top:112px;max-height:calc(100dvh - 122px)}}
+@media(max-width:700px){:root .calendar-launch{top:122px;left:10px;font-size:11px}:root .method-launch{top:164px;left:10px;font-size:11px}:root .card{top:auto;max-height:calc(100dvh - 382px)}:root .reference-workspace{width:calc(100vw - 12px);height:calc(100dvh - 12px);border-radius:12px}:root #calendar-open{padding:6px;font-size:10px}}
+@media(max-height:500px) and (orientation:landscape){:root .calendar-launch{top:68px;left:10px}:root .method-launch{top:110px;left:10px}:root .card{top:154px;max-height:calc(100dvh - 164px)}}
 
-:root .story-caption:has(.tour-calendar){width:min(900px,calc(100vw - 32px));max-width:none;bottom:94px}:root .tour-calendar{display:block;width:100%;height:280px;border:0;border-radius:10px;margin-top:10px;background:#EEF0EC}:root .story-caption>a{display:inline-block;padding:8px 0;color:var(--ui-ink);font:12px var(--sans)}
-@media(max-width:700px){:root .story-caption:has(.tour-calendar){width:calc(100vw - 20px);bottom:160px}:root .tour-calendar{height:230px}}
 
-:root .story-caption:has(.tour-calendar){left:max(16px,calc((100vw - 900px)/2));transform:none;pointer-events:auto}:root .tour-calendar{height:clamp(120px,32vh,280px)}
-@media(max-width:700px){:root .story-caption:has(.tour-calendar){left:10px}:root .tour-calendar{height:230px}}
-@media(max-height:500px) and (orientation:landscape){:root .story-caption:has(.tour-calendar){left:12px;right:12px;width:calc(100vw - 24px);bottom:12px;padding:10px 12px}:root .tour-calendar{height:110px}:root .story-caption:has(.tour-calendar)>span{font-size:11px}}
+/* Subtitles remain a single readable line, without obscuring the landscape. */
+:root .story-caption{left:16px;right:16px;bottom:104px;transform:none;width:auto;max-width:none;padding:0;border:0;border-radius:0;background:none;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;color:#EEF0EC;text-align:center;white-space:nowrap;font:500 clamp(11px,1.1vw,15px)/1.5 var(--sans);text-shadow:0 1px 3px #000,0 0 9px #000,0 2px 16px #000;pointer-events:none}
+:root .tour-evidence{position:fixed;z-index:27;left:max(16px,calc((100vw - 900px)/2));bottom:150px;width:min(900px,calc(100vw - 32px));pointer-events:auto}
+:root .tour-calendar{display:block;width:100%;height:clamp(120px,32vh,280px);border:1px solid var(--ui-line);border-radius:10px;background:#EEF0EC}
+:root .tour-evidence>a{display:inline-block;padding:8px 10px;margin-top:6px;border:1px solid var(--ui-line);border-radius:18px;background:var(--ui-glass);color:var(--ui-ink);font:12px var(--sans);-webkit-backdrop-filter:var(--ui-filter);backdrop-filter:var(--ui-filter)}
+:root .tour-voice{position:fixed;z-index:36;right:16px;top:168px;display:flex;align-items:center;gap:6px;min-height:34px;padding:7px 11px;border:1px solid var(--ui-line);border-radius:18px;background:var(--ui-glass);color:var(--ui-ink);font:12px var(--sans);-webkit-backdrop-filter:var(--ui-filter);backdrop-filter:var(--ui-filter)}
+body.record-clean .tour-evidence,body.record-clean .tour-voice{visibility:hidden}
+:root .is-touring .tour-stop{top:68px;right:16px;min-height:34px;padding:7px 11px;font-size:12px}
+:root .is-touring .tour-voice{top:68px;right:116px}
+:root .is-touring .view-key{top:114px}
+:root .tour-has-calendar .view-key{display:none}
+@media(max-width:700px){:root .story-caption{left:8px;right:8px;bottom:164px;font-size:clamp(10px,2.7vw,12px)}:root .tour-evidence{left:10px;width:calc(100vw - 20px);bottom:204px}:root .tour-calendar{height:clamp(120px,27vh,230px)}:root .tour-voice{top:196px;right:10px;font-size:11px}}
+@media(max-height:500px) and (orientation:landscape){:root .story-caption{bottom:80px;font-size:11px}:root .tour-evidence{left:180px;bottom:114px;width:calc(100vw - 360px)}:root .tour-calendar{height:110px}:root .tour-voice{top:110px;right:10px}}
+@media(max-width:700px){:root .is-touring .tour-stop{top:122px;right:10px}:root .is-touring .tour-voice{top:164px;right:10px}:root .is-touring .view-key{top:210px}}

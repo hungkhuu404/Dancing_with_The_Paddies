@@ -18,7 +18,8 @@ export function createRecorder(source,{subtitle=()=>'',credit=()=> 'Flood Calend
     } catch(e){state.error=e.message;finish();}
   }
   // Called synchronously after the WebGL render: preserveDrawingBuffer is not needed.
-  function capture(){if(!state.active)return;ctx.fillStyle='#1B211F';ctx.fillRect(0,0,copy.width,copy.height);ctx.drawImage(source,fit.x,fit.y,fit.w,fit.h);ctx.font='20px "IBM Plex Sans"';ctx.fillStyle='#EEF0EC';ctx.fillText(credit(),24,copy.height-20);const text=subtitle();if(text){ctx.fillStyle='rgba(27,33,31,.85)';ctx.fillRect(0,copy.height-108,copy.width,62);ctx.fillStyle='#EEF0EC';ctx.font='18px "IBM Plex Sans"';const words=text.split(' ');let line='',y=copy.height-82;for(const word of words){if(ctx.measureText(line+word).width>copy.width-48){ctx.fillText(line,24,y);line='';y+=24;}line+=word+' ';}ctx.fillText(line,24,y);}}
+  function capture(){if(!state.active)return;ctx.fillStyle='#1B211F';ctx.fillRect(0,0,copy.width,copy.height);ctx.drawImage(source,fit.x,fit.y,fit.w,fit.h);ctx.font='20px "IBM Plex Sans"';ctx.fillStyle='#EEF0EC';ctx.fillText(credit(),24,copy.height-20);const text=subtitle();if(text){ctx.save();ctx.fillStyle='#EEF0EC';ctx.font='500 18px "IBM Plex Sans"';ctx.textAlign='center';ctx.shadowColor='#000';ctx.shadowBlur=6;ctx.shadowOffsetY=1;ctx.fillText(text,copy.width/2,copy.height-64,copy.width-48);ctx.restore();}}
+
   function stop(){if(recorder?.state==='recording')recorder.stop();}
   function download(){if(!state.url)return;const a=document.createElement('a');a.href=state.url;a.download='flood-calendar.'+(state.mime.includes('mp4')?'mp4':'webm');document.body.append(a);a.click();a.remove();}
   return {state,start,stop,capture,download,get elapsed(){return state.active?(performance.now()-started)/1000:0;}};
