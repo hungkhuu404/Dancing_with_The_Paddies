@@ -4,7 +4,7 @@
 
 Team **Dancing with The Paddies** · NASA Space Apps Challenge 2026 · Challenge: *Dancing with the SARs*
 
-**Migration status:** The local web includes the Tân Hội landscape, map, location entrance, water calendar and Method and limits. It reads the existing public v1 data and H5 reference-comparison output; the interface does not report agreement scores. The S0/S7 tools, site configuration, schema and S1–S5 pixel pipeline are present. Exporting and integrating the pixel data, S6 code, Bang Rakam observations and H7 remain separate work. See [web instructions](web/README.md) and [scientific views](docs/plans/calendar-method.md).
+**Data status:** The web reads the Tân Hội pixel-method export under contract 2.0.0. The repository includes S1–S5, S7 and a post-hoc S6 comparison; S6 source code, Bang Rakam observations and H7 remain separate work. The interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md) and [data provenance](docs/provenance/tan-hoi-v2.md).
 
 **Existing live site:** https://flood-calendar.pages.dev — this migration has not been deployed or verified against that site.
 
@@ -31,7 +31,7 @@ What it does **not** do: it does not measure methane, and it cannot tell whether
 
 ## How it works
 
-The table describes the pipeline code in this branch. The web reads the existing v1 public export rather than running the pipeline. S6 remains separate work; the pixel pipeline and v2 export have not yet replaced the public data.
+The web reads the published pixel export rather than running the pipeline. S6 comparison code remains separate work.
 
 | Stage | What it does | Folder |
 | --- | --- | --- |
@@ -44,7 +44,7 @@ The table describes the pipeline code in this branch. The web reads the existing
 | S6 Compare | Compare with OPERA DSWx-S1 | `pipeline/validate/` |
 | S7 Export | Write static files for the web | `pipeline/export/` |
 
-The existing v1 export records Q0 defaults of HH < −14 dB and HV < −20 dB, with per-acquisition Q1 overrides. Its H5 validation file is present, but the local web does not report agreement scores. The new pixel pipeline marks a cell as water when at least 75% of jointly valid pixels meet both acquisition thresholds. A 50% threshold controls whether a dry singleton between water observations is filled. The pixel method was selected after examining OPERA DSWx-S1 agreement; that agreement is post-hoc, not independent validation or field accuracy.
+The v2 export records Q0 defaults of HH < −14 dB and HV < −20 dB, with per-acquisition Q1 overrides. It marks a cell as water when at least 75% of jointly valid pixels meet both acquisition thresholds. A 50% threshold controls whether a dry singleton between water observations is filled. The pixel method was selected after examining OPERA DSWx-S1 agreement; that agreement is post-hoc, not independent validation or field accuracy. The comparison file also retains its clearly marked historical H3 baseline; the web reads the v2 pixel states.
 
 The file format between the pipeline and the web is defined in [docs/data-contract.md](docs/data-contract.md).
 
@@ -114,7 +114,7 @@ Never commit the token, the image cache or files with signed links.
 <!-- TODO: thay bằng bản cuối "Validation and limits" khi khóa số liệu -->
 
 - The 75% pixel method and 50% temporal guard were selected after examining DSWx-S1; agreement is not an independent test and DSWx-S1 is not ground truth.
-- The local web does not report agreement scores. Its existing v1 data has not yet been replaced with the pixel output.
+- The local web does not report agreement scores; the supplied comparison is post-hoc.
 - Bang Rakam, H7/final data and S6 pipeline code are not migrated.
 - One track revisits every 12 days, so water arrival and water leaving are date ranges.
 - Track 148 D does not cover about 13.5% of the commune's cells; the map uses each cell's latest valid image.

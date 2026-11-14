@@ -69,6 +69,7 @@ export function renderChart(rec, acq, pass, p) {
   const rows = acq.map((a, i) => `<tr><td>${fmtDate(a.date_local)}</td><td>${a.track}</td><td>${rec.hh[i] === null ? '—' : (rec.hh[i] / 10).toFixed(1)}</td><td>${rec.hv[i] === null ? '—' : (rec.hv[i] / 10).toFixed(1)}</td><td>${{ W: 'water', N: 'no water', '-': 'no image' }[rec.s[i]]}</td></tr>`).join('');
   return `<svg class="chart" viewBox="0 0 ${W} ${yb + 4}" role="img" aria-label="HH and HV backscatter of this block for each pass; filled marks are water.">${svg}</svg>
     <p class="keys">${key}<span class="key"><span class="dash"></span>threshold</span>${filtered}</p>
+    <p>Points show average block backscatter for context. Water states use the fraction of pixels meeting both thresholds, not these averages.</p>
     <button type="button" class="ghost show-table">Show as table</button>
     <table hidden><thead><tr><th>Date</th><th>Track</th><th>HH dB</th><th>HV dB</th><th>State</th></tr></thead><tbody>${rows}</tbody></table>`;
 }

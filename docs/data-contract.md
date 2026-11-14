@@ -1,6 +1,6 @@
-# Hợp đồng dữ liệu (CONTRACT-001, bản 2.0.0 đề xuất)
+# Hợp đồng dữ liệu (CONTRACT-001, bản 2.0.0)
 
-Hợp đồng giữa nhóm dữ liệu và nhóm giao diện. Bản 2.0.0 đề xuất thay nghĩa phân loại và lọc ở mục 4, đồng thời bổ sung metadata phương pháp; cần nhóm S6, S7 và web kiểm tương thích trước khi merge. Không thay thế hoặc sửa snapshot H3 đã công bố.
+Hợp đồng giữa nhóm dữ liệu và nhóm giao diện. Bản 2.0.0 thay nghĩa phân loại và lọc ở mục 4, đồng thời bổ sung metadata phương pháp. Bộ dữ liệu web hiện hành dùng phương pháp pixel; snapshot H3 cũ được giữ trong lịch sử Git để đối chiếu, không gọi bản pixel là H3.
 
 ## Tóm tắt
 
@@ -309,7 +309,7 @@ Giới hạn cứng của host: Cloudflare Pages cho mỗi file tối đa 25 MiB
 
 ## 8. Phiên bản, thiếu dữ liệu
 
-- **Phiên bản:** `contract_version` đề xuất là `2.0.0` do thay nghĩa `s_raw`, `s` và các chỉ số từ phương pháp trung bình ô sang pixel. Cần phối hợp nhóm dữ liệu và web trước khi merge, đồng thời cập nhật S6 cho cùng phương pháp. Sửa file này và `schema/` trong cùng một pull request.
+- **Phiên bản:** `contract_version` là `2.0.0` do thay nghĩa `s_raw`, `s` và các chỉ số từ phương pháp trung bình ô sang pixel. Bộ S6 đi kèm là so sánh hậu kiểm; nguồn và hai mốc khóa được mô tả tại [tan-hoi-v2.md](provenance/tan-hoi-v2.md). Sửa file này và `schema/` cùng nhau khi thay đổi hợp đồng.
 - **Lần chụp đọc lỗi:** không đưa vào `acquisitions`; ghi vào `skipped` trong `meta.json` kèm lý do.
 - **Ô không có dữ liệu ở một lần chụp:** ký tự `-` trong `s`, `null` trong `hh` và `hv`.
 - **Không có bộ mẫu giả trong `data/`.** Số trên video, slide và trang Project chỉ lấy từ bản dữ liệu cuối đã khóa.
