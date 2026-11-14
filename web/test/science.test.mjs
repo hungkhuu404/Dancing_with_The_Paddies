@@ -34,6 +34,11 @@ test('pixel method explains 75% classification and asymmetric 50% filter',()=>{
  assert.match(text,/75%/);assert.match(text,/50%/);assert.match(text,/70%/);assert.match(text,/N-W-N/);assert.match(text,/post-hoc/i);
  assert.throws(()=>methodDescription({classification:'unknown'}),/Unsupported/);
 });
+test('method explanation identifies the GCOV mask when it was applied',()=>{
+ const method={classification:'pixel_fraction_75_dual_50',water_fraction:.75,fill_min_fraction:.5,joint_valid_fraction:.7,selection_status:'post_hoc',single_flip_filter:true,valid_mask:'gcov_fully_focused_1_254'};
+ assert.match(methodDescription(method),/mask.*0.*255/i);
+ assert.throws(()=>methodDescription({...method,valid_mask:'unknown'}),/Unsupported/);
+});
 test('map query preserves hamlet names and selects the actual image scope',()=>{
  const q=new URLSearchParams(calendarMapQuery('tan_hoi',4,'Tân Hội & <x>'));assert.equal(q.get('hamlet'),'Tân Hội & <x>');assert.equal(q.get('scope'),'image');assert.equal(q.get('pass'),'4');
 });

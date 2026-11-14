@@ -15,7 +15,7 @@
 | --- | --- |
 | `pipeline/{catalog,core,export,validate}/` | S0, S1–S5 pixel processing, offline Tân Hội S6 comparison and S7 export |
 | `config/sites/`, `schema/`, `tests/` | Site configuration and JSON Schema are present; frontend tests are in web/test/ |
-| `data/` | Tân Hội v2 pixel export with 20 acquisitions and post-hoc S6 comparison; no Bang Rakam or H7 export |
+| `data/` | Tân Hội v2 pixel export with 22 acquisitions and post-hoc S6 comparison; no Bang Rakam or H7 export |
 | `docs/data-contract.md` | Contract 2.0.0 for the pixel export |
 | `docs/plans/`, `docs/provenance/` | Bổ sung trong đợt 1 |
 | `web/` | Vite, Three.js và MapLibre; 3D và map tích hợp cùng tab, có route `/map/` độc lập; test trong `web/test/` |

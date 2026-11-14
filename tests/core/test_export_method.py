@@ -31,6 +31,15 @@ def test_export_refuses_old_or_inconsistent_method():
             'single_anomaly_filter': {'enabled': True}, 'frozen_utc': None})
 
 
+def test_export_preserves_gcov_mask_provenance():
+    cfg = {'thresholds': {'hh_db': -14., 'hv_db': -20., 'min_valid_pixel_fraction': .7}}
+    frozen = {'classification': {'name': 'pixel_fraction_75_dual_50', 'water_fraction': .75,
+                                  'fill_min_fraction': .5, 'joint_valid_fraction': .7,
+                                  'valid_mask': 'gcov_fully_focused_1_254'},
+              'selection': {'status': 'post_hoc'}, 'single_anomaly_filter': {'enabled': True}, 'frozen_utc': None}
+    assert method_metadata(cfg, frozen)['valid_mask'] == 'gcov_fully_focused_1_254'
+
+
 def test_export_rejects_stale_flag_instead_of_overwriting_it():
     properties = {'cropland': True, 'status': 'flooded', 'flood_days_min': 40,
                   'flood_days_max': 45, 'ongoing': True, 'flag_gt30': 'yes'}

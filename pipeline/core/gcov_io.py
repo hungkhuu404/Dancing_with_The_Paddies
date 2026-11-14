@@ -61,12 +61,18 @@ def _window(group, xs, ys, bbox, layers):
     if not len(cols) or not len(rows):
         raise ValueError("ReferenceOutsideGrid")
     index = (slice(rows[0], rows[-1] + 1), slice(cols[0], cols[-1] + 1))
-    return {"hh": group[layers[0]][index], "hv": group[layers[1]][index], "xs": xs[cols], "ys": ys[rows]}
+    mask = group["mask"][index]
+    valid = (mask > 0) & (mask < 255)
+    hh, hv = group[layers[0]][index], group[layers[1]][index]
+    if mask.shape != hh.shape or mask.shape != hv.shape:
+        raise ValueError("GCOVMaskShapeMismatch")
+    return {"hh": np.where(valid, hh, np.nan), "hv": np.where(valid, hv, np.nan),
+            "mask": mask, "xs": xs[cols], "ys": ys[rows]}
 
 
 def cache_identity(row, cfg):
     identity = {"grid": cfg["grid"], "references": {label: {k: ref[k] for k in ("epsg", "bbox_utm_m")} for label, ref in cfg["references"].items()},
-        "group": cfg["read"].get("gcov_group"), "layers": cfg["read"].get("layers"), "granule": row["granule"], "version": 2}
+        "group": cfg["read"].get("gcov_group"), "layers": cfg["read"].get("layers"), "granule": row["granule"], "version": 3}
     return hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()[:16]
 
 
@@ -100,6 +106,8 @@ def read_acquisition(row, cfg, base, force=False, open_source=None):
         layers = cfg["read"]["layers"]
         if any(layer not in group for layer in layers):
             raise KeyError("MissingPolarization")
+        if "mask" not in group:
+            raise KeyError("MissingGCOVMask")
         epsg = int(np.asarray(group["projection"].attrs["epsg_code"]).ravel()[0])
         if epsg != cfg["grid"]["epsg"]:
             raise ValueError("UnexpectedRasterCRS")

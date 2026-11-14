@@ -39,11 +39,15 @@ def method_metadata(config, freeze):
     frozen = freeze.get("frozen_utc")
     if frozen is not None:
         frozen = utc(frozen).isoformat().replace("+00:00", "Z")
-    return {"rule":"Q0", "hh_db_max":config["thresholds"]["hh_db"],
+    result = {"rule":"Q0", "hh_db_max":config["thresholds"]["hh_db"],
             "hv_db_max":config["thresholds"]["hv_db"], "single_flip_filter":True,
             "frozen_utc":frozen, "classification":classification["name"],
             "water_fraction":classification["water_fraction"], "fill_min_fraction":classification["fill_min_fraction"],
             "joint_valid_fraction":classification["joint_valid_fraction"], "selection_status":"post_hoc"}
+    if "valid_mask" in classification:
+        require(classification["valid_mask"] == "gcov_fully_focused_1_254", "Unsupported GCOV mask policy")
+        result["valid_mask"] = classification["valid_mask"]
+    return result
 
 def validated_gt30(properties):
     flag = gt30(properties)

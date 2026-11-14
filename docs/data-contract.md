@@ -54,7 +54,7 @@ Hợp đồng giữa nhóm dữ liệu và nhóm giao diện. Bản 2.0.0 thay n
   - P1: trung vị mực nước tham chiếu thấp hơn ngưỡng ít nhất 2 dB ở cả HH và HV. Track không đạt chuyển sang Q1.
   - P2: độ lệch chuẩn theo thời gian của vùng ổn định không quá 0,5 dB.
   - P3: trên vùng ổn định, ảnh bản P05036 lệch không quá 3 lần độ lệch chuẩn so với trung bình các ảnh P05023 cùng track. Không đạt thì ảnh P05036 dùng ngưỡng Q1 tính riêng.
-- **Quy tắc pixel:** HH và HV phải hợp lệ cùng vị trí, hữu hạn, dương. So từng pixel với ngưỡng HH/HV của ảnh, trên công suất tuyến tính. Ô 250 m cần đủ lưới 25×25 vị trí và tối thiểu 438/625 pixel hợp lệ. Tính tỷ lệ pixel cùng dưới hai ngưỡng trên tổng pixel hợp lệ; tỷ lệ ≥75% là `W`, còn lại là `N`. Không đủ điều kiện là `-`. HH/HV trung bình ô vẫn xuất để tham khảo, không dùng trực tiếp để suy ra `W`.
+- **Quy tắc pixel:** HH và HV phải hợp lệ cùng vị trí, hữu hạn, dương; GCOV `mask` phải từ 1 đến 254 (0 không fully focused, 255 ngoài ảnh). So từng pixel với ngưỡng HH/HV của ảnh, trên công suất tuyến tính. Ô 250 m cần đủ lưới 25×25 vị trí và tối thiểu 438/625 pixel hợp lệ. Tính tỷ lệ pixel cùng dưới hai ngưỡng trên tổng pixel hợp lệ; tỷ lệ ≥75% là `W`, còn lại là `N`. Không đủ điều kiện là `-`. HH/HV trung bình ô vẫn xuất để tham khảo, không dùng trực tiếp để suy ra `W`. Bản Tân Hội v2 20 ảnh trước đây chưa áp GCOV mask; đây là sửa lỗi định nghĩa hợp lệ và cần được review cùng dữ liệu xuất lại.
 - **Lọc hai mức:** xếp các lần chụp hợp lệ theo thời gian, gộp mọi track và lọc singleton trên chuỗi thô 75%. Với `W-N-W`, chỉ đổi `N` thành `W` nếu lần giữa có tỷ lệ pixel nước ≥50%; nếu dưới 50% giữ `N`. Với `N-W-N`, vẫn đổi `W` thành `N`. Lần đầu, cuối và thiếu giữ nguyên.
   - **Luôn so trên chuỗi thô, xét mọi vị trí cùng lúc.** Không sửa tại chỗ rồi dùng giá trị vừa sửa để xét vị trí kế tiếp. Với các `N` có tỷ lệ ≥50%, ví dụ `NNWNWW` thành `NNNWWW`.
 - File xuất có cả chuỗi thô 75% (`s_raw`) và chuỗi đã lọc hai mức (`s`). Chỉ số tính trên chuỗi đã lọc. Phương pháp chọn sau khi đã xem DSWx, vì vậy là **post-hoc**, không phải kiểm chứng độc lập. DSWx không phải ground truth; ảnh thưa không chứng minh ngập liên tục.
@@ -146,7 +146,7 @@ Mọi file nằm trong `data/{site}/`, trừ `data/sites.json`. Dữ liệu cho 
   "method": {"rule": "Q0", "hh_db_max": -14.0, "hv_db_max": -20.0, "single_flip_filter": true,
              "frozen_utc": null, "classification": "pixel_fraction_75_dual_50",
              "water_fraction": 0.75, "fill_min_fraction": 0.5, "joint_valid_fraction": 0.7,
-             "selection_status": "post_hoc"},
+              "selection_status": "post_hoc", "valid_mask": "gcov_fully_focused_1_254"},
   "acquisitions": [
     {"i": 0, "acq_utc": "2026-08-11T11:31:41Z", "date_local": "2026-08-11", "track": "148D",
      "frame": "083", "crid": "P05023", "valid_share": 0.86,
@@ -165,6 +165,7 @@ Mọi file nằm trong `data/{site}/`, trừ `data/sites.json`. Dữ liệu cho 
 - **`acquisitions` xếp theo `acq_utc` tăng dần.** `i` là vị trí trong danh sách này; mọi chuỗi trong `series.json` và `summary.json` dùng cùng thứ tự. Web lấy số lần chụp và danh sách track từ đây, không viết cứng số lần chụp hay số track.
 - **`valid_share`:** tỉ lệ ô của xã hợp lệ ở lần chụp đó.
 - **`rule`, `hh_db_max`, `hv_db_max` của từng lần chụp:** ngưỡng thật đã dùng cho lần đó. Khối `method` chỉ ghi mặc định. Cần vậy vì Q1 đặt ngưỡng riêng cho một track, và ảnh bản P05036 có thể có ngưỡng riêng (phép kiểm P3). Web vẽ đường ngưỡng theo từng lần chụp.
+- **`method.valid_mask`:** `gcov_fully_focused_1_254` khi bộ xuất đã áp mask GCOV. Metadata v2 cũ không có trường này không chứng minh mask đã được áp.
 - **`backdrop` của từng lần chụp:** đường dẫn ảnh nền, tính từ `data/{site}/`. Web không tự ghép tên file.
 - **`backdrop.corners`:** bốn góc của ảnh nền theo kinh độ, vĩ độ, thứ tự trên trái, trên phải, dưới phải, dưới trái. Đây là thứ tự MapLibre cần để đặt ảnh lên bản đồ. Mọi ảnh nền của một site dùng chung một khung. Khung UTM lệch so với hướng bắc khoảng 10 m trên 17,5 km, nên đặt ảnh theo bốn góc là đủ.
 - **`skipped`:** danh sách lần chụp có trong `catalog.csv` nhưng không đưa vào `acquisitions`. Không có lần nào bị loại thì ghi `[]`. Mỗi phần tử gồm:

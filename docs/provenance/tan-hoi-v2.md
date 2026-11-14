@@ -1,6 +1,6 @@
-# Tân Hội v2 pixel export provenance
+# Tân Hội v2 pixel export provenance — historical 20-image snapshot
 
-The active web bundle is CONTRACT-001 2.0.0. Its 20 NISAR acquisitions and 2,344 cells use the 75% pixel rule and asymmetric 50% temporal guard. Selection used DSWx-S1 after the original H3 freeze; the comparison is post-hoc, not independent validation or ground truth.
+This records the earlier 20-image CONTRACT-001 2.0.0 snapshot, before the GCOV mask fix and QUAN-8 acquisitions. For the updated snapshot see [tan-hoi-quan8-mask.md](tan-hoi-quan8-mask.md). Its 20 NISAR acquisitions and 2,344 cells use the 75% pixel rule and asymmetric 50% temporal guard. Selection used DSWx-S1 after the original H3 freeze; the comparison is post-hoc, not independent validation or ground truth.
 
 S1–S5 input snapshot: cube SHA-256 `0a7949591fd17dd8ee83665d4e14247a2c225c1bff136a0c999ebcd58e5f217f`; metrics SHA-256 `2be917c3e99f1c5fd2ba369eb41be30f6df378e330860b35d50fae609b0f9ba2`. The BANG-2 landcover table used in S7 has SHA-256 `47106610fda1f5b677e53eeb2788baf41bd4cce6efc1500aff508d422902e36f`. S7 regenerated cells, series, summary and metadata with the existing OSM boundary and all 24 real published hamlet points. Sites, AOI, places and 20 radar backdrops are byte-identical to the previous public bundle. No fixture points are used.
 

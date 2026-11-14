@@ -74,7 +74,7 @@ def validate_inputs(cube, dsw):
     require(np.array_equal(cube["s"] > 0, cube["s_raw"] > 0), "Filtered/raw validity differs")
     td = len(dsw["TD_utc"])
     require(td > 0 and len(dsw["TD"]) == td, "DSWx time length mismatch")
-    for key in ("valid", "water", "water13"):
+    for key in ("valid", "water", *(["water13"] if "water13" in dsw else [])):
         require(dsw[key].shape == (td, n), "DSWx flag shape mismatch")
         require(dsw[key].dtype == np.dtype(bool), "DSWx flags must be boolean")
 
@@ -94,7 +94,7 @@ def run(args):
     validate_inputs(cube, dsw)
     order = {c: i for i, c in enumerate(dsw["cell_id"].tolist())}
     perm = np.array([order[c] for c in ids])  # cube cell order -> dswx column
-    D = {k: dsw[k][:, perm] for k in ("valid", "water", "water13")}
+    D = {k: dsw[k][:, perm] for k in ("valid", "water", *(["water13"] if "water13" in dsw else []))}
     lc = read_csv(args.landcover)
     require(set(lc) == set(ids), "Landcover cell_id set differs from cube")
     crop = np.array([float(lc[c]["cropland_share"]) >= 0.5 for c in ids])
@@ -114,7 +114,7 @@ def run(args):
     # DSWx states: 0 missing, 1 N, 2 W (main: unfiltered, code 1)
     def dstates(water):
         return np.where(D["valid"], np.where(water, 2, 1), 0).astype(np.uint8)
-    dS = dstates(D["water"]); dS13 = dstates(D["water13"])
+    dS = dstates(D["water"])
     dSf = science.filter_singletons(dS)
     dtracks = ["dswx"] * len(dutc)
 
@@ -199,8 +199,6 @@ def run(args):
     filt, pf = block("s", None, dS)
     unf, pu = block("s_raw", None, dS)
     filt["pairs_detail_key"] = unf["pairs_detail_key"] = "pairs"
-    v13f, _ = block("s", None, dS13)
-    v13u, _ = block("s_raw", None, dS13)
     side_f, _ = block("s", None, dSf)
     side = lambda b: {k: b[k] for k in ("n_pairs", "kappa_median", "kappa_min", "kappa_max", "onset", "gt30")}
     out = dict(
@@ -210,10 +208,14 @@ def run(args):
         pairing="each NISAR acquisition to nearest DSWx pass by UTC time, within 3 days (inclusive)",
         dswx_rules="cell valid if >=70% px code<250; water if >=50% of valid px code 1; DSWx series not filtered",
         filtered=filt, unfiltered=unf, pairs=pf, pairs_unfiltered=pu,
-        dswx_class_1_3={"filtered": {k: v13f[k] for k in ("n_pairs", "kappa_median", "kappa_min", "kappa_max")},
-                        "unfiltered": {k: v13u[k] for k in ("n_pairs", "kappa_median", "kappa_min", "kappa_max")}},
         side_note_dswx_single_flip_filtered=side(side_f),
         posthoc=[])
+    if "water13" in D:
+        dS13 = dstates(D["water13"])
+        v13f, _ = block("s", None, dS13)
+        v13u, _ = block("s_raw", None, dS13)
+        out["dswx_class_1_3"] = {"filtered": {k: v13f[k] for k in ("n_pairs", "kappa_median", "kappa_min", "kappa_max")},
+                                   "unfiltered": {k: v13u[k] for k in ("n_pairs", "kappa_median", "kappa_min", "kappa_max")}}
     for b in (filt, unf):
         b.pop("pairs_detail_key")
     (OUT / "fig").mkdir(parents=True, exist_ok=True)
@@ -224,7 +226,11 @@ def run(args):
         print(nm, {k: b[k] for k in ("n_pairs", "kappa_median", "kappa_min", "kappa_max", "onset", "cropland_share_of_flagged",
               "water_share_on_builtup")})
         print("  gt30", b["gt30"]); print("  by_track", b["by_track"]); print("  by_n", b["by_n_tracks"])
-    print("1_3", out["dswx_class_1_3"]); print("side", out["side_note_dswx_single_flip_filtered"])
+    if "dswx_class_1_3" in out:
+        print("1_3", out["dswx_class_1_3"])
+    else:
+        print("1_3 unavailable: no exact water13 input")
+    print("side", out["side_note_dswx_single_flip_filtered"])
 
     path = OUT / "validation.json"
     if args.posthoc_entry:

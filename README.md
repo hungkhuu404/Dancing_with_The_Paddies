@@ -4,7 +4,7 @@
 
 Team **Dancing with The Paddies** · NASA Space Apps Challenge 2026 · Challenge: *Dancing with the SARs*
 
-**Data status:** The web reads the Tân Hội pixel-method export under contract 2.0.0. The repository includes S1–S5, an offline S6 comparison runner and S7. Bang Rakam observations and H7 remain separate work. The interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md), [S6 instructions](docs/s6-comparison.md) and [data provenance](docs/provenance/tan-hoi-v2.md).
+**Data status:** The web reads the Tân Hội pixel-method export under contract 2.0.0. The repository includes S1–S5, an offline S6 comparison runner and S7. Bang Rakam observations and H7 remain separate work. The interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md), [S6 instructions](docs/s6-comparison.md) and [data provenance](docs/provenance/tan-hoi-quan8-mask.md).
 
 **Existing live site:** https://flood-calendar.pages.dev — this migration has not been deployed or verified against that site.
 
