@@ -56,4 +56,5 @@ for (let i = 0; i < args.length; i += 2) {
   }
   console.log(`Verified ${relative(WEB, output)}: exactly ${names.length} public files, byte-for-byte equal to checked inputs.`);
 }
-console.warn('validation.json is absent: validation results remain unavailable; no substitute is generated.');
+if(names.includes('tan_hoi/validation.json')) console.log('Public H5 file included; agreement scores are not displayed in the UI.');
+else console.warn('validation.json is not in the public allowlist; no substitute is generated.');

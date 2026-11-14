@@ -13,9 +13,9 @@
 
 | Đường dẫn | Hiện trạng |
 | --- | --- |
-| `pipeline/{catalog,core,export,validate}/` | Khung có `.gitkeep`, chưa chuyển implementation |
-| `config/sites/`, `schema/`, `tests/` | Khung có `.gitkeep`; chưa chuyển cấu hình site, schema hoặc test pipeline |
-| `data/` | Bộ xuất công khai H4 của Tân Hội, 20 lần chụp; chưa có validation, Bang Rakam hoặc H7 |
+| `pipeline/{catalog,core,export,validate}/` | S0 catalogue and S7 export are implemented; core/validate remain separate work |
+| `config/sites/`, `schema/`, `tests/` | Site configuration and JSON Schema are present; frontend tests are in web/test/ |
+| `data/` | Public Tân Hội v1/H4 with 20 acquisitions and the H5 reference comparison; no Bang Rakam or H7 export |
 | `docs/data-contract.md` | Hợp đồng đã có từ baseline, giữ nguyên |
 | `docs/plans/`, `docs/provenance/` | Bổ sung trong đợt 1 |
 | `web/` | Vite, Three.js và MapLibre; 3D và map tích hợp cùng tab, có route `/map/` độc lập; test trong `web/test/` |

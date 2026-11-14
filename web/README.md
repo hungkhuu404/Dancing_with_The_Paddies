@@ -19,7 +19,7 @@ Thiết kế và bản đồ module hiện hành: [MAP-UX-001](../docs/plans/int
 ## Dữ liệu và giới hạn
 
 - Chỉ dùng bộ xuất công khai `data/sites.json` và `data/tan_hoi/` của đúng snapshot: 2.344 ô, 20 lần chụp, ba track, 11/8–27/10/2026. Đây là H4, chưa phải bản khóa cuối H7. Không chuyển raw granule, heldout hoặc dữ liệu private.
-- `scripts/public-data-files.json` là danh sách 27 file công khai được phép đồng bộ. `predev`/`prebuild` kiểm đủ input trước khi tạo lại `public/data/`; không quét cả `data/`, không nhận symlink hoặc đường dẫn vượt root, không sinh fixture.
+- `scripts/public-data-files.json` là danh sách 28 file công khai được phép đồng bộ. `predev`/`prebuild` kiểm đủ input trước khi tạo lại `public/data/`; không quét cả `data/`, không nhận symlink hoặc đường dẫn vượt root, không sinh fixture.
 - Thiếu input bắt buộc làm lệnh đồng bộ thất bại. Khi dữ liệu runtime không tải được, 3D/bản đồ hiện lỗi rõ; 3D không dùng trạng thái trong scene thay cho contract.
 - Snapshot không có `validation.json`, site Bang Rakam hoặc bản H7. Luồng 3D và `/map/` hiện không đọc `validation.json`, nên file này không chặn khám phá dữ liệu; nó vẫn là phần bắt buộc để hoàn thiện bộ xuất theo [contract đích](../docs/data-contract.md). Build và giao diện báo rõ chưa có kết quả validation. Không sinh số kiểm chứng/thống kê cho phần thiếu; chưa đạt bộ dữ liệu cuối đầy đủ.
 - Nhà, cây, người, thời tiết và hạ tầng trong 3D là minh họa theo mô tả nguồn; không phải phép đo radar hay khảo sát thực địa. Giữ các manifest và notice tại `public/licenses/`, `public/models/`, `public/impostors/` và `public/scene/`.
