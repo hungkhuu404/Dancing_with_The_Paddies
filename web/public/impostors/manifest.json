@@ -1,0 +1,9 @@
+{
+  "type": "rendered multi-angle impostors",
+  "source": "Existing original procedural models palm_a, palm_b, banana, bush, bamboo, tram, areca, mango, nipa and reeds; provenance in ../models/models.json and ../models/veg.json",
+  "generator": "web/tools/blender/render_tree_impostors.py",
+  "views": { "azimuth_count": 8, "elevations_degrees": [20, 65], "pixels_per_view": 128 },
+  "method": "Blender 5.3 Cycles render of uncompressed generator outputs; no AI generated images, no external image assets",
+  "license": "Derivative of existing repository models; no new independent license grant is asserted",
+  "scope": "Visual LOD only; no species or tree-location measurement"
+}

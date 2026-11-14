@@ -1,0 +1,564 @@
+[
+  {
+    "file": "bridge_monkey.glb",
+    "kind": "bridge",
+    "size_m": [
+      12.6,
+      4.16,
+      1.2
+    ],
+    "bbox_min_m": [
+      -6.3,
+      -2.01,
+      -0.6
+    ],
+    "bbox_max_m": [
+      6.3,
+      2.15,
+      0.6
+    ],
+    "tris": 1618,
+    "bytes": 32304,
+    "clips": [],
+    "nodes": [],
+    "materials": [
+      "Bamboo",
+      "Rope"
+    ],
+    "max_texture_px": 256,
+    "notes": "Cau khi along X (12 m). Deck logs top ~y=1.26 (sag to 1.14 between X-stakes); handrail ~y=2.0 on the -Z side; stakes to y=-2. Water at y=0."
+  },
+  {
+    "file": "bridge_concrete.glb",
+    "kind": "bridge",
+    "size_m": [
+      14.7,
+      5.61,
+      3.6
+    ],
+    "bbox_min_m": [
+      -7.35,
+      -2.0,
+      -1.8
+    ],
+    "bbox_max_m": [
+      7.35,
+      3.61,
+      1.8
+    ],
+    "tris": 1336,
+    "bytes": 72136,
+    "clips": [],
+    "nodes": [],
+    "materials": [
+      "Concrete",
+      "Paint"
+    ],
+    "max_texture_px": 256,
+    "notes": "Rural slab bridge along X, 14 m, 3 m wide. Deck top y = 1.0 + 1.5*(1-(x/7)^2) (2.5 mid, 1.0 at ends); 2 pier bents + end abutments to y=-2; galvanised pipe railings."
+  },
+  {
+    "file": "pole.glb",
+    "kind": "pole",
+    "size_m": [
+      1.9,
+      8.54,
+      0.38
+    ],
+    "bbox_min_m": [
+      -0.95,
+      -0.05,
+      -0.16
+    ],
+    "bbox_max_m": [
+      0.95,
+      8.49,
+      0.21
+    ],
+    "tris": 308,
+    "bytes": 71252,
+    "clips": [],
+    "nodes": [
+      "wire_a",
+      "wire_b",
+      "wire_c"
+    ],
+    "materials": [
+      "Concrete",
+      "Metal",
+      "Porcelain",
+      "Paint"
+    ],
+    "max_texture_px": 256,
+    "notes": "Spun-concrete pole 8.5 m; cross-arm along X on the +Z face. wire_a (x=-0.82) / wire_b (x=+0.82) on the arm at y~8.07, wire_c on the pole top y~8.48. Run wires along +-Z."
+  },
+  {
+    "file": "pole_tx.glb",
+    "kind": "pole",
+    "size_m": [
+      1.9,
+      8.54,
+      1.02
+    ],
+    "bbox_min_m": [
+      -0.95,
+      -0.05,
+      -0.16
+    ],
+    "bbox_max_m": [
+      0.95,
+      8.49,
+      0.86
+    ],
+    "tris": 666,
+    "bytes": 78316,
+    "clips": [],
+    "nodes": [
+      "wire_a",
+      "wire_b",
+      "wire_c"
+    ],
+    "materials": [
+      "Concrete",
+      "Metal",
+      "Porcelain",
+      "Paint",
+      "Rubber"
+    ],
+    "max_texture_px": 256,
+    "notes": "pole + grey pole-mounted transformer can (y 5.1-6.0) on the +Z side with drop leads to the arm."
+  },
+  {
+    "file": "lift_net.glb",
+    "kind": "lift_net",
+    "size_m": [
+      4.04,
+      4.43,
+      11.83
+    ],
+    "bbox_min_m": [
+      -2.02,
+      -1.32,
+      -3.05
+    ],
+    "bbox_max_m": [
+      2.02,
+      3.11,
+      8.78
+    ],
+    "tris": 650,
+    "bytes": 62664,
+    "clips": [
+      "lift"
+    ],
+    "nodes": [
+      "net",
+      "lever"
+    ],
+    "materials": [
+      "Bamboo",
+      "Rope",
+      "Sack",
+      "Net",
+      "Planks"
+    ],
+    "max_texture_px": 256,
+    "notes": "Vo: A-frame on the bank (origin = bank base), lever pivots at (0,2.4,0.3), 4x4 m net hangs in front (+Z, centre z~6.5). Clip \"lift\" 6 s loop (net lowered 0-1.5 s, rises to ~y 2.5, held, lowers). Net = alpha-BLEND material \"Net\". Lowered net sinks to y~-1.3, so put water ~y -0.3."
+  },
+  {
+    "file": "fish_stakes.glb",
+    "kind": "fish_stakes",
+    "size_m": [
+      10.2,
+      3.24,
+      0.25
+    ],
+    "bbox_min_m": [
+      -5.1,
+      -2.0,
+      -0.16
+    ],
+    "bbox_max_m": [
+      5.1,
+      1.24,
+      0.09
+    ],
+    "tris": 1110,
+    "bytes": 37976,
+    "clips": [],
+    "nodes": [],
+    "materials": [
+      "Bamboo",
+      "Net",
+      "Rope"
+    ],
+    "max_texture_px": 256,
+    "notes": "Row of 11 bamboo stakes along X, y -2..+1.2, alpha-BLEND net panels between them, tied top rail. Water at y=0."
+  },
+  {
+    "file": "pump.glb",
+    "kind": "pump",
+    "size_m": [
+      1.56,
+      1.38,
+      6.55
+    ],
+    "bbox_min_m": [
+      -0.76,
+      0.0,
+      -0.49
+    ],
+    "bbox_max_m": [
+      0.8,
+      1.38,
+      6.06
+    ],
+    "tris": 894,
+    "bytes": 84296,
+    "clips": [
+      "vibrate"
+    ],
+    "nodes": [
+      "engine"
+    ],
+    "materials": [
+      "Paint",
+      "Metal",
+      "Rubber",
+      "Wood",
+      "Planks"
+    ],
+    "max_texture_px": 256,
+    "notes": "Diesel pump set on a wooden stand at origin; blue flexible discharge hose ~6 m toward +Z lying on the ground. Clip \"vibrate\" (1 s loop) shakes node \"engine\" by ~3 mm."
+  },
+  {
+    "file": "shrine.glb",
+    "kind": "shrine",
+    "size_m": [
+      1.18,
+      2.07,
+      0.97
+    ],
+    "bbox_min_m": [
+      -0.59,
+      0.0,
+      -0.49
+    ],
+    "bbox_max_m": [
+      0.59,
+      2.07,
+      0.49
+    ],
+    "tris": 882,
+    "bytes": 133072,
+    "clips": [],
+    "nodes": [],
+    "materials": [
+      "Concrete",
+      "Plaster",
+      "Paint",
+      "Glaze",
+      "Porcelain",
+      "Figure",
+      "RoofTile",
+      "Wood"
+    ],
+    "max_texture_px": 256,
+    "notes": "Mieu roadside shrine ~2.1 m, red/yellow, tiled mini hip roof, open front (+Z) with bowl/vases inside."
+  },
+  {
+    "file": "church.glb",
+    "kind": "church",
+    "size_m": [
+      13.57,
+      23.05,
+      32.55
+    ],
+    "bbox_min_m": [
+      -6.79,
+      -0.25,
+      -15.65
+    ],
+    "bbox_max_m": [
+      6.79,
+      22.8,
+      16.9
+    ],
+    "tris": 3350,
+    "bytes": 169988,
+    "clips": [],
+    "nodes": [],
+    "materials": [
+      "Plaster",
+      "Concrete",
+      "RoofTile",
+      "Wood",
+      "Window_Glass",
+      "Paint",
+      "Dark",
+      "Metal"
+    ],
+    "max_texture_px": 256,
+    "notes": "Rural church: nave 12x25 m, front bell tower to ~22.7 m (incl. plain cross) at +Z, rear apse. Pointed windows = Window_Glass (glows at night)."
+  },
+  {
+    "file": "pagoda.glb",
+    "kind": "pagoda",
+    "size_m": [
+      20.36,
+      11.58,
+      14.37
+    ],
+    "bbox_min_m": [
+      -10.18,
+      -0.01,
+      -7.18
+    ],
+    "bbox_max_m": [
+      10.18,
+      11.57,
+      7.18
+    ],
+    "tris": 3614,
+    "bytes": 169396,
+    "clips": [],
+    "nodes": [],
+    "materials": [
+      "Concrete",
+      "Plaster",
+      "Paint",
+      "Wood",
+      "Window_Glass",
+      "Dark",
+      "RoofTile"
+    ],
+    "max_texture_px": 256,
+    "notes": "Village pagoda hall on 18x12 m platform, double-tier curved hip roof with upturned corners, red columns, front steps at +Z. Windows = Window_Glass."
+  },
+  {
+    "file": "grave.glb",
+    "kind": "grave",
+    "size_m": [
+      6.02,
+      1.56,
+      6.08
+    ],
+    "bbox_min_m": [
+      -3.01,
+      -0.0,
+      -3.07
+    ],
+    "bbox_max_m": [
+      3.01,
+      1.56,
+      3.01
+    ],
+    "tris": 1876,
+    "bytes": 129920,
+    "clips": [],
+    "nodes": [],
+    "materials": [
+      "Concrete",
+      "Ceramic",
+      "RoofTile",
+      "Wood",
+      "Glaze"
+    ],
+    "max_texture_px": 256,
+    "notes": "Family grave plot 6x6 m, low concrete fence (gap at +Z front), 4 tiled tombs with steles + tiny tile roofs (one aged grey)."
+  },
+  {
+    "file": "longtail.glb",
+    "kind": "boat",
+    "size_m": [
+      1.22,
+      1.62,
+      9.72
+    ],
+    "bbox_min_m": [
+      -0.61,
+      -0.13,
+      -6.22
+    ],
+    "bbox_max_m": [
+      0.61,
+      1.49,
+      3.5
+    ],
+    "tris": 2126,
+    "bytes": 110376,
+    "clips": [
+      "spin"
+    ],
+    "nodes": [
+      "prop"
+    ],
+    "materials": [
+      "Figure",
+      "Paint",
+      "Wood",
+      "Planks",
+      "Metal",
+      "Rubber"
+    ],
+    "max_texture_px": 256,
+    "notes": "Vo lai ~7 m hull, bow +Z, origin at waterline centre; engine on stern swivel, long shaft down-aft, seated driver with non la holding the tiller. Node \"prop\" = propeller hub; spin axis = prop local -Z(glTF) (Blender local Y); clip \"spin\" = one turn per 0.5 s (linear)."
+  },
+  {
+    "file": "cargo_boat.glb",
+    "kind": "boat",
+    "size_m": [
+      3.8,
+      3.53,
+      16.2
+    ],
+    "bbox_min_m": [
+      -1.9,
+      -0.56,
+      -8.2
+    ],
+    "bbox_max_m": [
+      1.9,
+      2.97,
+      8.0
+    ],
+    "tris": 2942,
+    "bytes": 162512,
+    "clips": [],
+    "nodes": [],
+    "materials": [
+      "Planks",
+      "Wood",
+      "Paint",
+      "Window_Glass",
+      "Dark",
+      "Tin",
+      "Metal",
+      "Sack"
+    ],
+    "max_texture_px": 256,
+    "notes": "Ghe cho lua ~16 m, bow +Z, origin waterline centre (keel y~-0.55, deep-laden), mound of ~100 rice sacks, painted eyes at the bow, plank cabin + tin roof aft (Window_Glass windows)."
+  },
+  {
+    "file": "jars.glb",
+    "kind": "prop",
+    "size_m": [
+      1.53,
+      1.02,
+      1.29
+    ],
+    "bbox_min_m": [
+      -0.78,
+      0.0,
+      -0.55
+    ],
+    "bbox_max_m": [
+      0.76,
+      1.02,
+      0.74
+    ],
+    "tris": 989,
+    "bytes": 37364,
+    "clips": [],
+    "nodes": [],
+    "materials": [
+      "Glaze",
+      "Metal",
+      "Dark"
+    ],
+    "max_texture_px": 256,
+    "notes": "3 brown-glazed lu (0.92/0.86/0.72 m), one with an aluminium lid, others with dark water surface."
+  },
+  {
+    "file": "clothesline.glb",
+    "kind": "prop",
+    "size_m": [
+      4.13,
+      1.9,
+      0.11
+    ],
+    "bbox_min_m": [
+      -2.06,
+      -0.0,
+      -0.06
+    ],
+    "bbox_max_m": [
+      2.06,
+      1.9,
+      0.05
+    ],
+    "tris": 450,
+    "bytes": 39308,
+    "clips": [],
+    "nodes": [],
+    "materials": [
+      "Wood",
+      "Rope",
+      "Fabric"
+    ],
+    "max_texture_px": 256,
+    "notes": "Two posts 4 m apart along X, sagging line, 5 hanging garments (double-sided Fabric) with pegs."
+  },
+  {
+    "file": "hammock.glb",
+    "kind": "prop",
+    "size_m": [
+      3.38,
+      1.85,
+      0.92
+    ],
+    "bbox_min_m": [
+      -1.69,
+      -0.0,
+      -0.46
+    ],
+    "bbox_max_m": [
+      1.69,
+      1.85,
+      0.46
+    ],
+    "tris": 306,
+    "bytes": 36548,
+    "clips": [],
+    "nodes": [],
+    "materials": [
+      "Wood",
+      "Fabric",
+      "Rope"
+    ],
+    "max_texture_px": 256,
+    "notes": "Striped fabric hammock between two posts 3.2 m apart along X, lowest point ~y 0.52."
+  },
+  {
+    "file": "stilt_toilet.glb",
+    "kind": "stilt",
+    "size_m": [
+      1.6,
+      4.9,
+      4.55
+    ],
+    "bbox_min_m": [
+      -0.8,
+      -2.0,
+      -0.85
+    ],
+    "bbox_max_m": [
+      0.8,
+      2.9,
+      3.7
+    ],
+    "tris": 406,
+    "bytes": 84632,
+    "clips": [],
+    "nodes": [],
+    "materials": [
+      "Wood",
+      "Planks",
+      "Fabric",
+      "Tin",
+      "Bamboo"
+    ],
+    "max_texture_px": 256,
+    "notes": "Over-water plank outhouse on stilts (floor y=1.0, stilts to -2), cloth door curtain and plank walkway toward +Z (bank side), tin roof. Water at y=0."
+  }
+]

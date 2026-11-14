@@ -4,7 +4,9 @@
 
 Team **Dancing with The Paddies** · NASA Space Apps Challenge 2026 · Challenge: *Dancing with the SARs*
 
-**Live site:** https://flood-calendar.pages.dev
+**Local migration status:** the Tân Hội 3D view and `/map/` are migrated from Nasa_prep snapshot `963333c`. The public H4 export contains 20 acquisitions (11 Aug–27 Oct 2026). Validation results, Bang Rakam, H7/final data and pipeline S0–S7 have **not been migrated**. See [local instructions](web/README.md) and the [review](docs/reviews/web-local-review.md).
+
+**Existing live site:** https://flood-calendar.pages.dev — this migration has not been deployed or verified against that site.
 
 ## What it does
 
@@ -18,16 +20,18 @@ Flood Calendar uses NISAR L-band radar to answer three questions for every 250 m
 
 Each NISAR track revisits every 12 days, so every date is a range between two images, never a single day.
 
-The site also has:
+The local web includes:
 
 - A map that can be replayed image by image, and a chart for any single cell.
-- A sound made from the data itself: a "listen" button for the whole commune or for one cell.
 - A layer for fields flooded more than 30 days before the season, relevant *if the IPCC emission factor is applied* (IPCC 2019, Table 5.13).
-- A second test site, Bang Rakam (Thailand). <!-- TODO: cập nhật theo mức Bang Rakam cuối cùng tại mốc khóa số liệu -->
+
+Data sonification and the second site, Bang Rakam (Thailand), are planned work and are not available in this checkout. Ambient 3D audio is illustrative, not the planned data sonification.
 
 What it does **not** do: it does not measure methane, and it cannot tell whether a field was sown right after the water left.
 
 ## How it works
+
+The table below describes the planned pipeline. These folders contain placeholders; executable S0–S7 code, site configuration, schema and pipeline tests have not been migrated. The current web reads the existing public export instead of running this pipeline.
 
 | Stage | What it does | Folder |
 | --- | --- | --- |
@@ -40,7 +44,7 @@ What it does **not** do: it does not measure methane, and it cannot tell whether
 | S6 Compare | Compare with OPERA DSWx-S1 | `pipeline/validate/` |
 | S7 Export | Write static files for the web | `pipeline/export/` |
 
-Default rule: a cell is water when HH < −14 dB and HV < −20 dB. Thresholds were adjusted using OPERA DSWx-S1, so the agreement numbers shown on the site are agreement after tuning, not an independent validation.
+The exported method metadata records default rule Q0 (HH < −14 dB and HV < −20 dB), with per-acquisition Q1 overrides. `validation.json` is absent: the local web does not report agreement scores. Future agreement after tuning with OPERA DSWx-S1 must not be described as independent validation.
 
 The file format between the pipeline and the web is defined in [docs/data-contract.md](docs/data-contract.md).
 
@@ -48,15 +52,15 @@ The file format between the pipeline and the web is defined in [docs/data-contra
 
 | Path | Contents |
 | --- | --- |
-| `pipeline/core/` | S1–S5 |
-| `pipeline/catalog/`, `pipeline/export/` | S0, S7 |
-| `pipeline/validate/` | S6 |
-| `config/sites/` | One TOML file per site: area, EPSG, tracks and frames, reference areas, thresholds |
-| `schema/` | JSON Schema for every exported file |
-| `tests/` | Pipeline tests |
+| `pipeline/core/` | Placeholder for S1–S5; not migrated |
+| `pipeline/catalog/`, `pipeline/export/` | Placeholders for S0, S7; not migrated |
+| `pipeline/validate/` | Placeholder for S6; not migrated |
+| `config/sites/` | Placeholder for site TOML files; not migrated |
+| `schema/` | Placeholder for JSON Schema; not migrated |
+| `tests/` | Placeholder for pipeline tests; not migrated. Web tests are in `web/test/` |
 | `data/` | Exported data read by the web (`data/sites.json`, `data/{site}/`) |
-| `web/` | Static website (Vite, MapLibre GL JS, Three.js); `web/tools/` holds the generators for the 3D assets |
-| `web/src/sound/` | Sound generated from the data |
+| `web/` | Local static website (Vite, MapLibre GL JS, Three.js); asset generators are not migrated |
+| `web/src/sound/` | Not present; data sonification is not migrated |
 | `docs/` | Data contract and method notes |
 
 ## Quick start
@@ -67,38 +71,22 @@ Requires Node.js 24.
 
 ```bash
 cd web
-npm ci
-npm run dev      # local server; copies data/ into web/public/data/
+npm ci --ignore-scripts
+npm run dev -- --host 127.0.0.1  # syncs only allowlisted public files
 npm test
 npm run build    # static site in web/dist/
 ```
 
 ### Pipeline
 
-Requires Python 3.11+ and a NASA Earthdata token.
-
-```bash
-python -m venv .venv
-# Windows: .venv\Scripts\activate    macOS/Linux: source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-Keep the token in a file outside the repository and point to it:
-
-```bash
-export EARTHDATA_TOKEN_FILE=/path/to/token.txt        # PowerShell: $env:EARTHDATA_TOKEN_FILE="C:\path\to\token.txt"
-```
-
-<!-- TODO: lệnh chạy pipeline cho một site — điền khi code S0–S7 đã vào repo. Không ghi lệnh chưa chạy thử. -->
-
-Never commit the token, the image cache or files with signed links.
+Not migrated. There is no runnable pipeline or requirements file in this checkout. Python setup and Earthdata credentials are not required to explore the migrated local web. Do not commit tokens, image caches or signed links when pipeline work is added later.
 
 ## Data sources
 
 | Data | Provider | Use | Terms |
 | --- | --- | --- | --- |
 | NISAR L2 GCOV | NASA / ISRO, via ASF DAAC | Water detection (S1–S5) | NASA open data |
-| OPERA DSWx-S1 | NASA JPL (OPERA project) | Threshold tuning and comparison (S6) | NASA open data |
+| OPERA DSWx-S1 | NASA JPL (OPERA project) | Planned S6 comparison; validation export not migrated | NASA open data |
 | ESA WorldCover 2021 | European Space Agency | Cropland mask | CC BY 4.0. © ESA WorldCover project 2021 / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium |
 | OpenStreetMap | OpenStreetMap contributors | Commune boundary, hamlet names, roads, bridges and places in the 3D scene | ODbL, © OpenStreetMap contributors |
 
@@ -108,7 +96,8 @@ Never commit the token, the image cache or files with signed links.
 
 <!-- TODO: thay bằng bản cuối "Validation and limits" khi khóa số liệu -->
 
-- Thresholds were tuned with DSWx-S1; agreement with DSWx-S1 is therefore not an independent test.
+- Validation results are unavailable in this snapshot; no agreement score is reported or fabricated. Agreement after tuning with DSWx-S1 would not be an independent test.
+- Bang Rakam, H7/final data and pipeline S0–S7 are not migrated.
 - One track revisits every 12 days, so water arrival and water leaving are date ranges.
 - Track 148 D does not cover about 13.5% of the commune's cells; the map uses each cell's latest valid image.
 - Water arrival may be dated early on dry, flat fields.

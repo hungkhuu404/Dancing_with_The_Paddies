@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Flood Calendar · Map</title>
+    <meta name="description" content="NISAR radar flood calendar of Tân Hội, An Giang: when the water came in, how long it stayed, whether it is still there, for every 250 m block." />
+  </head>
+  <body>
+    <header class="top">
+      <a class="brand" href="../">
+        <span class="brand-name">Flood Calendar</span>
+        <span class="brand-site" id="site-name">Tân Hội, An Giang</span>
+      </a>
+      <nav class="top-nav">
+        <a href="../">Story</a>
+        <a href="#method" aria-disabled="true" title="Coming soon">Method and limits</a>
+      </nav>
+    </header>
+
+    <p id="fixture" class="notice" hidden>Fixture data for building the page. These are not results.</p>
+    <p id="errors" class="notice notice-error" role="alert" hidden></p>
+    <p id="validation-status" class="notice" role="status">Validation results are unavailable. Water observations can be explored, but agreement with a reference dataset is not reported.</p>
+
+    <main class="layout">
+      <aside class="side" aria-label="Map controls">
+        <fieldset class="questions" id="questions">
+          <legend class="sr-only">Question</legend>
+          <button type="button" data-mode="onset" aria-pressed="false">When did the water come in?</button>
+          <button type="button" data-mode="duration" aria-pressed="false">How long?</button>
+          <button type="button" data-mode="status" aria-pressed="true">Is it still there?</button>
+        </fieldset>
+        <div class="toggles">
+          <label><input type="checkbox" id="radar-only" /> Radar only</label>
+          <label id="gt30-wrap"><input type="checkbox" id="gt30" /> Flooded over 30 days before the crop <small>if the IPCC default factor applies</small></label>
+        </div>
+        <div id="legend" class="legend" aria-live="polite"></div>
+        <button type="button" id="whole" class="ghost">Whole commune</button>
+      </aside>
+
+      <div class="map-wrap">
+        <div id="map" class="map" role="region" aria-label="Map of the commune. Click a block to read its flood record."></div>
+        <p id="pass-banner" class="pass-banner" hidden></p>
+      </div>
+
+      <aside id="panel" class="panel" aria-label="Selected block" hidden>
+        <button type="button" class="panel-close" id="panel-close" aria-label="Close">×</button>
+        <div id="panel-body"></div>
+      </aside>
+    </main>
+
+    <footer class="timeline" aria-label="Radar passes">
+      <button type="button" class="step" id="prev" aria-label="Previous pass">‹</button>
+      <div class="tl-body">
+        <div id="tl-rows" class="tl-rows" role="listbox" tabindex="0" aria-label="Radar passes, use arrow keys"></div>
+        <p id="tl-label" class="tl-label"></p>
+      </div>
+      <button type="button" class="step" id="next" aria-label="Next pass">›</button>
+    </footer>
+    <p class="credit" id="credit"></p>
+
+    <script type="module" src="/src/map/main.js"></script>
+  </body>
+</html>

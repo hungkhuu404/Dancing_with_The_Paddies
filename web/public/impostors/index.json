@@ -1,0 +1,92 @@
+{
+  "palm_a": {
+    "span": 14.917700901031493,
+    "center": 6.321059703826904,
+    "azimuths": 8,
+    "elevations": [
+      20,
+      65
+    ]
+  },
+  "palm_b": {
+    "span": 11.79876100540161,
+    "center": 4.999475002288818,
+    "azimuths": 8,
+    "elevations": [
+      20,
+      65
+    ]
+  },
+  "banana": {
+    "span": 5.08273901939392,
+    "center": 1.9974582195281982,
+    "azimuths": 8,
+    "elevations": [
+      20,
+      65
+    ]
+  },
+  "bush": {
+    "span": 2.7158490109443663,
+    "center": 1.0569465160369873,
+    "azimuths": 8,
+    "elevations": [
+      20,
+      65
+    ]
+  },
+  "bamboo": {
+    "span": 14.633669548034668,
+    "center": 5.614482402801514,
+    "azimuths": 8,
+    "elevations": [
+      20,
+      65
+    ]
+  },
+  "tram": {
+    "span": 13.790522817745805,
+    "center": 5.811548233032227,
+    "azimuths": 8,
+    "elevations": [
+      20,
+      65
+    ]
+  },
+  "areca": {
+    "span": 16.85602876844816,
+    "center": 7.137998104095459,
+    "azimuths": 8,
+    "elevations": [
+      20,
+      65
+    ]
+  },
+  "mango": {
+    "span": 9.502465982064605,
+    "center": 3.966141700744629,
+    "azimuths": 8,
+    "elevations": [
+      20,
+      65
+    ]
+  },
+  "nipa": {
+    "span": 7.559329986572266,
+    "center": 2.050981044769287,
+    "azimuths": 8,
+    "elevations": [
+      20,
+      65
+    ]
+  },
+  "reeds": {
+    "span": 1.5692677201190963,
+    "center": 0.6643773317337036,
+    "azimuths": 8,
+    "elevations": [
+      20,
+      65
+    ]
+  }
+}
