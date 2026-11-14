@@ -1,0 +1,74 @@
+{
+  "provider": "ElevenLabs",
+  "voice_id": "MFZUKuGQUsGJPQjTS4wC",
+  "voice_name": "Jon - Warm & Grounded Storyteller",
+  "model": "eleven_multilingual_v2",
+  "created_at": "2026-11-14T12:35:56.399Z",
+  "source": "https://elevenlabs.io/voice-library",
+  "licence": "Generated with a paid ElevenLabs subscription; use subject to https://elevenlabs.io/terms-of-use",
+  "voice_settings": {
+    "stability": 0.65,
+    "similarity_boost": 0.75,
+    "style": 0.1,
+    "use_speaker_boost": true,
+    "speed": 0.94
+  },
+  "script_sha256": "333fb268aafbab1583e1f7f33a22618f4718c4c3ef3699e1626a943ee94dbdd5",
+  "clips": [
+    {
+      "file": "tour-1.mp3",
+      "text": "After harvest in Tân Hội. Rice fields change with the season. Water observations tell their story.",
+      "duration_seconds": 6.362,
+      "cue_starts": [
+        0,
+        2.206,
+        4.145
+      ],
+      "sha256": "90760c0b3777f6cc9612554f0f931271b823409fac3357a36f85c91ddf3b46eb"
+    },
+    {
+      "file": "tour-2.mp3",
+      "text": "Clouds can obscure the fields. Radar offers another view. It records the surface through cloud.",
+      "duration_seconds": 5.573,
+      "cue_starts": [
+        0,
+        1.95,
+        3.506
+      ],
+      "sha256": "7f3a2faa972ee9d7ca48dbbaf1b539e9a674d9daab1b545f0d4974a9e8f03e9a"
+    },
+    {
+      "file": "tour-3.mp3",
+      "text": "Smooth water often appears dark. Buildings and plants scatter differently. These responses are illustrated here.",
+      "duration_seconds": 6.455,
+      "cue_starts": [
+        0,
+        2.194,
+        4.342
+      ],
+      "sha256": "ef1c28642f99539b492efbb0b1e33fb02dcd2af57fd2d79cf94f3501033cae76"
+    },
+    {
+      "file": "tour-4.mp3",
+      "text": "Select a block to read its record. See when water arrived and how long it stayed. Dates are ranges between observations.",
+      "duration_seconds": 6.78,
+      "cue_starts": [
+        0,
+        1.939,
+        4.54
+      ],
+      "sha256": "e51775032e1ce301379aa3519a9424c9ba36603b92f82b871f5800c356df9ebd"
+    },
+    {
+      "file": "tour-5.mp3",
+      "text": "Compare the season across 24 hamlets. Each column is one satellite visit. Gaps remain visible in the water calendar.",
+      "duration_seconds": 7.338,
+      "cue_starts": [
+        0,
+        2.519,
+        4.981
+      ],
+      "sha256": "eb32caf186f097818e7caf91d775ac0b6a4c737c7876637c710df4c0b73a4335"
+    }
+  ]
+}

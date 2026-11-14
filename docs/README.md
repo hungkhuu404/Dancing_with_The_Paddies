@@ -29,3 +29,7 @@ Các tài liệu đợt migration là snapshot lịch sử. Web hiện cài từ
 ## Scientific views
 
 [SCIENCE-UI-001](plans/calendar-method.md) documents the hamlet water calendar, Method and limits, calculation rules, module map and verification. The views are available as /calendar/ and /method/ and open inside landscape/map exploration.
+
+## Guided-tour audio migration
+
+[MIG-TOUR-AUDIO-004](plans/tour-audio.md) records the narrated tour, audible scene score, compact captions and independent Calendar/Method entries. [Pinned source and file hashes](provenance/tour-audio.md) cover the selected import from Nasa_prep main. No source hosting workflow or data files are migrated.
