@@ -143,14 +143,14 @@ void main() {
 }`;
 
 /** One water plane over the whole commune. The canal mask / field overlay follow the active tile (setTile). */
-export function createWater(quality, size = 16000, centre = [0, 0]) {
+export function createWater(quality, size = 16000, centre = [0, 0],recipe={}) {
   const geo = new THREE.PlaneGeometry(size, size, 1, 1);
   const water = new Water(geo, {
     textureWidth: quality.reflection, textureHeight: quality.reflection,
     waterNormals: makeNormalMap(),
     sunDirection: new THREE.Vector3(0, 1, 0),
     sunColor: 0xffffff,
-    waterColor: new THREE.Color(0.11, 0.105, 0.065),
+    waterColor: new THREE.Color(...(recipe.water_color||[0.11, 0.105, 0.065])),
     distortionScale: 2.2,
     fog: true,
     alpha: 1,

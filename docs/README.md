@@ -33,3 +33,7 @@ Các tài liệu đợt migration là snapshot lịch sử. Web cài từ lockfi
 ## Guided-tour audio migration
 
 [MIG-TOUR-AUDIO-004](plans/tour-audio.md) records the narrated tour, audible scene score, compact captions and independent Calendar/Method entries. [Pinned source and file hashes](provenance/tour-audio.md) cover the selected import from Nasa_prep main. No source hosting workflow or data files are migrated.
+
+## Current two-site frontend
+
+[MIG-WEB-TWO-SITES-005](plans/pixel-v2-two-sites.md) records the current module map, preserved 20-image pixel export, explicit Bang Rakam illustration, verification and open scientific limits. [Pinned source and file hashes](provenance/pixel-v2-two-sites.md) distinguish source imports from product adaptations. This migration does not introduce hosting or merge the separate 22-image backend candidate.

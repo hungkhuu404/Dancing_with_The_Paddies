@@ -1,0 +1,308 @@
+{
+  "default": "tan_hoi",
+  "sites": {
+    "tan_hoi": {
+      "id": "tan_hoi",
+      "name": "Tân Hội",
+      "region": "An Giang, Vietnam",
+      "epsg": 32648,
+      "zone": 48,
+      "timezone": "Asia/Ho_Chi_Minh",
+      "center": [
+        105.185992,
+        10.14206
+      ],
+      "astronomy_center": [
+        105.186,
+        10.142
+      ],
+      "origin": {
+        "utm_e": 520375,
+        "utm_n": 1121125,
+        "epsg": 32648
+      },
+      "frame": {
+        "e0": 511500,
+        "e1": 529250,
+        "n0": 1113000,
+        "n1": 1129250
+      },
+      "tile_grid": {
+        "first_e": 512500,
+        "first_n": 1114000,
+        "cols": 9,
+        "rows": 8,
+        "size": 2000
+      },
+      "boundary": {
+        "mode": "polygon",
+        "file": "fixtures/tan_hoi/aoi.geojson"
+      },
+      "scene": {
+        "base": "scene/commune/",
+        "infrastructure": "scene/infrastructure.json",
+        "weather": "scene/history.json",
+        "fallback_image": "fallback.webp",
+        "legacy_base": "scene/",
+        "reference_radar_date": "2026-10-27",
+        "radar_tracks": {
+          "148": "3_cua_so_anh_mau/148_20261022_P05036.npz",
+          "047": "3_cua_so_anh_mau/047_20261027_P05036.npz"
+        },
+        "optical": "s2_tanhoi",
+        "reference_track": "047"
+      },
+      "start_utm": [
+        520200,
+        1122600
+      ],
+      "tour": {
+        "enabled": true,
+        "audio": "audio/tour/",
+        "legacy_audio": "audio/tour-en.mp3"
+      },
+      "fields": {
+        "pattern": "strips",
+        "strip_min": 25,
+        "strip_max": 55,
+        "cross_min": 180,
+        "cross_max": 450
+      },
+      "ecology": {
+        "dry_before_water": "standing",
+        "bank_margin": [
+          "sesbania",
+          "sedge",
+          "morning_glory",
+          "water_spinach",
+          "so_dua"
+        ],
+        "windbreak": [
+          "acacia",
+          "eucalyptus"
+        ],
+        "roadside": [
+          "dau",
+          "tram_bau"
+        ],
+        "garden_trees": [
+          "papaya",
+          "guava",
+          "jackfruit",
+          "mango"
+        ],
+        "generator_vegetation": [
+          "areca",
+          "mango",
+          "bamboo",
+          "tram",
+          "nipa",
+          "reeds"
+        ]
+      },
+      "roads": {
+        "arterial_refs": [
+          "961"
+        ]
+      },
+      "architecture": {
+        "palette": "mekong",
+        "allow_illustrative_gates": true,
+        "arch_prefix": "Ấp văn hóa ",
+        "nearby_pattern": "Kinh 8|Tân Hiệp",
+        "source_religious": [
+          "church",
+          "temple",
+          "cemetery",
+          "religious"
+        ],
+        "junction_shrines": true,
+        "civic_name_pattern": "^UBND",
+        "market_name_pattern": "^Chợ "
+      },
+      "inputs": {
+        "aoi_h0": "1_ranh_xa/xa_tan_hoi_osm.geojson"
+      },
+      "streaming": {
+        "high": {
+          "max": 4,
+          "radius": 2000,
+          "worldDist": 450,
+          "crownDist": 700,
+          "mirrorDist": 250
+        }
+      }
+    },
+    "bang_rakam": {
+      "id": "bang_rakam",
+      "name": "Bang Rakam",
+      "region": "Phitsanulok, Thailand",
+      "epsg": 32647,
+      "zone": 47,
+      "timezone": "Asia/Bangkok",
+      "center": [
+        100.11878375680217,
+        16.75013833127494
+      ],
+      "origin": {
+        "utm_e": 619250,
+        "utm_n": 1852250,
+        "epsg": 32647
+      },
+      "frame": {
+        "e0": 613250,
+        "e1": 625250,
+        "n0": 1846250,
+        "n1": 1858250
+      },
+      "tile_grid": {
+        "first_e": 614250,
+        "first_n": 1847250,
+        "cols": 6,
+        "rows": 6,
+        "size": 2000
+      },
+      "boundary": {
+        "mode": "frame",
+        "file": null
+      },
+      "scene": {
+        "base": "scene/bang_rakam/",
+        "infrastructure": "scene/bang_rakam/infrastructure.json",
+        "weather": "scene/bang_rakam/history.json",
+        "fallback_image": null,
+        "reference_radar_date": null,
+        "radar_tracks": {},
+        "optical": "s2_bang_rakam",
+        "reference_track": null,
+        "fixture_preview": true
+      },
+      "start_utm": [
+        619250,
+        1852250
+      ],
+      "tour": {
+        "enabled": false,
+        "audio": null,
+        "legacy_audio": null
+      },
+      "fields": {
+        "pattern": "blocks",
+        "strip_min": 90,
+        "strip_max": 160,
+        "cross_min": 110,
+        "cross_max": 210
+      },
+      "ecology": {
+        "dry_before_water": "stubble",
+        "bank_margin": [
+          "sedge",
+          "water_spinach"
+        ],
+        "windbreak": [],
+        "roadside": [],
+        "garden_trees": [
+          "mango"
+        ],
+        "generator_vegetation": [
+          "mango",
+          "bamboo",
+          "reeds"
+        ],
+        "submerge_bunds": true,
+        "water_color": [
+          0.19,
+          0.125,
+          0.062
+        ]
+      },
+      "roads": {
+        "arterial_refs": [
+          "117",
+          "126"
+        ]
+      },
+      "architecture": {
+        "palette": "thai_floodplain_illustration",
+        "allow_illustrative_gates": false,
+        "source_religious": [],
+        "junction_shrines": false,
+        "gate_types": [
+          "sluice_gate"
+        ],
+        "display_source_names": false,
+        "illustrative_graves": false
+      },
+      "inputs": {
+        "aoi_h0": null
+      },
+      "observation_selection": {
+        "tracks": {
+          "011A": "010",
+          "112A": "010",
+          "105D": "080"
+        },
+        "mode": "DHDH",
+        "start": "2026-08-01T00:00:00Z",
+        "end": "2026-11-01T00:00:00Z"
+      },
+      "streaming": {
+        "high": {
+          "max": 4,
+          "radius": 2000,
+          "worldDist": 450,
+          "crownDist": 700,
+          "mirrorDist": 250
+        },
+        "low": {
+          "max": 3,
+          "radius": 1500,
+          "worldDist": 350,
+          "crownDist": 450,
+          "mirrorDist": 180
+        }
+      },
+      "identity": {
+        "stilts": [
+          "thai_stilt_a",
+          "thai_stilt_b",
+          "thai_stilt_c"
+        ],
+        "raised": "thai_raised",
+        "raised_share": 0.32,
+        "raft": "thai_raft",
+        "hut": "thai_hut",
+        "temple": "thai_temple",
+        "spirit": "thai_spirit",
+        "boat": "thai_longtail",
+        "net": "thai_net",
+        "trap": "thai_trap",
+        "trees": [
+          "thai_borassus",
+          "thai_tamarind"
+        ],
+        "impostors": "impostors/thai/",
+        "models": [
+          "thai_stilt_a",
+          "thai_stilt_b",
+          "thai_stilt_c",
+          "thai_raised",
+          "thai_raft",
+          "thai_hut",
+          "thai_temple",
+          "thai_spirit",
+          "thai_longtail",
+          "thai_net",
+          "thai_trap",
+          "thai_borassus",
+          "thai_tamarind"
+        ],
+        "tree_scales": {
+          "palm": 1,
+          "bush": 0.4,
+          "banana": 1
+        }
+      }
+    }
+  }
+}

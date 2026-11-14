@@ -36,13 +36,13 @@ function plant(kind){
   }const merged=mergeGeometries(parts);for(const g of parts)g.dispose();return merged;
 }
 const geometries=new Map(),materials=new Map();
-export function createEcosystem(layout,land,pickIndex,quality,reduced=false,props={}){
+export function createEcosystem(layout,land,pickIndex,quality,reduced=false,props={},recipe){
   const group=new THREE.Group();group.name='ecosystem_illustration';
   const low=quality.tier==='low',d=new THREE.Object3D(),random=seeded(710),sets=new Map();
   const localMaterials=[];
   const fauna=createFauna(layout,quality,reduced,props);group.add(fauna);
   fauna.traverse(o=>{if(o.material)localMaterials.push(o.material);});
-  const placements=[...bankPlantings(layout.canals,26,low?55:150),...gardenPlantings(layout.houses,81,low?24:72),...roadsidePlantings(layout.roads,low?8:24)];
+  const placements=[...bankPlantings(layout.canals,26,low?55:150,recipe),...gardenPlantings(layout.houses,81,low?24:72,recipe),...roadsidePlantings(layout.roads,low?8:24,recipe)];
   const valid=placements.filter(p=>pickParcel(pickIndex,layout.parcels,p.x,p.z)<0&&terrainHeight(layout,p.x,p.z)>=.2);
   for(const p of valid){if(!sets.has(p.kind))sets.set(p.kind,[]);sets.get(p.kind).push(p);}
   for(const [kind,items]of sets){

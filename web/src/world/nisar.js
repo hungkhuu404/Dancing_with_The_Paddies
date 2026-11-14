@@ -66,7 +66,7 @@ export function createNisar(ctx) {
     const pass = ctx.passes[i];
     if (!pass) return;
     const acq = ctx.acq?.[i];
-    if (acq && !opts.keepTime) { const h = localHour(acq.acq_utc); if (h !== null) ctx.setTod(hourToTod(h)); }
+    if (acq && !opts.keepTime) { const h = localHour(acq.acq_utc,ctx.profile?.timezone??7); if (h !== null) ctx.setTod(hourToTod(h)); }
     if (opts.from != null) ctx.setPassAll(opts.from, true);
     if (ctx.reduced) { ctx.setPassAll(i, true); return; }
     const dir = trackDir(pass.track);

@@ -40,4 +40,4 @@ jobs:
       - name: Build
         run: npm run build
       - name: Verify built public data
-        run: node scripts/verify-public-data.mjs --output public/data --output dist/data
+        run: node scripts/verify-published-data.mjs

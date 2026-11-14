@@ -116,10 +116,15 @@ export function clampToCanals(x, z, canals, margin = 1, out = {}) {
   return out;
 }
 
-/** Local clock hour (0..24) of a UTC timestamp at a fixed offset (Vietnam: +7, no DST). */
+/** Local clock hour in the selected IANA zone; numeric offsets remain compatible with older callers. */
+const hourFormats=new Map();
 export function localHour(utcIso, offsetH = 7) {
   const d = new Date(utcIso);
   if (Number.isNaN(+d)) return null;
+  if(typeof offsetH==='string'){
+    let fmt=hourFormats.get(offsetH);if(!fmt){fmt=new Intl.DateTimeFormat('en-GB',{timeZone:offsetH,hour:'2-digit',minute:'2-digit',hourCycle:'h23'});hourFormats.set(offsetH,fmt);}
+    const parts=Object.fromEntries(fmt.formatToParts(d).map(p=>[p.type,p.value]));return +parts.hour+parts.minute/60;
+  }
   return (((d.getUTCHours() + d.getUTCMinutes() / 60 + offsetH) % 24) + 24) % 24;
 }
 

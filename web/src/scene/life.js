@@ -131,15 +131,16 @@ export async function createLife(parent, layout, land, pickIndex, quality, opts 
 
   // trees: palm alternates palm_a / palm_b
   layout.trees.forEach((t, i) => {
-    const kind = t.kind === 'palm' ? (i % 2 ? 'palm_b' : 'palm_a') : t.kind === 'banana' ? 'banana' : 'bush';
+    const kind = t.kind === 'palm' ? (opts.identity?.trees[0] || (i % 2 ? 'palm_b' : 'palm_a')) : t.kind === 'banana' ? 'banana' : (opts.identity?.trees[1] || 'bush');
     dummy.position.set(t.x, groundAt(t.x, t.z) - 0.05, t.z);
     dummy.rotation.set(0, t.rot || 0, 0);
-    dummy.scale.setScalar(t.scale || 1);
+    dummy.scale.setScalar((t.scale || 1)*(opts.identity?.tree_scales?.[t.kind]??1));
     dummy.updateMatrix();
     addMatrix(kind, dummy.matrix.clone());
   });
   await step('L0');
   layout.houses.forEach((h) => {
+    if(opts.identity)return;
     if(h.infrastructureStyle&&h.infrastructureStyle!=='rural')return;
     // house_2 is a stilt house: its deck sits 0.35 m below the model origin, piles go further down
     dummy.position.set(h.x, terrainHeight(layout, h.x, h.z) + ((h.variant | 0) % 3 === 2 ? 0.45 : 0.05), h.z);
@@ -148,9 +149,9 @@ export async function createLife(parent, layout, land, pickIndex, quality, opts 
     dummy.updateMatrix();
     addMatrix('house_' + ((h.variant | 0) % 3), dummy.matrix.clone());
   });
-  const treeKind = (key) => (key.startsWith('palm') ? 'palm' : key);
+  const treeKind = (key) => (key.startsWith('palm') || key==='thai_borassus' ? 'palm' : key==='thai_tamarind'?'bush':key);
   // ~14k trees: detailed models only near the camera, a ~30-triangle stand-in beyond NEAR_M
-  for (const key of ['palm_a', 'palm_b', 'banana', 'bush']) {
+  for (const key of (opts.identity ? [...opts.identity.trees,'banana'] : ['palm_a', 'palm_b', 'banana', 'bush'])) {
     const s = sets.get(key);
     if (!s) continue;
     const impostor = treeImpostor(key);
@@ -183,7 +184,7 @@ export async function createLife(parent, layout, land, pickIndex, quality, opts 
     }
   }
   await step('L1');
-  const procTree = { palm_a: P.palm(), palm_b: P.palm(), banana: P.banana(), bush: P.bush() };
+  const procTree = opts.identity ? { [opts.identity.trees[0]]: P.palm(),[opts.identity.trees[1]]:P.bush(),banana:P.banana() } : { palm_a: P.palm(), palm_b: P.palm(), banana: P.banana(), bush: P.bush() };
   for (const key of Object.keys(procTree)) setParts(key, [{ geometry: procTree[key], material: null }], () => treeMaterial(treeKind(key)));
   const houseBody = (src) => shared(`house|${src?.uuid || '-'}`, () => patch(src ? src.clone() : new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.82 }), { key: 'house', radar: RADAR.house }));
   for (let v = 0; v < 3; v++) {
@@ -467,7 +468,7 @@ export async function createLife(parent, layout, land, pickIndex, quality, opts 
     if (!gltf) return false;
     const parts = gltfParts(gltf);
     if (!parts.length) return false;
-    if (name.startsWith('palm') || name === 'banana' || name === 'bush') {
+    if (name.startsWith('palm') || name === 'banana' || name === 'bush' || opts.identity?.trees.includes(name)) {
       setParts(name, parts, (m) => treeMaterial(treeKind(name), m));
     } else if (name.startsWith('house_')) {
       setParts(name, parts, (m) => (/window/i.test(m?.name || '') ? windowMaterial(m) : houseBody(m)));

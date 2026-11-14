@@ -1,3 +1,5 @@
+import {requestedSite} from './data/siteRules.js';
+let selectedSite;try{selectedSite=requestedSite(location.search);}catch{selectedSite=null;}
 import './ui/atlas.css';
 import '@fontsource/ibm-plex-sans/latin-400.css';
 import '@fontsource/ibm-plex-sans/vietnamese-400.css';
@@ -34,7 +36,7 @@ async function launch(initialReturning=false){
   const {createLocationAtlas}=await import('./ui/locationAtlas.js');
   atlas=await createLocationAtlas({
     async choose(site,transition){
-      if(site.id!=='tan_hoi'){location.assign(`${import.meta.env.BASE_URL}map/?site=${encodeURIComponent(site.id)}`);return;}
+      if(site.id!==selectedSite){location.assign(`${import.meta.env.BASE_URL}?site=${encodeURIComponent(site.id)}&enter=1`);return;}
       prepare();await ready;if(transition.cancelled())return;
       skip=false;skipButton.hidden=false;
       if(!await transition.fly()){skipButton.hidden=true;return;}
@@ -50,6 +52,7 @@ async function launch(initialReturning=false){
   const show=()=>{if(!returning)return;entryState.active=true;document.body.classList.add('is-atlas');ui.inert=canvas.inert=true;entryState.pauseSound?.(true);atlas.show(true);};
   trigger.onclick=show;trigger.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show();}};
   addEventListener('keydown',e=>{if(e.key==='Escape'&&entryState.active&&returning)atlas.root.querySelector('.atlas-resume').click();});
-  window.__atlas={show,enter:()=>atlas.root.querySelector('[data-location="tan_hoi"]')?.click(),get active(){return entryState.active;},get worldReady(){return entryState.ready;}};
-  prepare();
+  window.__atlas={show,enter:()=>atlas.root.querySelector(`[data-location="${selectedSite}"]`)?.click(),get active(){return entryState.active;},get worldReady(){return entryState.ready;}};
+  // Load the selected landscape after choice, keeping initial atlas delivery small.
+  if(new URLSearchParams(location.search).has('enter'))atlas.root.querySelector(`[data-location="${selectedSite}"]`)?.click();
 }

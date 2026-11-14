@@ -1,0 +1,97 @@
+{
+  "title": "Original Bang Rakam illustrative architecture and objects",
+  "license": "MIT",
+  "source": "web/tools/blender/thai/build_identity.py",
+  "units": "metres",
+  "front": "+Z",
+  "up": "+Y",
+  "generator": "Blender 5.3; glTF Transform 4.5.1 meshopt",
+  "illustrative": true,
+  "notes": [
+    "Shapes and proportions are original artist presets, not surveyed buildings.",
+    "Temple positions come from OSM; architecture is generic Thai illustration, not a reconstruction of each named temple.",
+    "Tree forms are illustrative; no local species-distribution or household-religion survey is claimed.",
+    "No flags, royal emblems, religious figures, brands, people or external images are included."
+  ],
+  "references": [
+    {
+      "url": "https://www.witpress.com/Secure/elibrary/papers/UW12/UW12021FU1.pdf",
+      "role": "Historical local stilt/floating house forms, independently modelled; no images copied"
+    },
+    {
+      "url": "https://thailandfoundation.or.th/understanding-thai-buddhist-architecture/",
+      "role": "Generic roof and chedi terminology; not local temple geometry"
+    },
+    {
+      "url": "https://library.tcdc.or.th/record/view/b00034334",
+      "role": "Spirit-house architectural context; no ritual objects reproduced"
+    }
+  ],
+  "assets": [
+    {
+      "file": "thai_stilt_a.glb",
+      "bytes": 30048,
+      "sha256": "3c04895ae20c6f08a2542a33d114dcc2422ef53696928b12382e633ad122bc13"
+    },
+    {
+      "file": "thai_stilt_b.glb",
+      "bytes": 30536,
+      "sha256": "65f8b26f759587952581d654fce8519a7367570c013bc1ee27e5549c9f1f363a"
+    },
+    {
+      "file": "thai_stilt_c.glb",
+      "bytes": 31136,
+      "sha256": "58c2452b521e8183267878ff110e37e7df4799399cb71c295bb33f89370711b2"
+    },
+    {
+      "file": "thai_raised.glb",
+      "bytes": 18736,
+      "sha256": "bbd159782d347ecb7db519220bb8286dfbddca82cae192d40abea3212b9332eb"
+    },
+    {
+      "file": "thai_raft.glb",
+      "bytes": 24324,
+      "sha256": "2a6c3026c07667f0020c1102d1628d8d61235c2b31754fa29449a92afd277ac6"
+    },
+    {
+      "file": "thai_hut.glb",
+      "bytes": 24764,
+      "sha256": "d563cfb87f57ec5ec616f1cd3dd4ca798af295c8890c893f600019007801d13b"
+    },
+    {
+      "file": "thai_temple.glb",
+      "bytes": 24888,
+      "sha256": "d531c918d128fc804abcc13fe8371d8f54f7a167fee1e8ce7f927e65b7e63d5b"
+    },
+    {
+      "file": "thai_spirit.glb",
+      "bytes": 5200,
+      "sha256": "77c2ccb0fd693e85e0a90d12cf9bac3211866bc84bcf513932d45b155664e3e0"
+    },
+    {
+      "file": "thai_longtail.glb",
+      "bytes": 5492,
+      "sha256": "586f45d0899aba7f39066032028053782e77c85ed287dd72d52190e1ec419cb8"
+    },
+    {
+      "file": "thai_net.glb",
+      "bytes": 18780,
+      "sha256": "94225675e9d209db0da485f5d49141f085ed0cd4374b690ed57223032409a585"
+    },
+    {
+      "file": "thai_trap.glb",
+      "bytes": 29416,
+      "sha256": "bc7034fb3d2461b4375ce77a72525748adfb70db248af603a2ba05d80483e961"
+    },
+    {
+      "file": "thai_borassus.glb",
+      "bytes": 12776,
+      "sha256": "e021e441509b87939d53530e8c147c522d356505ec0c1475ecd571b8de3e4add"
+    },
+    {
+      "file": "thai_tamarind.glb",
+      "bytes": 24952,
+      "sha256": "268759aafc2882077d0aa71c201d3af2dff256500783154f658345e7931e73a5"
+    }
+  ]
+}
