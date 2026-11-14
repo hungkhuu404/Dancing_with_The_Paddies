@@ -1,11 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "meta",
-  "$comment": "Implements CONTRACT-001 1.0.0 in docs/data-contract.md.",
+  "$comment": "Implements CONTRACT-001 2.0.0 in docs/data-contract.md.",
   "type": "object",
   "properties": {
     "contract_version": {
-      "const": "1.0.0"
+      "const": "2.0.0"
     },
     "site": {
       "enum": [
@@ -69,7 +69,24 @@
           }
         },
         "single_flip_filter": {
-          "type": "boolean"
+          "const": true
+        },
+        "classification": {
+          "const": "pixel_fraction_75_dual_50"
+        },
+        "water_fraction": {
+          "const": 0.75
+        },
+        "fill_min_fraction": {
+          "const": 0.5
+        },
+        "joint_valid_fraction": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "selection_status": {
+          "const": "post_hoc"
         },
         "frozen_utc": {
           "anyOf": [
@@ -89,7 +106,12 @@
         "hh_db_max",
         "hv_db_max",
         "single_flip_filter",
-        "frozen_utc"
+        "frozen_utc",
+        "classification",
+        "water_fraction",
+        "fill_min_fraction",
+        "joint_valid_fraction",
+        "selection_status"
       ]
     },
     "acquisitions": {

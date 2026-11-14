@@ -4,6 +4,7 @@ import {readFileSync, lstatSync, readdirSync, realpathSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {dirname, resolve, relative, isAbsolute, join} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {isPixelV2} from '../src/science/pixelMethod.js';
 
 const WEB = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const ROOT = resolve(WEB, '..');
@@ -30,7 +31,7 @@ for (const name of names) {
   digests.set(name, createHash('sha256').update(readFileSync(file)).digest('hex'));
 }
 const meta = JSON.parse(readFileSync(join(ROOT, 'data/tan_hoi/meta.json'), 'utf8'));
-if (meta.fixture || meta.contract_version !== '1.0.0') throw new Error('Expected real CONTRACT-001 1.0.0 input');
+if (!isPixelV2(meta)) throw new Error('Expected real CONTRACT-001 2.0.0 pixel input');
 console.log(`Verified ${names.length} committed public inputs at ${git('rev-parse', 'HEAD')}; no synthetic data.`);
 
 function filesIn(dir, prefix = '') {
@@ -56,5 +57,5 @@ for (let i = 0; i < args.length; i += 2) {
   }
   console.log(`Verified ${relative(WEB, output)}: exactly ${names.length} public files, byte-for-byte equal to checked inputs.`);
 }
-if(names.includes('tan_hoi/validation.json')) console.log('Public H5 file included; agreement scores are not displayed in the UI.');
+if(names.includes('tan_hoi/validation.json')) console.log('Post-hoc pixel reference comparison included; agreement scores are not displayed in the UI.');
 else console.warn('validation.json is not in the public allowlist; no substitute is generated.');

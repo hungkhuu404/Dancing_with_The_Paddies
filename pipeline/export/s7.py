@@ -28,6 +28,28 @@ DECIMALS = ("flood_days_min","flood_days_max","max_gap_days")
 STATUSES = ("never_water","flooded","water_gone","always_water","no_data")
 FLAGS = ("yes","possible","no","na")
 
+def method_metadata(config, freeze):
+    classification = freeze.get("classification", {})
+    require(classification.get("name") == "pixel_fraction_75_dual_50" and
+            classification.get("water_fraction") == .75 and classification.get("fill_min_fraction") == .5 and
+            classification.get("joint_valid_fraction") == config["thresholds"]["min_valid_pixel_fraction"] and
+            freeze.get("selection", {}).get("status") == "post_hoc" and
+            freeze.get("single_anomaly_filter", {}).get("enabled") is True,
+            "Unsupported or inconsistent pixel method")
+    frozen = freeze.get("frozen_utc")
+    if frozen is not None:
+        frozen = utc(frozen).isoformat().replace("+00:00", "Z")
+    return {"rule":"Q0", "hh_db_max":config["thresholds"]["hh_db"],
+            "hv_db_max":config["thresholds"]["hv_db"], "single_flip_filter":True,
+            "frozen_utc":frozen, "classification":classification["name"],
+            "water_fraction":classification["water_fraction"], "fill_min_fraction":classification["fill_min_fraction"],
+            "joint_valid_fraction":classification["joint_valid_fraction"], "selection_status":"post_hoc"}
+
+def validated_gt30(properties):
+    flag = gt30(properties)
+    require(properties["flag_gt30"] == flag, "flag_gt30 inconsistent with metrics")
+    return flag
+
 def require(condition, message):
     if not condition:
         raise ValueError(message)
@@ -181,7 +203,7 @@ def build_cells(config,cube,metrics,landcover,places,writer):
         # within one rounding unit of the boundary.
         require(abs(share-0.5)<=0.00005 or p["cropland"]==(share>=0.5),"BANG-2 boolean/share mismatch")
         p["nearest_hamlet"] = points[int(np.argmin((px-x-size/2)**2+(py-y-size/2)**2))]["properties"]["name"]
-        p["flag_gt30"] = gt30(p)
+        p["flag_gt30"] = validated_gt30(p)
         ring = writer.rounded([to_ll.transform(a,b) for a,b in [(x,y),(x+size,y),(x+size,y+size),(x,y+size),(x,y)]])
         feature = writer.feature({"type":"Polygon","coordinates":[ring]},p)
         feature["id"] = j
@@ -258,14 +280,10 @@ def build(args,stage):
         image_evidence.append({"backdrop":name,**evidence})
         public_acquisitions.append({k:acq[k] for k in ("i",*ACQ_FIELDS,"date_local")}|{
             "backdrop":name,"valid_share":float(np.mean(cube["s"][i]!=0))})
-    frozen = freeze["frozen_utc"]
-    if frozen is not None:
-        frozen = utc(frozen).isoformat().replace("+00:00","Z")
     meta = {
-        "contract_version":"1.0.0","site":config["site"],"generated_utc":datetime.now(timezone.utc).isoformat().replace("+00:00","Z"),
+        "contract_version":"2.0.0","site":config["site"],"generated_utc":datetime.now(timezone.utc).isoformat().replace("+00:00","Z"),
         "timezone":config["timezone"],"grid":{"epsg":config["grid"]["epsg"],"cell_m":250,"n_cells":len(cube["cell_id"])},
-        "method":{"rule":"Q0","hh_db_max":config["thresholds"]["hh_db"],"hv_db_max":config["thresholds"]["hv_db"],
-            "single_flip_filter":freeze["single_anomaly_filter"]["enabled"],"frozen_utc":frozen},
+        "method":method_metadata(config, freeze),
         "acquisitions":public_acquisitions,"backdrop":{"db_min":-25,"db_max":-5,"corners":corners},
         "sources":["NISAR L2 GCOV (NASA/ISRO), ASF DAAC","ESA WorldCover 2021","OpenStreetMap contributors (ODbL)"],
         "skipped":skipped_records(manifest)}
@@ -276,7 +294,7 @@ def build(args,stage):
     report = verify(data,config["site"],args.schemas)
     input_paths = [args.config,args.cube,args.metrics,args.landcover,args.reference,args.manifest,args.run_manifest,
                    args.freeze,args.places,args.aoi,args.sites,*[a["cache"] for a in acquisitions]]
-    evidence = {"task":"S7-EXPORT","contract_version":"1.0.0","synthetic":args.synthetic,
+    evidence = {"task":"S7-EXPORT","contract_version":"2.0.0","synthetic":args.synthetic,
         "site":config["site"],"duration_s":round(time.perf_counter()-started,3),
         "acquisitions":public_acquisitions,
         "libraries":{name:importlib.metadata.version(name) for name in ("numpy","Pillow","pyproj","shapely","jsonschema")},

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "cells",
-  "$comment": "Implements CONTRACT-001 1.0.0 in docs/data-contract.md. QUAN-3 compatibility: null ongoing/status_confirmed/n_episodes allowed only for no_data, matching S5.",
+  "$comment": "Implements CONTRACT-001 2.0.0 in docs/data-contract.md. QUAN-3 compatibility: null ongoing/status_confirmed/n_episodes allowed only for no_data, matching S5.",
   "type": "object",
   "properties": {
     "type": {

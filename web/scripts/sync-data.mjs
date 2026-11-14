@@ -2,6 +2,7 @@
 import { readFileSync, existsSync, lstatSync, mkdirSync, cpSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve, join, relative, isAbsolute } from 'node:path';
+import {isPixelV2} from '../src/science/pixelMethod.js';
 
 const WEB = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const ROOT = resolve(WEB, '..');
@@ -23,7 +24,7 @@ const files = allowlist.map(name => {
   return {name, source};
 });
 const meta = JSON.parse(readFileSync(join(ROOT, 'data/tan_hoi/meta.json'), 'utf8'));
-if (meta.fixture || meta.contract_version !== '1.0.0') throw new Error('Expected real CONTRACT-001 1.0.0 data');
+if (!isPixelV2(meta)) throw new Error('Expected real CONTRACT-001 2.0.0 pixel data');
 rejectLinks(OUT);
 if (!within(join(WEB, 'public'), OUT)) throw new Error('Invalid generated output');
 rmSync(OUT, { recursive: true, force: true });
