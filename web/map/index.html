@@ -9,8 +9,8 @@
   <body>
     <header class="top">
       <a class="brand" href="../" id="world-link"><span class="brand-name">Flood Calendar</span><span class="brand-site" id="site-name">Tân Hội</span></a>
-      <nav class="workspace-switch" aria-label="Workspace"><a href="../" id="back-world">Landscape</a><span aria-current="page">Map</span></nav>
-      <button class="text-button" id="about-open" type="button" aria-label="About the data" title="About the data"><span class="control-label">About the data</span></button>
+      <nav class="workspace-switch" aria-label="Workspace"><a href="../" id="back-world">Landscape</a><span aria-current="page">Map</span><a href="../calendar/" id="calendar-open" title="Water calendar">Calendar</a></nav>
+      <button class="text-button" id="about-open" type="button" aria-label="Method and limits" title="Method and limits"><span class="control-label">Method</span></button>
     </header>
 
     <main class="workspace" id="workspace">
@@ -71,7 +71,7 @@
       <p>Each block covers 250 m by 250 m. Radar observations show open water, not water depth.</p>
       <h3>Two ways to read the map</h3><p><strong>Season</strong> shows the record across all available observations. Choosing a date shows the latest valid water state on or before that date. A missing image does not mean the field was dry.</p>
       <h3>Date ranges, not exact days</h3><p>Water can arrive or recede between satellite visits. The record keeps both date bounds. Radar can date the start early on dry, flat fields. Pale status colours indicate a single, unconfirmed observation.</p>
-      <h3>Validation</h3><p id="validation-status">Validation results are unavailable. Agreement with a reference dataset is not reported.</p>
+      <h3>Validation</h3><p id="validation-status">Reference-agreement scores are not displayed in this interface. Read Method and limits for the interpretation.</p>
       <h3>Sources</h3><p id="credit"></p><p>Base map: © OpenStreetMap contributors, served by OpenFreeMap. The map works without the external base layer.</p>
     </dialog>
     <script type="module" src="/src/map/main.js"></script>

@@ -25,3 +25,7 @@ Các tài liệu đợt migration là snapshot lịch sử. Web hiện cài từ
 ## Local location-entrance migration
 
 [MIG-WEB-ENTRANCE-003](plans/location-entrance.md) records the regional entry, compact controls, module map, local checks and open-PR integration limits. [Source and per-file hashes](provenance/location-entrance.md) distinguish the pinned import from the one product adaptation. The integration branch now includes current main data tools; PR checks and merge state are tracked on GitHub. No deploy is configured by this migration.
+
+## Scientific views
+
+[SCIENCE-UI-001](plans/calendar-method.md) documents the hamlet water calendar, Method and limits, calculation rules, module map and verification. The views are available as /calendar/ and /method/ and open inside landscape/map exploration.

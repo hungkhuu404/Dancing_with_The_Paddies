@@ -26,3 +26,7 @@ Thiết kế và bản đồ module hiện hành: [MAP-UX-001](../docs/plans/int
 - Ảnh nền vector của `/map/` có thể gọi OpenFreeMap; chức năng lưới và dữ liệu radar dùng file local. About the data trình bày phương pháp và giới hạn. Nút nghe theo ô chưa có implementation đã được bỏ khỏi giao diện. Chưa chuyển công cụ tái tạo asset hoặc pipeline S0–S7.
 
 Lockfile giữ nguyên bytes từ nguồn. Các script deploy và fixture đã bỏ khỏi `package.json`; công cụ wrangler vẫn nằm trong dependency tree khóa sẵn nhưng không được gọi. Không đưa workflow deploy cũ sang repo này.
+
+## Scientific views
+
+/calendar/ shows the published nearest-hamlet water calendar, with keyboard inspection and full PNG export. /method/ reads the current acquisition method and documents limits, AI assistance and sources. Both are reachable inside the landscape/map without navigating away. The calendar groups blocks by nearest hamlet, not official boundaries.

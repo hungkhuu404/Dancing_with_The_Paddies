@@ -25,5 +25,6 @@
   "tan_hoi/meta.json",
   "tan_hoi/places.geojson",
   "tan_hoi/series.json",
-  "tan_hoi/summary.json"
+  "tan_hoi/summary.json",
+  "tan_hoi/validation.json"
 ]
