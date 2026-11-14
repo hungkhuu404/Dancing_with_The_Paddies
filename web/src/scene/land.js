@@ -22,7 +22,7 @@ function rasterAsync(layout, cx, cz, maskSize = MASK) {
     }
   } catch { worker = null; }
   if (!worker) return Promise.resolve(rasterise(layout, cx, cz, maskSize));
-  const id = ++wid, data = { parcels: layout.parcels.map((p) => ({ poly: p.poly })), canals: layout.canals, roads: layout.roads };
+  const id = ++wid, data = { parcels: layout.parcels.map((p) => ({ poly: p.poly })), canals: layout.canals, roads: layout.roads, water_areas:layout.water_areas };
   return new Promise((res, rej) => { waiting.set(id, [res, rej]); worker.postMessage({ id, layout: data, cx, cz, maskSize }); })
     .catch(() => rasterise(layout, cx, cz, maskSize));
 }
@@ -66,6 +66,7 @@ export async function createLand(layout, groundTex, opts = {}, step = async () =
     uMask: { value: maskTex }, uState: { value: stateTex }, uIds: { value: idTex },
     uEcology: { value: ecoTex },
     uFloodFrac: { value: 0.3 },
+    uSubmergeBund: {value:opts.ecology?.submerge_bunds?1:0},
     uOuterRot: { value: new THREE.Vector2(1, 0) },
     uWinC: { value: new THREE.Vector2(cx, cz) }, // the tile's window centre (mask / id textures)
   };
@@ -126,7 +127,7 @@ export async function createLand(layout, groundTex, opts = {}, step = async () =
   };
   const parcelMesh = mk('PARCEL', pg);
   await step('parcels');
-  mk('BUND', bundGeometry(parcels));
+  mk('BUND', bundGeometry(parcels,opts.ecology?.submerge_bunds));
   await step('bunds');
   const banks = bankGeometry(layout.canals);
   if (banks) mk('BANK', banks);
@@ -150,7 +151,7 @@ export async function createLand(layout, groundTex, opts = {}, step = async () =
       to[k] = levelAt(s, i) ? 1 : 0;
       flooded += s[i] === 'W' ? 1 : 0;
       stateData[k * 4 + 1] = s[i] === 'W' ? 255 : s[i] === '-' ? 128 : 0;
-      const appearance = fieldAppearance(s, i, opts.acquisitions);
+      const appearance = fieldAppearance(s, i, opts.acquisitions, opts.ecology);
       for (let j=0;j<3;j++) {
         ecoFrom[k*3+j]=ecoData[k*4+j]/255;
         ecoTo[k*3+j]=[appearance.standing,appearance.drained,appearance.longWet][j];
@@ -312,25 +313,27 @@ function resample(points, step) {
   return out;
 }
 
-function bundGeometry(parcels) {
+function bundGeometry(parcels,submerge=false) {
   // per edge: a low earthen mound centred on the boundary, extended a little at both ends to close corners
   // trapezoid: flat walkable crest, steep-ish flanks (reads as packed earth, not a pipe)
   const prof = [[-1.7, -0.7], [-0.75, H.bund - 0.08], [-0.45, H.bund], [0.45, H.bund], [0.75, H.bund - 0.08], [1.7, -0.7]];
   const P = prof.length;
-  const pos = [], idx = [];
-  for (const p of parcels) {
+  const pos = [], idx = [], parcelIds=[];
+  for (let pi=0;pi<parcels.length;pi++) {
+    const p=parcels[pi];
     const poly = p.poly;
     for (let k = 0; k < poly.length; k++) {
       const [ax, az] = poly[k], [bx, bz] = poly[(k + 1) % poly.length];
       let tx = bx - ax, tz = bz - az; const L = Math.hypot(tx, tz); if (L < 0.5) continue; tx /= L; tz /= L;
       const nx = -tz, nz = tx, e = 0.7, base = pos.length / 3;
       for (const [px, pz] of [[ax - tx * e, az - tz * e], [bx + tx * e, bz + tz * e]])
-        for (const [o, y] of prof) pos.push(px + nx * o, y, pz + nz * o);
+        for (const [o, y] of prof) {pos.push(px + nx * o, y, pz + nz * o);if(submerge)parcelIds.push(pi);}
       for (let q = 0; q < P - 1; q++) idx.push(base + q, base + q + 1, base + P + q, base + q + 1, base + P + 1 + q, base + P + q);
     }
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  if(submerge)g.setAttribute('aBund',new THREE.Float32BufferAttribute(parcelIds,1));
   g.setIndex(idx);
   g.computeVertexNormals();
   const nA = g.attributes.normal;
@@ -513,22 +516,22 @@ const RADAR = {
 const KINDS = { PARCEL: 0, BUND: 1, BANK: 2, ROAD: 3, BASE: 4, BED: 5 };
 
 function groundMaterial(kind, uniforms) {
-  const K = KINDS[kind];
+  const K = KINDS[kind],floodedBund=K===1&&uniforms.uSubmergeBund?.value===1;
   const m = new THREE.MeshStandardMaterial({ roughness: 0.9, metalness: 0, envMapIntensity: 0.6 });
   m.defines = { KIND: K };
   if (K === 5) m.dithering = true;
   patch(m, {
-    key: 'ground' + K,
+    key: 'ground' + K+(floodedBund?'floodplain':''),
     uniforms,
     radar: RADAR[K],
-    vertexPre: K === 0 ? `attribute vec4 aP; uniform sampler2D uState; uniform sampler2D uEcology; varying vec4 vSt; varying vec2 vRow; varying vec3 vEcology;` : `varying vec4 vSt; varying vec2 vRow; varying vec3 vEcology;${K===3?'attribute float aRoad; varying float vRoad;':''}`,
+    vertexPre: K === 0 ? `attribute vec4 aP; uniform sampler2D uState; uniform sampler2D uEcology; varying vec4 vSt; varying vec2 vRow; varying vec3 vEcology;` : `varying vec4 vSt; varying vec2 vRow; varying vec3 vEcology;${K===3?'attribute float aRoad; varying float vRoad;':floodedBund?'attribute float aBund;uniform sampler2D uState;uniform float uSubmergeBund;':''}`,
     vertexMain: K === 0
       ? `vec4 st = texelFetch(uState, ivec2(int(mod(aP.x, 256.)), int(aP.x / 256.)), 0);
          vSt = st; vRow = aP.yz;
          vEcology = texelFetch(uEcology, ivec2(int(mod(aP.x,256.)),int(aP.x/256.)),0).rgb;
          float k = clamp(st.r * 1.6 - aP.z * .6, 0., 1.); k = k * k * (3. - 2. * k);
          if (aP.w < .5) transformed.y = mix(${H.dry.toFixed(2)}, ${H.wet.toFixed(2)}, k);`
-      : `vSt = vec4(0.); vRow = vec2(0.); vEcology=vec3(0.);${K===3?'vRoad=aRoad;':''}`,
+      : `vSt = vec4(0.); vRow = vec2(0.); vEcology=vec3(0.);${K===3?'vRoad=aRoad;':floodedBund?'float wet=texelFetch(uState,ivec2(int(mod(aBund,256.)),int(aBund/256.)),0).r;transformed.y-=wet*.94*uSubmergeBund;':''}`,
     fragPre: GROUND_PRE,
     fragMap: GROUND_MAP,
     fragRough: 'float roughnessFactor = gRough;',

@@ -13,14 +13,16 @@ import { warmShadowPrograms } from './shadowWarmup.js';
 import { maskResolution } from './raster.js';
 import { createTileWorld, sanitizeProps } from '../world/index.js';
 import { sweepDelay } from '../world/paths.js';
+import {createIdentity} from '../world/identity.js';
 import {createInfrastructure} from '../world/infrastructure.js';
 import {enrichRoads,placeHouse} from '../world/infrastructurePlacement.js';
 
 /** Budgets per quality tier. */
-export function tileBudget(tier) {
-  return tier === 'low'
+export function tileBudget(tier,profile) {
+  const defaults=tier === 'low'
     ? { max: 4, radius: 1500, worldDist: 500, showDist: 6000, mirrorDist: 300, crownDist: 600 }
     : { max: 9, radius: 2400, worldDist: 700, showDist: 9000, mirrorDist: 700, crownDist: 1200 };
+  return {...defaults,...profile?.streaming?.[tier]};
 }
 
 /**
@@ -54,7 +56,7 @@ export function makeStep(budget = 8) {
  */
 export function createTiles(S) {
   const half = S.index.tile_m / 2, origin = S.index.origin;
-  const budget = tileBudget(S.quality.tier);
+  const budget = tileBudget(S.quality.tier,S.profile);
   const descs = S.index.tiles;
   const byId = new Map(descs.map((d) => [d.id, d]));
   const tiles = new Map(); // id -> tile (loading or ready)
@@ -79,13 +81,14 @@ export function createTiles(S) {
     if (t.dead) return;
     normalizeLayout(layout, S.nPasses);
     shiftXZ(layout, d.x, d.z);
+    layout.water_areas=(S.index.water_areas||[]).filter(w=>w.bounds[2]>=d.x-1000&&w.bounds[0]<=d.x+1000&&w.bounds[3]>=d.z-1000&&w.bounds[1]<=d.z+1000);
     const props = sanitizeProps(shiftXZ(rawProps, d.x, d.z));
     if (S.contract) applyCells(layout, S.contract, origin);
     if(S.infrastructure){
       // Source matching and footprint tests are CPU work too. Yield within this
       // stage rather than after an entire dense village has blocked a frame.
       for(const road of layout.roads){enrichRoads({roads:[road]},S.infrastructure);await step('road-metadata');if(t.dead)return;}
-      for(const h of layout.houses){h.infrastructurePlacement=placeHouse(h,layout,S.infrastructure);h.infrastructureStyle=h.infrastructurePlacement.kind;await step('house-placement');if(t.dead)return;}
+      for(const h of layout.houses){h.infrastructurePlacement=placeHouse(h,layout,S.infrastructure,S.profile);h.infrastructureStyle=h.infrastructurePlacement.kind;await step('house-placement');if(t.dead)return;}
       props.bridges=props.bridges.filter(p=>!S.infrastructure.bridges.some(b=>Math.hypot(p.x-b.x,p.z-b.z)<Math.max(25,b.len*.6)));
       props.religious=props.religious.filter(p=>!S.infrastructure.buildings.some(b=>b.kind==='church'&&Math.hypot(p.x-b.x,p.z-b.z)<100));
     }
@@ -96,20 +99,20 @@ export function createTiles(S) {
     const group = new THREE.Group(); group.name = 'tile_' + d.id; group.visible = false;
     const landStep = (k) => step('land:' + k);
     landStep.reset = step.reset;
-    const land = await createLand(layout, S.groundTex, { centre, acquisitions:S.contract?.acq || layout.passes, maskSize:maskResolution(S.quality.tier) }, landStep);
+    const land = await createLand(layout, S.groundTex, { centre, ecology:S.profile.ecology, acquisitions:S.contract?.acq || layout.passes, maskSize:maskResolution(S.quality.tier) }, landStep);
     group.add(land.group); mark('land');
     land.setPass(S.pass(), true);
     const pickIndex = buildGrid(layout.parcels, 50);
     if (t.dead) { land.dispose(); return; }
     await step('grid');
-    const ecosystem=createEcosystem(layout,land,pickIndex,S.quality,S.reduced,props);
+    const ecosystem=createEcosystem(layout,land,pickIndex,S.quality,S.reduced,props,S.profile.ecology);
     // Fine illustrative plants/fauna do not contribute useful mirror pixels.
     // Keep them on the main-camera-only layer from creation, so crossing the
     // mirror radius never introduces their reflected shader variants mid-flight.
     ecosystem.group.traverse(o=>o.layers.set(1));
     group.add(ecosystem.group); S.lensHidden?.push(ecosystem.group);
     await step('ecosystem');
-    const life = await createLife(group, layout, land, pickIndex, S.quality, { centre, reduced:S.reduced, roost:props.veg.find(v=>v.kind==='tram') }, (k) => step('life:' + k));
+    const life = await createLife(group, layout, land, pickIndex, S.quality, { centre, reduced:S.reduced, identity:S.profile.identity, roost:props.veg.find(v=>v.kind==='tram') }, (k) => step('life:' + k));
     mark('life'); await step('life');
     // village walkers/carts/cattle (PR #5), per tile; kept out of the scientific radar-lens pass
     const rural = createRuralLife(group, layout, pickIndex, S.quality, { reduced: S.reduced, enabled: S.rural !== false, motorbikes: false });
@@ -122,13 +125,15 @@ export function createTiles(S) {
     });
     const world = await createTileWorld(ctx, (k) => step('world:' + k));
     ctx.tileWorld=world;
+    const identity=S.profile.identity?createIdentity(ctx,S.infrastructure,S.models):null;
+    if(identity){group.add(identity.group);await step('identity');}
     group.add(world.group); mark('world');
     const infrastructure=S.infrastructure?createInfrastructure(ctx,S.infrastructure):null;
     if(infrastructure){group.add(infrastructure.group);S.lensHidden?.push(infrastructure.group);await step('infrastructure');}
-    for (const [n, g] of S.models) { life.upgrade(n, g); world.upgrade(n, g); await step('model:' + n); }
+    for (const [n, g] of S.models) { life.upgrade(n, g); world.upgrade(n, g); identity?.upgrade(n,g); await step('model:' + n); }
     mark('models'); S.renderer.initTexture(land.maskTex); await step('mask-upload');
     S.renderer.initTexture(land.idTex); await step('id-upload');
-    Object.assign(t, { layout, props, land, life, rural, ecosystem, world, infrastructure,group, pickIndex, ctx, cents: layout.parcels.map((p) => centroid(p.poly)), ms: Math.round(performance.now() - t0), slices: { ...step.stats, work: Math.round(step.stats.work), worst: Math.round(step.stats.worst) } });
+    Object.assign(t, { layout, props, land, life, rural, ecosystem, world, infrastructure,identity,group, pickIndex, ctx, cents: layout.parcels.map((p) => centroid(p.poly)), ms: Math.round(performance.now() - t0), slices: { ...step.stats, work: Math.round(step.stats.work), worst: Math.round(step.stats.worst) } });
     if (t.dead) { dispose(t); return; }
     // static parts (identity transforms): skip their per-frame matrix recompose
     group.traverse((o) => { if (o.isInstancedMesh || o.name.startsWith('land_')) { o.matrixAutoUpdate = false; o.updateMatrix(); } });
@@ -157,7 +162,7 @@ export function createTiles(S) {
   function dispose(t) {
     t.dead = true;
     if (!t.group) return;
-    t.life?.dispose(); t.world?.dispose(); t.land?.dispose();
+    t.identity?.dispose(); t.life?.dispose(); t.world?.dispose(); t.land?.dispose();
     if(t.infrastructure){const i=S.lensHidden?.indexOf(t.infrastructure.group);if(i>=0)S.lensHidden.splice(i,1);t.infrastructure.dispose();}
     if(t.ecosystem){const i=S.lensHidden?.indexOf(t.ecosystem.group);if(i>=0)S.lensHidden.splice(i,1);t.ecosystem.dispose();}
     if (t.rural) {
@@ -246,6 +251,7 @@ export function createTiles(S) {
       if (!tl.group.visible) continue;
       const mir = tileDist(tl, half, target.x, target.z) < budget.mirrorDist;
       if (mir !== tl.mirror || (frame + (tl.x & 63)) % 60 === 0) setMirror(tl, mir); // re-applied now and then: models / clones added later
+      tl.identity?.update(dt,t,camPos);
       tl.life.setDistant(d > budget.crownDist);
       tl.life.update(dt, t, target, camDist, camPos, tl === active);
       const near = d < budget.worldDist;
@@ -290,7 +296,7 @@ export function createTiles(S) {
         tl.infrastructure?.setPass(i,false,now);
       }
     },
-    upgrade(name, g) { for (const tl of readyList) { tl.life.upgrade(name, g); tl.world.upgrade(name, g); } },
+    upgrade(name, g) { for (const tl of readyList) { tl.life.upgrade(name, g); tl.world.upgrade(name, g);tl.identity?.upgrade(name,g); } },
     setWakeColor(c) { for (const tl of readyList) tl.life.setWakeColor(c); },
   };
 }

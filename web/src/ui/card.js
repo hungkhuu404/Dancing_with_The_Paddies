@@ -5,7 +5,7 @@ import {blockCore} from './blockCore.js';
 import {icon} from './icons.js';
 import {reveal,dismiss} from './motion.js';
 
-export function createCard(root, passes, onClose) {
+export function createCard(root, passes, onClose, fixture=false) {
   root.setAttribute('role', 'region');
   root.setAttribute('aria-labelledby', 'card-title');
   root.hidden = true;
@@ -49,7 +49,7 @@ export function createCard(root, passes, onClose) {
       <button class="card-x" type="button" aria-label="Close">
         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9"/></svg>
       </button>
-      ${blockCore(p,'card-title')}
+      ${fixture?'<p class="fixture-record">Fixture record. Water data pending.</p>':''}${blockCore(p,'card-title')}
       <details class="observation-details"><summary>Observation record <span>${p.n_obs??0} images</span></summary>
       <div class="card-strip" role="img" aria-label="${stripLabel(s, passes)}">
         ${[...s].map((c, i) => `<i class="c-${c === 'W' ? 'w' : c === 'N' ? 'n' : 'x'}${i === pass ? ' is-cur' : ''}" title="${fmtDate(passes[i].date)}: ${c === 'W' ? 'water' : c === 'N' ? 'dry' : 'no data'}"></i>`).join('')}

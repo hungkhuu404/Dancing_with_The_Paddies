@@ -146,6 +146,8 @@ export function createTraffic(ctx) {
 
   function upgrade(name, gltf) {
     if (!gltf) return false;
+    if(ctx.profile?.identity?.boat===name)name='longtail';
+
     if (name === 'motorbike') return crowd ? crowd.setModel(gltf) : false;
     const kind = name === 'cargo_boat' ? 'cargo' : name === 'longtail' ? 'longtail' : null;
     if (!kind) return false;

@@ -1,3 +1,4 @@
+import {defaultSite} from '../data/siteRules.js';
 import {enterDialog,leaveDialog} from './motion.js';
 
 /** Lazy, same-origin map workspace. The native dialog makes the world inert. */
@@ -20,7 +21,7 @@ export function createMapWorkspace({beforeOpen,onReturn,current}) {
   function open(input=null,push=true) {
     if(active){if(input){const u=new URL(input,location.origin);pendingQuery=u.search.slice(1);lastQuery=pendingQuery;updateAddress(pendingQuery);if(ready)post('navigate',{query:pendingQuery});}return;}
     originControl=document.activeElement;savedWorldUrl=location.href;
-    if(!push){const clean=new URL(savedWorldUrl);for(const k of ['view','cell','layer','scope','site'])clean.searchParams.delete(k);savedWorldUrl=clean.href;}
+    if(!push){const clean=new URL(savedWorldUrl);for(const k of ['view','cell','layer','scope','site'])clean.searchParams.delete(k);if(current().site!==defaultSite)clean.searchParams.set('site',current().site);savedWorldUrl=clean.href;}
     const url=new URL(input||`${import.meta.env.BASE_URL}map/`,location.origin);
     // Preserve the existing map viewport and layer when reopened from the top bar.
     const explicit=!!input;
@@ -60,6 +61,6 @@ export function createMapWorkspace({beforeOpen,onReturn,current}) {
   return {open,close,get active(){return active;},openDeepLink(){if(new URL(location.href).searchParams.get('view')==='map'){
     const original=new URL(location.href);savedWorldUrl=new URL(import.meta.env.BASE_URL,location.origin).href;
     open(`${import.meta.env.BASE_URL}map/${original.search}`,false);
-    const clean=new URL(original);for(const k of ['view','cell','layer','scope','pass','site'])clean.searchParams.delete(k);savedWorldUrl=clean.href;
+    const clean=new URL(original);for(const k of ['view','cell','layer','scope','pass','site'])clean.searchParams.delete(k);if(current().site!==defaultSite)clean.searchParams.set('site',current().site);savedWorldUrl=clean.href;
   }}};
 }

@@ -1,3 +1,5 @@
+import {siteProfile} from './siteRules.js';
+import {assertSceneMeta} from './contractPolicy.js';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
@@ -12,10 +14,11 @@ export async function json(url) {
   return r.json();
 }
 
-/** Real scene layout only; missing inputs never select a fixture. */
+/** layout.json, else the dev fixture. Validates the parts the scene relies on. */
 export async function loadLayout() {
   let layout, source = 'layout.json';
-  layout = await json(BASE + 'scene/layout.json');
+  try { layout = await json(BASE + 'scene/layout.json'); }
+  catch { layout = await json(BASE + 'scene/_fixture.json'); source = '_fixture.json'; }
   if (!layout.passes?.length) throw new Error('layout has no passes');
   normalizeLayout(layout);
   layout.source = source;
@@ -35,14 +38,15 @@ export function normalizeLayout(layout, n = layout.passes?.length || 0) {
   return layout;
 }
 
-/** Required real CONTRACT-001 data of the default site, shared with the map page. */
-export async function loadContract() {
+/** CONTRACT-001 data of the default site (the same files as the map page), or null when missing. */
+export async function loadContract(profile=siteProfile()) {
   try {
     const sites = await json(BASE + 'data/sites.json');
-    const site = sites.sites.find((s) => s.default) || sites.sites[0];
+    const site = sites.sites.find(s=>s.id===profile.id);
+    if(!site)throw Error(profile.name+' observations are not available yet. Data pending.');
     const dir = `${BASE}data/${site.id}/`;
     const [meta, series, cells] = await Promise.all([json(dir + 'meta.json'), json(dir + 'series.json'), json(dir + 'cells.geojson')]);
-    if (meta.fixture) throw new Error('Synthetic contract data is not allowed');
+    assertSceneMeta(profile,meta);
     const acq = meta.acquisitions;
     return {
       meta, series, acq, step: meta.grid.cell_m,
@@ -50,7 +54,7 @@ export async function loadContract() {
       passes: acq.map((a) => ({ i: a.i, date: a.date_local, track: a.track, source: meta.fixture ? 'sim' : 'radar' })),
     };
   } catch (e) {
-    throw new Error('Required public contract data is unavailable: ' + e.message);
+    throw e; // Incompatible real data must not silently use layout or fixture states.
   }
 }
 

@@ -1,5 +1,6 @@
+import {siteProfiles,checkSiteIndex,checkSiteMeta} from '../data/siteRules.js';
 import * as THREE from 'three';
-import {atlasPoint,publishedSite} from './entryRules.js';
+import {atlasPoint,entryKind} from './entryRules.js';
 import {escapeHTML as esc} from '../map/presentation.js';
 import {dateRange} from './blockSummary.js';
 
@@ -35,18 +36,21 @@ export async function createLocationAtlas({choose,back}){
     const isCancelled=()=>cancelled||revision!==choiceRevision;
     choose(location,{cancelled:isCancelled,fly:()=>isCancelled()?Promise.resolve(false):fly(location),message}).catch(error=>{
       if(isCancelled())return;
-      flight=false;root.classList.remove('is-preparing');root.setAttribute('aria-busy','false');message('Landscape unavailable.');if(!status.querySelector('.atlas-map-fallback')){const a=document.createElement('a');a.href=BASE+'map/?site='+encodeURIComponent(location.id);a.textContent='Open observation map';a.className='atlas-map-fallback';status.append(a);}
+      flight=false;root.classList.remove('is-preparing');root.setAttribute('aria-busy','false');message(error.message);if(!status.querySelector('.atlas-map-fallback')){const a=document.createElement('a');a.href=BASE+'map/?site='+encodeURIComponent(location.id);a.textContent='Open observation map';a.className='atlas-map-fallback';status.append(a);}
     });
   }
   try{
     const [registry,geography]=await Promise.all([fetchJSON('data/sites.json'),fetchJSON('atlas/region.json').catch(()=>null)]);dataset=geography;
     const published=await Promise.all(registry.sites.map(async site=>({site,meta:await fetchJSON(`data/${site.id}/meta.json`).catch(()=>null)})));
-    locations=published.map(({site,meta})=>({...site,available:publishedSite(site,meta),meta}));
-    if(!locations.some(l=>l.id==='bang_rakam'))locations.push({id:'bang_rakam',name:'Bang Rakam',region:'Thailand',center:[100.12,16.75],available:false});
-    cards.innerHTML=locations.map(l=>l.available?`<button type="button" class="atlas-location" data-location="${esc(l.id)}"><span class="atlas-location-name">${esc(l.name)}</span><span class="atlas-location-arrow" aria-hidden="true">↗</span><span class="atlas-location-region">${esc(l.region||'')}</span><span class="atlas-location-record">${l.meta.acquisitions.length} observations <span>${dateRange(l.meta.acquisitions[0].date_local,l.meta.acquisitions.at(-1).date_local)}</span></span></button>`:`<article class="atlas-location is-pending"><span class="atlas-location-name">${esc(l.name)}</span><span class="atlas-pending-label">Data pending</span><span class="atlas-location-region">${esc(l.region||'')}</span></article>`).join('');
+    locations=await Promise.all(Object.values(siteProfiles).map(async profile=>{
+      const record=published.find(v=>v.site.id===profile.id),site=record?.site||profile,meta=record?.meta;
+      let sceneReady=false;try{checkSiteIndex(profile,await fetchJSON(profile.scene.base+'index.json'));checkSiteMeta(profile,meta);sceneReady=true;}catch{/* pending landscape */}
+      return {...site,available:sceneReady&&entryKind(profile,site,meta)!=='pending',fixture:meta?.fixture===true,meta};
+    }));
+    cards.innerHTML=locations.map(l=>l.available?`<button type="button" class="atlas-location" data-location="${esc(l.id)}"><span class="atlas-location-name">${esc(l.name)}</span><span class="atlas-location-arrow" aria-hidden="true">↗</span><span class="atlas-location-region">${esc(l.region||'')}</span><span class="atlas-location-record">${l.fixture?'Data pending <span>Explore an illustrative landscape</span>':l.meta.acquisitions.length+' observations <span>'+dateRange(l.meta.acquisitions[0].date_local,l.meta.acquisitions.at(-1).date_local)+'</span>'}</span></button>`:`<article class="atlas-location is-pending"><span class="atlas-location-name">${esc(l.name)}</span><span class="atlas-pending-label">Data pending</span><span class="atlas-location-region">${esc(l.region||'')}</span></article>`).join('');
     locations.forEach(l=>{
       const el=document.createElement(l.available?'button':'div');el.className='atlas-pin'+(l.available?'':' is-pending');
-      el.innerHTML=`<i aria-hidden="true"></i><span>${esc(l.name)}<small>${l.available?'Explore':'Data pending'}</small></span>`;
+      el.innerHTML=`<i aria-hidden="true"></i><span>${esc(l.name)}<small>${l.fixture?'Fixture data':l.available?'Explore':'Data pending'}</small></span>`;
       if(l.available){el.type='button';el.setAttribute('aria-label','Explore '+l.name);el.onclick=()=>startChoice(l);cards.querySelector(`[data-location="${l.id}"]`).onclick=()=>startChoice(l);}
       markers.append(el);l.element=el;l.point=atlasPoint(...l.center);l.lastX=l.lastY=NaN;
     });

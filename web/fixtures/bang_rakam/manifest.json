@@ -1,0 +1,16 @@
+{
+  "purpose": "Fixture input provenance; synthetic water states must remain labelled",
+  "catalogue": "acquisitions.json",
+  "catalogue_sha256": "f017e00112fa165578a71d14bf8a35006c739e12331d40021caf9b8954d0a576",
+  "places": "places.geojson",
+  "river": "yom.json",
+  "osm_sha256": "9914a4cc3359674c06c7fe6624b3a5486ee6c20cd872b2fa8ac2e0a74516a57e",
+  "osm_license": "ODbL-1.0",
+  "radar_placeholder": {
+    "file": "no-radar.webp",
+    "description": "Original empty transparent 1x1 WebP; no radar image is invented",
+    "sha256": "df60ef3b17bed445d0a42a92b7eb475bf62621da520270bb56db3c6b3e2fa301"
+  },
+  "aoi_schema": "aoi-frame.schema.json",
+  "aoi_schema_status": "Fixture-only compatibility proposal; nullable osm_relation; the data-team schema is unchanged"
+}
