@@ -123,3 +123,21 @@
 @media(min-width:701px) and (max-width:880px) and (min-height:501px){:root .light-control,:root .credit,:root .reset-view{bottom:96px}}
 @media(prefers-reduced-transparency:reduce),(prefers-contrast:more){:root .light-control{background:#1B211F;-webkit-backdrop-filter:none;backdrop-filter:none}}
 @media(forced-colors:active){:root .light-control{background:Canvas;color:CanvasText;border-color:CanvasText;backdrop-filter:none}:root .control-note{color:CanvasText;text-shadow:none}}
+
+/* Scientific reference views stay in the exploration tab. */
+:root .calendar-launch{position:fixed;top:78px;left:16px;z-index:25;display:flex;align-items:center;gap:7px;min-height:34px;padding:6px 12px;border-radius:18px;background:var(--ui-glass);border:1px solid var(--ui-line);color:var(--ui-ink);font:12px var(--sans);text-decoration:none;-webkit-backdrop-filter:var(--ui-filter);backdrop-filter:var(--ui-filter)}
+:root .card{top:122px;max-height:calc(100dvh - 198px)}
+:root .reference-workspace{padding:0;width:calc(100vw - 32px);max-width:1400px;height:calc(100dvh - 32px);max-height:none;border:1px solid #eef0ec44;border-radius:18px;overflow:hidden;background:#EEF0EC;box-shadow:0 20px 90px #09150f66}
+:root .reference-workspace::backdrop{background:#0c191f55;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+:root .reference-workspace iframe{display:block;width:100%;height:100%;border:0}
+:root .reference-close{position:absolute;top:8px;right:8px;z-index:5;width:36px;height:36px;min-height:36px;border:1px solid #1b211f33;border-radius:50%;background:#EEF0EC;color:#1B211F;font:24px/1 var(--sans)}
+:root .tools-panel a{color:var(--ui-ink);font:12px var(--sans);padding:8px 0}
+@media(max-width:700px){:root .calendar-launch{top:122px;left:10px;font-size:11px}:root .card{top:auto;max-height:calc(100dvh - 340px)}:root .reference-workspace{width:calc(100vw - 12px);height:calc(100dvh - 12px);border-radius:12px}:root #calendar-open{padding:6px;font-size:10px}}
+@media(max-height:500px) and (orientation:landscape){:root .calendar-launch{top:68px;left:10px}:root .card{top:112px;max-height:calc(100dvh - 122px)}}
+
+:root .story-caption:has(.tour-calendar){width:min(900px,calc(100vw - 32px));max-width:none;bottom:94px}:root .tour-calendar{display:block;width:100%;height:280px;border:0;border-radius:10px;margin-top:10px;background:#EEF0EC}:root .story-caption>a{display:inline-block;padding:8px 0;color:var(--ui-ink);font:12px var(--sans)}
+@media(max-width:700px){:root .story-caption:has(.tour-calendar){width:calc(100vw - 20px);bottom:160px}:root .tour-calendar{height:230px}}
+
+:root .story-caption:has(.tour-calendar){left:max(16px,calc((100vw - 900px)/2));transform:none;pointer-events:auto}:root .tour-calendar{height:clamp(120px,32vh,280px)}
+@media(max-width:700px){:root .story-caption:has(.tour-calendar){left:10px}:root .tour-calendar{height:230px}}
+@media(max-height:500px) and (orientation:landscape){:root .story-caption:has(.tour-calendar){left:12px;right:12px;width:calc(100vw - 24px);bottom:12px;padding:10px 12px}:root .tour-calendar{height:110px}:root .story-caption:has(.tour-calendar)>span{font-size:11px}}

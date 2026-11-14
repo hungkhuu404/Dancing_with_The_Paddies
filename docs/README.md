@@ -13,9 +13,9 @@
 
 | Đường dẫn | Hiện trạng |
 | --- | --- |
-| `pipeline/{catalog,core,export,validate}/` | Khung có `.gitkeep`, chưa chuyển implementation |
-| `config/sites/`, `schema/`, `tests/` | Khung có `.gitkeep`; chưa chuyển cấu hình site, schema hoặc test pipeline |
-| `data/` | Bộ xuất công khai H4 của Tân Hội, 20 lần chụp; chưa có validation, Bang Rakam hoặc H7 |
+| `pipeline/{catalog,core,export,validate}/` | S0 catalogue and S7 export are implemented; core/validate remain separate work |
+| `config/sites/`, `schema/`, `tests/` | Site configuration and JSON Schema are present; frontend tests are in web/test/ |
+| `data/` | Public Tân Hội v1/H4 with 20 acquisitions and the H5 reference comparison; no Bang Rakam or H7 export |
 | `docs/data-contract.md` | Hợp đồng đã có từ baseline, giữ nguyên |
 | `docs/plans/`, `docs/provenance/` | Bổ sung trong đợt 1 |
 | `web/` | Vite, Three.js và MapLibre; 3D và map tích hợp cùng tab, có route `/map/` độc lập; test trong `web/test/` |
@@ -25,3 +25,7 @@ Các tài liệu đợt migration là snapshot lịch sử. Web hiện cài từ
 ## Local location-entrance migration
 
 [MIG-WEB-ENTRANCE-003](plans/location-entrance.md) records the regional entry, compact controls, module map, local checks and open-PR integration limits. [Source and per-file hashes](provenance/location-entrance.md) distinguish the pinned import from the one product adaptation. The integration branch now includes current main data tools; PR checks and merge state are tracked on GitHub. No deploy is configured by this migration.
+
+## Scientific views
+
+[SCIENCE-UI-001](plans/calendar-method.md) documents the hamlet water calendar, Method and limits, calculation rules, module map and verification. The views are available as /calendar/ and /method/ and open inside landscape/map exploration.

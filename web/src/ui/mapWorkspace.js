@@ -18,7 +18,7 @@ export function createMapWorkspace({beforeOpen,onReturn,current}) {
     originControl?.focus({preventScroll:true});
   }
   function open(input=null,push=true) {
-    if(active)return;
+    if(active){if(input){const u=new URL(input,location.origin);pendingQuery=u.search.slice(1);lastQuery=pendingQuery;updateAddress(pendingQuery);if(ready)post('navigate',{query:pendingQuery});}return;}
     originControl=document.activeElement;savedWorldUrl=location.href;
     if(!push){const clean=new URL(savedWorldUrl);for(const k of ['view','cell','layer','scope','site'])clean.searchParams.delete(k);savedWorldUrl=clean.href;}
     const url=new URL(input||`${import.meta.env.BASE_URL}map/`,location.origin);
@@ -44,6 +44,7 @@ export function createMapWorkspace({beforeOpen,onReturn,current}) {
     if(e.data.type==='ready'){ready=true;loading.hidden=true;if(pendingQuery!==sentQuery)post('navigate',{query:pendingQuery});post('active',{active});if(active)frame.focus();}
     if(e.data.type==='state'&&active){lastQuery=e.data.query;updateAddress(lastQuery);}
     if(e.data.type==='close')close(e.data.cell);
+    if(e.data.type==='reference')document.dispatchEvent(new CustomEvent('open-reference',{detail:{path:e.data.path,site:e.data.site}}));
     if(e.data.type==='error'){loading.hidden=true;}
   });
   // Intercept ordinary in-app links only. Modified clicks retain normal link behaviour.

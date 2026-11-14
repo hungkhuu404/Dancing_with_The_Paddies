@@ -59,6 +59,8 @@ export async function createSignature(ctx) {
   const moon=new THREE.Mesh(new THREE.PlaneGeometry(52,52),moonMat);moon.name='astronomical-moon-phase';moon.frustumCulled=false;scene.add(moon);
   const pose={};let audio=null,audioAvailable=false;
   try {const r=await fetch(import.meta.env.BASE_URL+'audio/tour-en.mp3',{method:'HEAD'});audioAvailable=r.ok&&(r.headers.get('content-type')||'').startsWith('audio/');}catch{/* subtitles only */}
+  let tourCalendar=null;
+  addEventListener('message',e=>{if(e.origin!==location.origin||e.source!==tourCalendar?.contentWindow||e.data?.channel!=='flood-reference')return;if(e.data.type==='map')ctx.openCalendarMap?.(e.data.query);if(e.data.type==='close')stopTour();});
   function startTour(){
     if(tour)return;ctx.stopActivities();tourSaved={view:ctx.saveView(),mode,age};
     tour=[ctx.target().x,ctx.target().z];
@@ -66,7 +68,7 @@ export async function createSignature(ctx) {
     age=0;updateAge();tourTime=0;lastScene=-1;reveal(subtitle);find('tour-skip').hidden=false;find('tour-start').disabled=true;
     if(audioAvailable){audio=new Audio(import.meta.env.BASE_URL+'audio/tour-en.mp3');audio.play().catch(()=>{});}
   }
-  function stopTour(){if(!tour)return;audio?.pause();audio=null;tour=null;dismiss(subtitle);find('tour-skip').hidden=true;find('tour-start').disabled=false;ctx.restoreView(tourSaved.view);setMode(tourSaved.mode);age=tourSaved.age;updateAge();}
+  function stopTour(){if(!tour)return;audio?.pause();audio=null;tour=null;tourCalendar=null;dismiss(subtitle);find('tour-skip').hidden=true;find('tour-start').disabled=false;ctx.restoreView(tourSaved.view);setMode(tourSaved.mode);age=tourSaved.age;updateAge();}
   find('tour-start').onclick=startTour;find('tour-skip').onclick=stopTour;
   canvas.addEventListener('pointerdown',()=>{if(tour)stopTour();});
   addEventListener('keydown',e=>{if(document.body.classList.contains('is-atlas')||document.querySelector('dialog[open]')||e.target.closest?.('#tools-panel')||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||e.target.isContentEditable)return;if(['1','2','3'].includes(e.key)){if(tour)stopTour();setMode(+e.key-1);}if(e.key==='Escape')stopTour();});
@@ -83,7 +85,7 @@ export async function createSignature(ctx) {
     if(Math.abs(tod-oldTod)>.0008){const date=contract?.acq?.[pass]?.date_local||ctx.passes[pass].date;astronomy=celestial(sceneDate(date,tod));sky.setAstronomy(astronomy);sky.set(tod);oldTod=tod;}
     if(weatherOn&&weather){sky.state.cloud=weather.cloud_cover/100;sky.sky.material.uniforms.cloudCoverage.value=weather.cloud_cover/100;const a=weather.wind_direction_10m*Math.PI/180;ctx.wind.set(-Math.sin(a)*weather.wind_speed_10m,Math.cos(a)*weather.wind_speed_10m);}
     radar+=(+(mode===1)-radar)*Math.min(1,dt*6);calendar+=(+(mode===2)-calendar)*Math.min(1,dt*6);if(reduced){radar=+(mode===1);calendar=+(mode===2);}U.uRadarMode.value=radar;U.uCalendarMode.value=calendar;
-    if(tour){tourTime+=dt;tourPose(tourTime,tour,pose);if(!reduced||pose.scene!==lastScene)ctx.pose(pose);if(pose.scene!==lastScene){lastScene=pose.scene;setMode([0,0,1,0,2][lastScene]);subtitle.replaceChildren(Object.assign(document.createElement('strong'),{textContent:TOUR_TEXT[lastScene][0]}),Object.assign(document.createElement('span'),{textContent:TOUR_TEXT[lastScene][1]}));if(lastScene===3)ctx.selectAt(tour[0],tour[1]);}if(tourTime>=60)stopTour();}
+    if(tour){tourTime+=dt;tourPose(tourTime,tour,pose);if(!reduced||pose.scene!==lastScene)ctx.pose(pose);if(pose.scene!==lastScene){lastScene=pose.scene;setMode([0,0,1,0,2][lastScene]);subtitle.replaceChildren(Object.assign(document.createElement('strong'),{textContent:TOUR_TEXT[lastScene][0]}),Object.assign(document.createElement('span'),{textContent:TOUR_TEXT[lastScene][1]}));if(lastScene===3)ctx.selectAt(tour[0],tour[1]);if(lastScene===4){tourCalendar=document.createElement('iframe');tourCalendar.className='tour-calendar';tourCalendar.title='Hamlet water calendar';const id=typeof contract?.meta.site==='string'?contract.meta.site:contract?.meta.site?.id||'tan_hoi';tourCalendar.src=import.meta.env.BASE_URL+'calendar/?'+new URLSearchParams({site:id,embed:'1',preview:'1'});const full=document.createElement('a');full.href=import.meta.env.BASE_URL+'calendar/?'+new URLSearchParams({site:id});full.textContent='Open full calendar';subtitle.append(tourCalendar,full);}}if(tourTime>=60)stopTour();}
     stars.position.copy(camera.position);stars.material.opacity=(astronomy?Math.max(0,1-astronomy.fraction/.15):0)*sky.state.night*(1-(weatherOn&&weather?weather.cloud_cover/100:sky.state.cloud))*.9*(1-radar);stars.visible=stars.material.opacity>.01;
     if(astronomy){moon.position.copy(camera.position).addScaledVector(moonDirection.fromArray(astronomy.moon),5500);moon.quaternion.copy(camera.quaternion);moonMat.uniforms.uPhase.value=astronomy.phase;moonMat.uniforms.uAngle.value=astronomy.angle;moonMat.uniforms.uOpacity.value=(1-radar)*(1-sky.state.cloud*.8);moon.visible=astronomy.moonElevation>0&&sky.state.night>.01;}
   }

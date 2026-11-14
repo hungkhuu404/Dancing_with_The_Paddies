@@ -4,7 +4,7 @@
 
 Team **Dancing with The Paddies** · NASA Space Apps Challenge 2026 · Challenge: *Dancing with the SARs*
 
-**Migration status:** T?n H?i landscape, same-tab observation map, location entrance and compact controls are integrated from the pinned Nasa_prep revisions recorded in provenance. Current main's S0 catalogue, S7 export, site configuration, JSON Schema and public v1 data are retained. S1?S6, validation/H5, Bang Rakam observations and H7 remain separate pending work. See [web instructions](web/README.md) and [integration review](docs/plans/location-entrance.md).
+**Migration status:** Tân Hội landscape, same-tab map, location entrance, water calendar and Method and limits are integrated with the S0/S7 tools, site configuration, JSON Schema and public v1 data. H5 reference-comparison output is available; the interface does not report agreement scores. S1-S6 pipeline integration, Bang Rakam observations and H7 remain separate work. See [web instructions](web/README.md) and [scientific views](docs/plans/calendar-method.md).
 
 **Existing live site:** https://flood-calendar.pages.dev — this migration has not been deployed or verified against that site.
 

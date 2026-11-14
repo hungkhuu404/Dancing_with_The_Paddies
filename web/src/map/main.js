@@ -31,7 +31,9 @@ let stopPlayback = () => {};
 let surfaceActive = true;
 function returnWorld(cell) { stopPlayback(); if(embedded) send('close',{cell}); else location.assign(BASE); }
 for(const id of ['world-link','back-world']) $(id).onclick = e => {if(embedded){e.preventDefault();returnWorld();}};
-$('about-open').onclick = () => {stopPlayback();$('about-dialog').showModal();};
+function openReference(path){stopPlayback();const site=new URLSearchParams(location.search).get('site')||'tan_hoi';if(embedded)send('reference',{path,site});else location.assign(BASE+path+'?'+new URLSearchParams({site}));}
+$('about-open').onclick=()=>openReference('method/');
+$('calendar-open').onclick=e=>{e.preventDefault();openReference('calendar/');};
 $('about-close').onclick = () => $('about-dialog').close();
 $('about-dialog').addEventListener('close', () => $('about-open').focus());
 $('about-dialog').addEventListener('click', e => {if(e.target !== $('about-dialog'))return;const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close();});
@@ -115,6 +117,7 @@ async function start() {
     // Load once so every historical area and panel uses the same public record.
     await loadSeries();
     paint();updateDate();fit();
+    if(query.get('hamlet'))focusHamlet(query.get('hamlet'));
     if(initial.cell&&byCell.has(initial.cell))select(byCell.get(initial.cell),true);
     $('map-loading').hidden=true;
     if(missing.length){$('errors').textContent='Some map resources are unavailable: '+missing.join(', ')+'.';$('errors').hidden=false;}
@@ -122,6 +125,12 @@ async function start() {
   }catch(error){$('map-loading').hidden=true;$('errors').textContent='The map could not be prepared. '+error.message; $('errors').hidden=false;send('error',{message:error.message});}
   });
   map.on('error',e=>{if(e.sourceId==='base')return;if(e.sourceId==='backdrop'){$('errors').textContent='The radar background is unavailable. Block observations remain visible.';$('errors').hidden=false;}});
+  function focusHamlet(name){
+    const group=features.filter(f=>f.properties.nearest_hamlet===name);if(!group.length)return;$('explorer-title').textContent='Near '+name;
+    let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;
+    for(const f of group)for(const ring of f.geometry.coordinates)for(const [x,y]of ring){x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y);}
+    map.fitBounds([[x0,y0],[x1,y1]],{padding:padding(),duration:duration()});$('selection-hint').textContent='Nearest-hamlet group: '+name;$('selection-hint').hidden=false;
+  }
   function cellLook(p) {
     const look={fill:'rgba(0,0,0,0)',op:.9,hatch:false,edge:false};
     if(state.scope==='image'){
@@ -233,7 +242,7 @@ async function start() {
     if(e.data.type==='active'){surfaceActive=!!e.data.active;if(!surfaceActive){stopPlayback();map.stop();}else{map.resize();}}
     if(e.data.type==='navigate'){
       stopPlayback();const next=readView(e.data.query,acq.length);Object.assign(state,{mode:next.mode,scope:next.scope,pass:next.pass});
-      swapBackdrop();paint();updateDate();if(next.cell&&byCell.has(next.cell))select(byCell.get(next.cell),true);
+      swapBackdrop();paint();updateDate();const hamlet=new URLSearchParams(e.data.query).get('hamlet');if(hamlet){select(-1);focusHamlet(hamlet);}if(next.cell&&byCell.has(next.cell))select(byCell.get(next.cell),true);
     }
   });
   // A keyboard alternative to selecting a small block with a pointer.
