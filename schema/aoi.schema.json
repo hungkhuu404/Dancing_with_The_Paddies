@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "aoi",
-  "$comment": "Implements CONTRACT-001 1.0.0 in docs/data-contract.md.",
+  "$comment": "Implements CONTRACT-001 2.0.0 in docs/data-contract.md.",
   "type": "object",
   "properties": {
     "type": {
