@@ -33,14 +33,14 @@ What it does **not** do: it does not measure methane, and it cannot tell whether
 | --- | --- | --- |
 | S0 Catalogue | Query NASA CMR for NISAR L2 GCOV scenes over the site; keep the latest CRID of each acquisition | `pipeline/catalog/` |
 | S1 Read | Read the HH and HV windows over HTTPS into a local cache | `pipeline/core/` |
-| S2 Grid | Average 10 m pixels into 250 m cells (linear power, then dB) | `pipeline/core/` |
+| S2 Grid | Prepare 250 m cells and diagnostic HH/HV means | `pipeline/core/` |
 | S3 Reference | Measure a river reference and a stable area for each track; run checks P1–P3 | `pipeline/core/` |
-| S4 Classify | Mark each cell as water / no water / no data per image; remove single-image flips | `pipeline/core/` |
+| S4 Classify | Apply HH/HV thresholds to pixels, require 75% water pixels, and filter single-image flips using a 50% fill guard | `pipeline/core/` |
 | S5 Indicators | Water arrival, days under water, current status, >30-day flag | `pipeline/core/` |
 | S6 Compare | Compare with OPERA DSWx-S1 | `pipeline/validate/` |
 | S7 Export | Write static files for the web | `pipeline/export/` |
 
-Default rule: a cell is water when HH < −14 dB and HV < −20 dB. Thresholds were adjusted using OPERA DSWx-S1, so the agreement numbers shown on the site are agreement after tuning, not an independent validation.
+The default HH/HV thresholds are −14/−20 dB, with track-specific fallback where reference checks require it. For a valid cell, each pixel must be below both acquisition thresholds; the cell is water when at least 75% of jointly valid pixels meet them. A 50% lower threshold controls whether a dry singleton between water observations is filled. The pixel method was selected after examining OPERA DSWx-S1 agreement, so those numbers are post-hoc agreement, not independent validation or field accuracy.
 
 The file format between the pipeline and the web is defined in [docs/data-contract.md](docs/data-contract.md).
 
@@ -81,6 +81,7 @@ Requires Python 3.11+ and a NASA Earthdata token.
 python -m venv .venv
 # Windows: .venv\Scripts\activate    macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
+python -m pytest -q tests/core
 ```
 
 Keep the token in a file outside the repository and point to it:
@@ -108,7 +109,7 @@ Never commit the token, the image cache or files with signed links.
 
 <!-- TODO: thay bằng bản cuối "Validation and limits" khi khóa số liệu -->
 
-- Thresholds were tuned with DSWx-S1; agreement with DSWx-S1 is therefore not an independent test.
+- The 75% pixel method and 50% temporal guard were selected after examining DSWx-S1; agreement is not an independent test and DSWx-S1 is not ground truth.
 - One track revisits every 12 days, so water arrival and water leaving are date ranges.
 - Track 148 D does not cover about 13.5% of the commune's cells; the map uses each cell's latest valid image.
 - Water arrival may be dated early on dry, flat fields.

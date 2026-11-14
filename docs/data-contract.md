@@ -1,6 +1,6 @@
-# Hợp đồng dữ liệu (CONTRACT-001, bản 1.0.0)
+# Hợp đồng dữ liệu (CONTRACT-001, bản 2.0.0 đề xuất)
 
-Hợp đồng giữa nhóm dữ liệu (bên ghi) và nhóm giao diện (bên đọc). Đây là nguồn duy nhất về tên file, tên khóa và ý nghĩa của chúng. Muốn thêm, đổi hay bỏ khóa thì theo mục 8 và báo trưởng nhóm trước khi merge.
+Hợp đồng giữa nhóm dữ liệu và nhóm giao diện. Bản 2.0.0 đề xuất thay nghĩa phân loại và lọc ở mục 4, đồng thời bổ sung metadata phương pháp; cần nhóm S6, S7 và web kiểm tương thích trước khi merge. Không thay thế hoặc sửa snapshot H3 đã công bố.
 
 ## Tóm tắt
 
@@ -44,7 +44,7 @@ Hợp đồng giữa nhóm dữ liệu (bên ghi) và nhóm giao diện (bên đ
 
 | Ký hiệu | Nghĩa | Điều kiện |
 | --- | --- | --- |
-| `W` | Thấy nước mặt | Ô hợp lệ, HH thấp hơn ngưỡng HH và HV thấp hơn ngưỡng HV |
+| `W` | Tín hiệu nước theo quy tắc pixel | Ô hợp lệ, ít nhất 75% pixel hợp lệ đồng thời có HH và HV thấp hơn ngưỡng của ảnh |
 | `N` | Không thấy nước mặt | Ô hợp lệ và không thỏa điều kiện `W` |
 | `-` | Không có dữ liệu | Ô không hợp lệ ở lần chụp đó (ngoài dải quét hoặc bị che) |
 
@@ -54,10 +54,10 @@ Hợp đồng giữa nhóm dữ liệu (bên ghi) và nhóm giao diện (bên đ
   - P1: trung vị mực nước tham chiếu thấp hơn ngưỡng ít nhất 2 dB ở cả HH và HV. Track không đạt chuyển sang Q1.
   - P2: độ lệch chuẩn theo thời gian của vùng ổn định không quá 0,5 dB.
   - P3: trên vùng ổn định, ảnh bản P05036 lệch không quá 3 lần độ lệch chuẩn so với trung bình các ảnh P05023 cùng track. Không đạt thì ảnh P05036 dùng ngưỡng Q1 tính riêng.
-- **Lọc lần lệch đơn lẻ:** xếp các lần chụp hợp lệ của ô theo thời gian, gộp mọi track. Một lần chụp khác trạng thái với cả lần ngay trước và lần ngay sau thì lấy theo hai lần đó. Lần đầu và lần cuối giữ nguyên.
-  - **Luôn so trên chuỗi thô, xét mọi vị trí cùng lúc.** Không sửa tại chỗ rồi dùng giá trị vừa sửa để xét vị trí kế tiếp. Ví dụ `NNWNWW` thành `NNNWWW`; nếu sửa tại chỗ sẽ ra `NNNNWW`.
-  - Hai cách đọc này cho kết quả khác nhau trên dữ liệu thật (121 trong 1.677 ô ở vùng thử). Code S4 và test phải dùng cùng một cách.
-- File xuất có cả chuỗi thô (`s_raw`) và chuỗi đã lọc (`s`). Chỉ số tính trên chuỗi đã lọc.
+- **Quy tắc pixel:** HH và HV phải hợp lệ cùng vị trí, hữu hạn, dương. So từng pixel với ngưỡng HH/HV của ảnh, trên công suất tuyến tính. Ô 250 m cần đủ lưới 25×25 vị trí và tối thiểu 438/625 pixel hợp lệ. Tính tỷ lệ pixel cùng dưới hai ngưỡng trên tổng pixel hợp lệ; tỷ lệ ≥75% là `W`, còn lại là `N`. Không đủ điều kiện là `-`. HH/HV trung bình ô vẫn xuất để tham khảo, không dùng trực tiếp để suy ra `W`.
+- **Lọc hai mức:** xếp các lần chụp hợp lệ theo thời gian, gộp mọi track và lọc singleton trên chuỗi thô 75%. Với `W-N-W`, chỉ đổi `N` thành `W` nếu lần giữa có tỷ lệ pixel nước ≥50%; nếu dưới 50% giữ `N`. Với `N-W-N`, vẫn đổi `W` thành `N`. Lần đầu, cuối và thiếu giữ nguyên.
+  - **Luôn so trên chuỗi thô, xét mọi vị trí cùng lúc.** Không sửa tại chỗ rồi dùng giá trị vừa sửa để xét vị trí kế tiếp. Với các `N` có tỷ lệ ≥50%, ví dụ `NNWNWW` thành `NNNWWW`.
+- File xuất có cả chuỗi thô 75% (`s_raw`) và chuỗi đã lọc hai mức (`s`). Chỉ số tính trên chuỗi đã lọc. Phương pháp chọn sau khi đã xem DSWx, vì vậy là **post-hoc**, không phải kiểm chứng độc lập. DSWx không phải ground truth; ảnh thưa không chứng minh ngập liên tục.
 
 ## 5. Chỉ số mỗi ô
 
@@ -71,7 +71,7 @@ Mỗi track chụp lại sau 12 ngày, nên không biết chính xác ngày nư�
 | `onset_by_local` | Ngày chụp đầu tiên thấy nước của đợt chính. Nước vào trong khoảng sau `onset_after_local` và không muộn hơn ngày này |
 | `end_after_local` | Ngày chụp cuối cùng còn thấy nước của đợt chính. `null` nếu ô còn nước ở ảnh cuối |
 | `end_by_local` | Ngày chụp đầu tiên không còn thấy nước sau đợt chính. `null` nếu ô còn nước ở ảnh cuối |
-| `flood_days_min` | Số ngày ngập ít nhất: từ `onset_by` đến `end_after`. Nếu còn nước thì tính đến ảnh cuối của ô |
+| `flood_days_min` | Khoảng ngày giữa lần W đầu và cuối của đợt chính. Cách diễn giải là ngập liên tục phụ thuộc giả định giữa các ảnh; quan sát thưa không tự chứng minh liên tục |
 | `flood_days_max` | Số ngày ngập nhiều nhất: từ `onset_after` đến `end_by`. Nếu còn nước thì tính đến ảnh cuối của ô. `null` nếu không có `onset_after` |
 | `ongoing` | `true` nếu ô còn nước ở ảnh cuối. Khi đó hai số ngày ngập là "tính đến ảnh cuối" |
 | `status` | Một trong 5 giá trị ở bảng dưới |
@@ -138,13 +138,15 @@ Mọi file nằm trong `data/{site}/`, trừ `data/sites.json`. Dữ liệu cho 
 
 ```json
 {
-  "contract_version": "1.0.0",
+  "contract_version": "2.0.0",
   "site": "tan_hoi",
   "generated_utc": "2026-11-14T03:10:00Z",
   "timezone": "Asia/Ho_Chi_Minh",
   "grid": {"epsg": 32648, "cell_m": 250, "n_cells": 2344},
   "method": {"rule": "Q0", "hh_db_max": -14.0, "hv_db_max": -20.0, "single_flip_filter": true,
-             "frozen_utc": "2026-11-13T09:00:00Z"},
+             "frozen_utc": null, "classification": "pixel_fraction_75_dual_50",
+             "water_fraction": 0.75, "fill_min_fraction": 0.5, "joint_valid_fraction": 0.7,
+             "selection_status": "post_hoc"},
   "acquisitions": [
     {"i": 0, "acq_utc": "2026-08-11T11:31:41Z", "date_local": "2026-08-11", "track": "148D",
      "frame": "083", "crid": "P05023", "valid_share": 0.86,
@@ -251,7 +253,7 @@ Chỉ số `i` trùng với `acquisitions` trong `meta.json`. HH và HV ghi bằ
 
 ### 6.7. `validation.json` (rút gọn)
 
-Web và video chỉ đọc khối `filtered`; khối `unfiltered` có cùng các khóa.
+Web và video chỉ đọc khối `filtered`; khối `unfiltered` có cùng các khóa. Ví dụ dưới chỉ minh họa cấu trúc cũ, kể cả timestamp và `posthoc`; **không dùng làm validation của phương pháp pixel**. S6 phải tính và gắn đúng nguồn phương pháp mới trước khi xuất hoặc công bố.
 
 ```json
 {
@@ -272,7 +274,7 @@ Web và video chỉ đọc khối `filtered`; khối `unfiltered` có cùng các
 }
 ```
 
-- Ngưỡng được chỉnh theo DSWx-S1, nên các số này là mức khớp sau khi chỉnh. Web, video và slide không gọi chúng là kiểm chứng độc lập.
+- Phương pháp pixel được chọn sau khi xem DSWx-S1, nên các số là mức khớp hậu kiểm. Web, video và slide không gọi chúng là kiểm chứng độc lập hoặc độ chính xác thực địa.
 
 **Mỗi phần tử của `posthoc`** là một thay đổi đã ghi trong `posthoc_log.md`, cùng thứ tự. Chưa có thay đổi nào thì ghi `[]`.
 
@@ -284,7 +286,7 @@ Web và video chỉ đọc khối `filtered`; khối `unfiltered` có cùng các
 | `what`, `why` | Thay gì, vì sao; mỗi khóa một câu tiếng Anh, vì web hiện nguyên văn |
 | `before`, `after` | Số trước và sau khi thay, cùng tên khóa với khối `filtered`. Ít nhất có `kappa_median`, `kappa_min`, `kappa_max`, `n_pairs` |
 
-- Web hiện danh sách này ở trang "Method and limits". Số chính vẫn lấy từ khối `filtered` của bản đã khóa.
+- Web hiện danh sách này ở trang "Method and limits". Chỉ dùng khối `filtered` được S6 tính lại đúng trên phiên bản phương pháp đang xuất; không gắn số H3 cũ cho kết quả pixel.
 
 Các con số trong mọi ví dụ là số minh họa, không phải kết quả.
 
@@ -307,7 +309,7 @@ Giới hạn cứng của host: Cloudflare Pages cho mỗi file tối đa 25 MiB
 
 ## 8. Phiên bản, thiếu dữ liệu
 
-- **Phiên bản:** `contract_version` là `1.0.0`. Thêm khóa mới thì tăng số giữa. Đổi tên, đổi nghĩa hoặc bỏ khóa phải được cả hai nhóm đồng ý và tăng số đầu. Sửa file này và `schema/` trong cùng một pull request.
+- **Phiên bản:** `contract_version` đề xuất là `2.0.0` do thay nghĩa `s_raw`, `s` và các chỉ số từ phương pháp trung bình ô sang pixel. Cần phối hợp nhóm dữ liệu và web trước khi merge, đồng thời cập nhật S6 cho cùng phương pháp. Sửa file này và `schema/` trong cùng một pull request.
 - **Lần chụp đọc lỗi:** không đưa vào `acquisitions`; ghi vào `skipped` trong `meta.json` kèm lý do.
 - **Ô không có dữ liệu ở một lần chụp:** ký tự `-` trong `s`, `null` trong `hh` và `hv`.
 - **Không có bộ mẫu giả trong `data/`.** Số trên video, slide và trang Project chỉ lấy từ bản dữ liệu cuối đã khóa.
