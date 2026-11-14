@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { MapControls } from 'three/examples/jsm/controls/MapControls.js';
 import './style.css';
 import './ui/liquid.css';
+import './ui/surfaces.css';
 import '@fontsource/ibm-plex-sans/latin-400.css';
 import '@fontsource/ibm-plex-sans/vietnamese-400.css';
 import '@fontsource/ibm-plex-sans/latin-600.css';
@@ -31,12 +32,13 @@ import { createWorld, MODELS } from './world/index.js';
 import {patchScene} from './world/common.js';
 import {createCrowdPrototypes} from './world/crowdModels.js';
 import {createArterialLights} from './world/infrastructure.js';
-import {createInfrastructurePanel} from './ui/infrastructurePanel.js';
 import {primeFirstView} from './fx/firstView.js';
 import {uploadMaterialTextures} from './fx/textureWarmup.js';
 import {createSignature} from './world/signature.js';
 import {createChrome} from './ui/chrome.js';
 import {createMapWorkspace} from './ui/mapWorkspace.js';
+import {entryState} from './ui/entryState.js';
+import {entrancePose,bypassAtlas} from './ui/entryRules.js';
 import {sceneCellCentre} from './map/presentation.js';
 
 const $ = (s) => document.querySelector(s);
@@ -50,6 +52,7 @@ const OLD_WINDOW = [520200, 1122600]; // UTM centre of the first 2 km scene: the
 boot().catch((e) => { console.error(e); fallback(e); });
 
 async function fallback(err) {
+  entryState.error=err;entryState.onError?.(err);
   $('#loading').hidden=true;
   document.body.classList.add('is-fallback');
   const el = $('#fallback');
@@ -57,8 +60,7 @@ async function fallback(err) {
   let img = false;
   try { const r = await fetch(BASE + 'fallback.webp', { method: 'HEAD' }); img = r.ok && (r.headers.get('content-type') || '').includes('image'); } catch { /* none */ }
   el.innerHTML = (img ? `<img src="${BASE}fallback.webp" alt="Tân Hội fields during the 2026 flood season">` : '') +
-    '<p id="view-error" role="alert"></p><p><a href="' + BASE + 'map/">Open the map</a></p>';
-  document.getElementById('view-error').textContent = `The 3D view could not load: ${err?.message || 'WebGL 2 or required public resources are unavailable'}. No substitute data has been generated.`;
+    `<p>This view needs WebGL 2, which is not available here${err?.message ? ` (${err.message.slice(0, 80)})` : ''}.</p>`;
 }
 
 /** scene/commune/index.json, else a one-tile index around the 2 km window (scene/layout.json). */
@@ -160,7 +162,8 @@ async function boot() {
     gotoPass: (i, instant, opts) => { momentOpts = instant ? null : opts || {}; timeline.set(i); momentOpts = null; },
     saveView: () => ({ pos: camera.position.clone(), target: controls.target.clone() }),
     restoreView: (v) => { if (v) { camera.position.copy(v.pos); controls.target.copy(v.target); camera.lookAt(v.target); } controls.enabled = true; },
-    onPassMoment: () => { if (!reduced && !world.ride.on) tilt.on = true; },
+    onPassMoment: () => { $('#timeline').classList.add('is-scanning'); },
+    onPassMomentEnd: () => { $('#timeline').classList.remove('is-scanning'); },
     onTimelapseEnd: () => timeline.stop(),
     setPassAll: (i, instant) => { tiles.setPass(i, instant, clock.elapsed); far.setPass(i); far.sweep.w = 0; shownPass = i; },
     sweepPass: (i, sw) => { tiles.sweep(i, sw, clock.elapsed); far.setPass(shownPass, i); far.sweep.set(sw.dir[0], sw.dir[1], sw.s0, 1); shownPass = i; },
@@ -183,7 +186,6 @@ async function boot() {
 
   const arterial=infrastructure?createArterialLights(infrastructure):null;
   if(arterial){scene.add(arterial.group);arterial.group.traverse(o=>o.layers.set(1));lens.hidden.push(arterial.group);}
-  const places=infrastructure?createInfrastructurePanel(infrastructure,p=>flyTo({x:p.x,z:p.z},180,THREE.MathUtils.degToRad(65))):null;
 
   // ---------------------------------------------------------------- start point and the first tile
   let start = utmToScene(origin, ...OLD_WINDOW);
@@ -251,7 +253,7 @@ async function boot() {
   sky.set(tod0);
   const sunAz = Math.atan2(sky.state.sunDir.x, sky.state.sunDir.z);
   const END = { target: T.clone(), r: 135, polar: THREE.MathUtils.degToRad(73), az: sunAz + Math.PI + 0.45 };
-  const START = { target: T.clone().add(new THREE.Vector3(-120, 0, 260)), r: 1650, polar: THREE.MathUtils.degToRad(12), az: END.az + 0.9 };
+  const START = { target: T.clone().add(new THREE.Vector3(-700, 0, 900)), r: 4200, polar: THREE.MathUtils.degToRad(10), az: END.az + 1.05 };
   const sph = new THREE.Spherical();
   function pose(p) {
     sph.set(p.r, p.polar, p.az);
@@ -265,8 +267,9 @@ async function boot() {
   const timeline = createTimeline($('#timeline'), passes, fractions, (i, user) => {
     curPass = i;
     clearTimeout(momentTimer);
+    world.nisar.stop();
     if (momentOpts) world.nisar.play(i, momentOpts);
-    else if (user && !reduced) momentTimer = setTimeout(() => world.nisar.play(i), 280); // settle while scrubbing
+    else if (user && !reduced) momentTimer = setTimeout(() => world.nisar.play(i, {keepTime:true}), 280); // compare dates without changing scene lighting or the camera
     else wctx.setPassAll(i, reduced);
     card.markPass(i);
   }, { start: () => world.timelapse.start(), stop: () => world.timelapse.stop() });
@@ -294,10 +297,10 @@ async function boot() {
   });
 
   // ---------------------------------------------------------------- intro
-  const intro = { t: reduced || params.has('nointro') ? 1 : 0, speed: 1, done: false, dur: 6.5 };
+  const intro = { t: reduced || bypassAtlas(location.search) ? 1 : 0, speed: 1, done: false, dur: 4.8 };
   const title = $('#title');
   function finishIntro() {
-    intro.done = true;
+    intro.done = true;camera.fov=40;camera.updateProjectionMatrix();entryState.onFinish?.();
     post.dofPass.enabled = false;
     controls.enabled = true;
     document.body.classList.add('ready');
@@ -311,23 +314,29 @@ async function boot() {
     pose(START);
     post.dofPass.enabled = quality.dof;
     post.dof.target = END.target;
-    setTimeout(() => title.classList.add('is-in'), 350);
-    for (const ev of ['pointerdown', 'wheel', 'keydown', 'touchstart']) addEventListener(ev, skipIntro, { passive: true });
+    if(!entryState.active)setTimeout(() => title.classList.add('is-in'), 350);
+    addEventListener('keydown',e=>{if(e.key==='Escape'&&!entryState.active&&!intro.done){intro.t=1;pose(END);finishIntro();}});
   }
   const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
   const cur = { target: new THREE.Vector3(), r: 0, polar: 0, az: 0 };
+  const entranceState={};
   function updateIntro(dt) {
-    intro.t = Math.min(1, intro.t + (dt / intro.dur) * intro.speed);
-    const e = ease(intro.t), er = 1 - Math.pow(1 - intro.t, 2.4);
-    cur.target.lerpVectors(START.target, END.target, e);
-    cur.r = Math.exp(THREE.MathUtils.lerp(Math.log(START.r), Math.log(END.r), er));
-    cur.polar = THREE.MathUtils.lerp(START.polar, END.polar, e);
-    cur.az = THREE.MathUtils.lerp(START.az, END.az, e);
-    pose(cur);
-    post.dof.bokehScale = 2 * (1 - e);
-    if (intro.t > 0.78) title.classList.add('is-out');
-    if (intro.t >= 1) finishIntro();
+    intro.t=Math.min(1,intro.t+dt/intro.dur*intro.speed);
+    entrancePose(intro.t,START,END,entranceState);
+    cur.target.set(entranceState.x,0,entranceState.z);cur.r=entranceState.r;cur.polar=entranceState.polar;cur.az=entranceState.az;
+    pose(cur);camera.rotateZ(entranceState.roll);camera.fov=entranceState.fov;camera.updateProjectionMatrix();
+    post.dof.bokehScale=1.4*(1-intro.t);
+    if(intro.t>.6)title.classList.add('is-out');
+    if(intro.t>=1){pose(END);finishIntro();}
   }
+  entryState.enter=instant=>{
+    signature?.stopTour();signature?.setMode(0);timeline.stop();world.timelapse.stop();world.ride.exit();select(null);setLens(false);held.clear();fly.on=false;tilt.on=false;
+    if(instant){intro.t=1;pose(END);finishIntro();return;}
+    intro.t=0;intro.speed=1;intro.done=false;controls.enabled=false;pose(START);camera.fov=50;camera.updateProjectionMatrix();
+    post.dofPass.enabled=quality.dof;post.dof.target=END.target;
+    document.body.classList.remove('ready');title.classList.remove('is-out');title.classList.add('is-in');
+  };
+  entryState.pauseSound=paused=>{if(paused){signature?.stopTour();timeline.stop();world.timelapse.stop();world.nisar.stop();world.ride.exit();held.clear();clearTimeout(momentTimer);fly.on=false;tilt.on=false;}world.sound.setPaused(paused);};
 
   // ---------------------------------------------------------------- fly-to (double click, whole commune), interruptible
   const fly = { on: false, t: 0, dur: 1.2, from: new THREE.Vector3(), to: new THREE.Vector3(), r0: 0, r1: 0, p0: 0, p1: 0, az: 0 };
@@ -419,8 +428,6 @@ async function boot() {
     const moved = Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]);
     if (moved < 6 && performance.now() - downAt[2] < 400) {
       groundHit(e.clientX,e.clientY);
-      const place=tiles.pickInfrastructure(ray);
-      if(place){places?.show(place);downAt=null;return;}
       const s = pickAt(e.clientX, e.clientY) || (groundHit(e.clientX, e.clientY) ? cellAt(hit.x, hit.z) : null);
       if (!same(s, selected)) select(s);
     }
@@ -431,7 +438,7 @@ async function boot() {
   // ---------------------------------------------------------------- keyboard
   const held = new Set();
   addEventListener('keydown', (e) => {
-    if(document.querySelector('dialog[open]')||e.target.closest?.('#tools-panel'))return;
+    if(entryState.active||document.querySelector('dialog[open]')||e.target.closest?.('#tools-panel'))return;
     const tag = e.target.tagName;
     const typing = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
     if (e.key === 'Escape') { if (selected) select(null); else if (lens.state.on) setLens(false); return; }
@@ -495,7 +502,7 @@ async function boot() {
   const lensLabel = $('#lens-label');
   function tick(now) {
     // Keep the world in memory while the map is open, without rendering two GPUs' worth of work.
-    if(mapWorkspace?.active){last=now;requestAnimationFrame(tick);return;}
+    if(entryState.active||mapWorkspace?.active){last=now;requestAnimationFrame(tick);return;}
     const raw = now - last;
     if (raw > frameLog.worst) frameLog.worst = raw;
     if (raw > 100 && frameLog.long.length < 50) frameLog.long.push([Math.round(raw), renderer.info.programs?.length, tiles.ready.length, tiles.loading]); // what the previous frame did
@@ -674,13 +681,13 @@ async function boot() {
     saveView:wctx.saveView,restoreView:wctx.restoreView,
     pose:p=>{tourTarget.set(p.x,0,p.z);pose({target:tourTarget,r:p.r,polar:p.polar,az:p.az});},
     selectAt:(x,z)=>{const field=tiles.pick(x,z);if(field)select(field);},
-    stopActivities:()=>{world.ride.exit();world.timelapse.stop();timeline.stop();fly.on=false;tilt.on=false;},
+    stopActivities:()=>{clearTimeout(momentTimer);world.ride.exit();world.timelapse.stop();world.nisar.stop();timeline.stop();fly.on=false;tilt.on=false;},
   });
   window.__debug.signature=signature;
-  createChrome({places,canvas,signature});
+  createChrome({canvas,signature});
   mapWorkspace=createMapWorkspace({
     current:()=>({pass:curPass,site:contract?.meta.site?.id||contract?.meta.site||'tan_hoi',cell:selected?.props?.cell_id||selected?.t?.layout.parcels[selected.i]?.cell?.cell_id}),
-    beforeOpen:()=>{signature.stopTour();timeline.stop();world.timelapse.stop();world.ride.exit();held.clear();clearTimeout(momentTimer);fly.on=false;tilt.on=false;world.sound.setPaused(true);},
+    beforeOpen:()=>{signature.stopTour();timeline.stop();world.timelapse.stop();world.nisar.stop();world.ride.exit();held.clear();clearTimeout(momentTimer);fly.on=false;tilt.on=false;world.sound.setPaused(true);},
     onReturn:({cell,query})=>{
       last=performance.now();world.sound.setPaused(false);
       const q=new URLSearchParams(query);if(q.get('scope')==='image'){const i=Number(q.get('pass'));if(Number.isInteger(i)&&i>=0&&i<nPasses)timeline.set(i);}
@@ -733,6 +740,7 @@ async function boot() {
   console.info('final lit/shadow shaders ready in',Math.round(performance.now()-compileStarted),'ms');
   last=performance.now();
   $('#loading').hidden=true;
+  entryState.ready=true;entryState.onReady?.();
   requestAnimationFrame(tick);
   mapWorkspace.openDeepLink();
   // Optional review deep link; normal entry keeps the existing cinematic intro.

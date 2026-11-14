@@ -81,7 +81,11 @@ export function createClouds(scene) {
       #include <fog_pars_fragment>
       void main(){
         vec4 t = texture2D(uTex, vUv);
-        float a = t.r * vFade * uOpacity;
+        // Some procedural puffs reach an atlas-cell boundary. Fade the cell
+        // edge so their rectangular billboards never show against a dark sky.
+        vec2 edge = min(fract(vUv * 2.), 1. - fract(vUv * 2.));
+        float border = smoothstep(0., .08, min(edge.x, edge.y));
+        float a = t.r * vFade * uOpacity * border;
         if (a < .004) discard;
         float shade = smoothstep(0., .8, t.g);
         vec3 col = mix(uSun * 1.25 + uAmb * .5, uAmb * .75, shade * .8);
@@ -103,7 +107,7 @@ export function createClouds(scene) {
     uniforms:{uTime:mat.uniforms.uTime,uTex:mat.uniforms.uTex,uOpacity:mat.uniforms.uOpacity},
     vertexShader:mat.vertexShader,
     fragmentShader:`uniform sampler2D uTex;uniform float uOpacity;varying vec2 vUv;varying float vFade;
-      void main(){float alpha=texture2D(uTex,vUv).r*vFade*uOpacity*.92;if(alpha<.004)discard;gl_FragColor=vec4(0.,0.,0.,alpha);}`,
+      void main(){vec2 edge=min(fract(vUv*2.),1.-fract(vUv*2.));float border=smoothstep(0.,.08,min(edge.x,edge.y));float alpha=texture2D(uTex,vUv).r*vFade*uOpacity*.92*border;if(alpha<.004)discard;gl_FragColor=vec4(0.,0.,0.,alpha);}`,
   });
   const occlusionScene=new THREE.Scene();occlusionScene.background=new THREE.Color(0xffffff);
   const occlusionMesh=new THREE.Mesh(geo,occlusionMaterial);occlusionMesh.frustumCulled=false;

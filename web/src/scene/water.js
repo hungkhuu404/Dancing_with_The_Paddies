@@ -38,6 +38,7 @@ const FRAG = /* glsl */ `
 uniform sampler2D mirrorSampler; uniform float alpha; uniform float time; uniform float size; uniform float distortionScale;
 uniform sampler2D normalSampler; uniform vec3 sunColor; uniform vec3 sunDirection; uniform vec3 eye; uniform vec3 waterColor;
 uniform vec3 uAmbient; uniform float uMirror; uniform sampler2D uMask; uniform sampler2D uIds; uniform sampler2D uState; uniform float uFloodFrac; uniform vec2 uWinC;
+uniform vec4 uScan; uniform float uScanWidth; uniform sampler2D uScanCells; uniform vec2 uScanN;
 varying vec4 mirrorCoord; varying vec4 worldPosition;
 #include <common>
 ${COMMON}
@@ -123,6 +124,22 @@ void main() {
   #include <fog_fragment>
   if(uRadarMode>.001)gl_FragColor.rgb = mix(gl_FragColor.rgb,vec3(.035 * speckle(xz) + .02 * F),uRadarMode);
   if(uHasCalendar>.5){vec4 cal=calendarAt(xz);if(cal.a>.1){gl_FragColor.rgb=mix(gl_FragColor.rgb,cal.rgb,uCalendarMode*(1.-uRadarMode));gl_FragColor.rgb=mix(gl_FragColor.rgb,vec3(.38,.41,.40)*(1.-.97*uNight),max(uAgeHaze*.38,step(.75,cal.a)*.45)*(1.-uRadarMode));}}
+  // Illustrative emphasis, not radar intensity: ONLY parcel-covered cells with a
+  // W observation at the selected pass. Canals, missing images and dry land stay unchanged.
+  if(uScan.w > .001 && uHasCalendar > .5){
+    vec2 uv = uvFrame(xz);
+    vec4 parcel = texture2D(uParcelAtlas, clamp(uv, 0., 1.));
+    vec2 cell = floor(parcel.rg * 255. + .5) - 1.;
+    bool inFrame = all(greaterThanEqual(uv, vec2(0.))) && all(lessThanEqual(uv, vec2(1.)));
+    bool valid = inFrame && parcel.b > .5 && all(greaterThanEqual(cell, vec2(0.))) && all(lessThan(cell, uScanN));
+    if(valid){
+      vec4 observation = texelFetch(uScanCells, ivec2(cell), 0);
+      float behind = (uScan.z - dot(xz, uScan.xy)) / uScanWidth;
+      float pulse = smoothstep(0., .25, behind) * (1. - smoothstep(.6, 1.8, behind));
+      float wet = step(.9, observation.g) * (1. - step(.5, observation.b)) * step(.5, observation.a);
+      gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(.10, .43, .47), pulse * wet * uScan.w * .68 * (1. - uRadarMode) * (1. - uCalendarMode));
+    }
+  }
 }`;
 
 /** One water plane over the whole commune. The canal mask / field overlay follow the active tile (setTile). */

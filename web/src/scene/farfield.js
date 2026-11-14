@@ -3,7 +3,7 @@
 // cells as the map): a flooded block is cut out so the water plane shows through, '-' is hatched, outside the commune
 // is darker and desaturated. Tree gardens get a clumped-canopy texture so the far field does not read as bare.
 import * as THREE from 'three';
-import { patch } from './shaderlib.js';
+import { patch, U } from './shaderlib.js';
 import { packCells } from '../data/commune.js';
 import { H } from './land.js';
 
@@ -77,6 +77,9 @@ export function createFarField({ rect, grid, groundTex, maskTex, parcelTex, marg
   const cells = new THREE.DataTexture(data, cols, rows, THREE.RGBAFormat);
   cells.magFilter = cells.minFilter = THREE.NearestFilter;
   cells.needsUpdate = true;
+  // The same target-pass cell texture drives water emphasis in near and far views.
+  U.uScanCells.value = cells;
+  U.uScanN.value.set(cols, rows);
   const near = Array.from({ length: MAX_NEAR }, () => new THREE.Vector4(1e9, 1e9, -1e9, -1e9));
   const uniforms = {
     uGround: { value: groundTex }, uHasGround: { value: groundTex ? 1 : 0 },

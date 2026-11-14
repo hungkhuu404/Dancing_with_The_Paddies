@@ -21,3 +21,7 @@
 | `web/` | Vite, Three.js và MapLibre; 3D và map tích hợp cùng tab, có route `/map/` độc lập; test trong `web/test/` |
 
 Các tài liệu đợt migration là snapshot lịch sử. Web hiện cài từ lockfile và chạy local; pipeline S0–S7 vẫn chưa được chuyển. Liên kết live site trong README có trước migration, không phải bằng chứng deploy từ checkout này. Kết quả kiểm tra local được tách khỏi trạng thái CI và production trong báo cáo từng tác vụ.
+
+## Local location-entrance migration
+
+[MIG-WEB-ENTRANCE-003](plans/location-entrance.md) records the regional entry, compact controls, module map, local checks and open-PR integration limits. [Source and per-file hashes](provenance/location-entrance.md) distinguish the pinned import from the one product adaptation. This is a local branch result, not a main/deployment claim.

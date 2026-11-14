@@ -4,7 +4,7 @@ import {enterDialog,leaveDialog} from './motion.js';
 export function createMapWorkspace({beforeOpen,onReturn,current}) {
   const dialog=document.createElement('dialog');dialog.className='map-workspace';dialog.setAttribute('aria-label','Flood Calendar map');
   const frame=document.createElement('iframe');frame.title='Flood Calendar water map';frame.allow='clipboard-write';
-  const loading=document.createElement('div');loading.className='map-workspace-loading';loading.innerHTML='<p role="status">Opening the water map</p><button type="button">Back to 3D world</button>';
+  const loading=document.createElement('div');loading.className='map-workspace-loading';loading.innerHTML='<p role="status">Opening the water map</p><button type="button">Return to landscape</button>';
   dialog.append(frame,loading);document.body.append(dialog);
   let active=false,ready=false,ownedEntry=false,originControl=null,savedWorldUrl=location.href;
   let lastQuery='',pendingQuery='',sentQuery='';

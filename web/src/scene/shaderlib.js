@@ -3,6 +3,9 @@ import * as THREE from 'three';
 
 export const U = {
   uTime: { value: 0 },
+  uScan: { value: new THREE.Vector4(0, 1, 0, 0) }, // direction x/z, front (m), illustration opacity
+  uScanWidth: { value: 420 },
+  uScanCells: { value: null }, uScanN: { value: new THREE.Vector2(1, 1) },
   uWind: { value: new THREE.Vector2() }, // cloud-shadow drift offset (m)
   uCloudAmt: { value: 0.35 },
   uRadarMode: { value: 0 }, // 1 while rendering the NISAR lens pass

@@ -142,9 +142,9 @@ export function trackDir(track) {
   return asc ? [-Math.sin(lean), -Math.cos(lean)] : [-Math.sin(lean), Math.cos(lean)];
 }
 
-/** Seconds after the sweep starts at which the swath front reaches (x,z). start = along-track coordinate of the front at t=0. */
-export function sweepDelay(x, z, dir, start, speed) {
-  return Math.max(0, (x * dir[0] + z * dir[1] - start) / speed);
+/** Seconds until the front reaches (x,z), including optional satellite lead-in. start is its initial along-track coordinate. */
+export function sweepDelay(x, z, dir, start, speed, leadIn = 0) {
+  return leadIn + Math.max(0, (x * dir[0] + z * dir[1] - start) / speed);
 }
 
 /** Deterministic PRNG (Park-Miller) returning a function in [0,1). */

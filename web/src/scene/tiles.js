@@ -285,7 +285,7 @@ export function createTiles(S) {
     sweep(i, sw, now) {
       for (const tl of readyList) {
         const delays = new Float32Array(tl.cents.length);
-        tl.cents.forEach(([x, z], k) => { delays[k] = Math.min(sw.maxDelay, sweepDelay(x, z, sw.dir, sw.s0, sw.speed)); });
+        tl.cents.forEach(([x, z], k) => { delays[k] = Math.min(sw.maxDelay, sweepDelay(x, z, sw.dir, sw.s0, sw.speed, sw.leadIn)); });
         tl.land.setPass(i, false, now, delays);
         tl.infrastructure?.setPass(i,false,now);
       }

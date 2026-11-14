@@ -1,13 +1,18 @@
 // One place for secondary tools, dialogs and keyboard focus. No scene/data rules.
 import {reveal,dismiss,enterDialog,leaveDialog,viewIndicator} from './motion.js';
-export function createChrome({places,canvas,signature}) {
+import {icon} from './icons.js';
+export function createChrome({canvas,signature}) {
   const $=s=>document.querySelector(s), menu=$('#menu-btn'),panel=$('#tools-panel');
-  $('#scene-views').append($('.signature-views'));
+  $('#scene-views').prepend($('.signature-views'));
   viewIndicator($('.signature-views'));
   $('#presentation-tools').append($('.signature-tools'));
+  // Move the real control, retaining its listener and tour state. No duplicate action.
+  $('.app-actions').prepend($('#tour-start'));
   const key=document.createElement('aside');key.className='view-key';key.setAttribute('aria-label','View legend');key.append($('.world-view-caption'),$('#calendar-legend'));document.body.append(key);
   $('#science-note').remove();
-  if(places){$('#places-slot').append(places.root);places.root.classList.add('tools-section');places.root.querySelector('.infrastructure-note').remove();}
+  $('#places-slot')?.remove();
+  for(const [selector,name] of [['#tour-start','tour'],['#record-start','record'],['#sound-btn','sound'],['[data-dialog="help-dialog"]','help'],['[data-dialog="sources-dialog"]','info']])document.querySelectorAll(selector).forEach(b=>{if(!b.querySelector('svg'))b.insertAdjacentHTML('afterbegin',icon(name));});
+  new MutationObserver(()=>{const b=$('#record-start');if(!b.querySelector('.ui-icon'))b.insertAdjacentHTML('afterbegin',icon('record'));}).observe($('#record-start'),{childList:true});
   let origin=null;
   const toolsOpen=()=>!panel.hidden&&panel.dataset.phase!=='closing';
   function closeTools(focus=true){dismiss(panel);menu.setAttribute('aria-expanded','false');if(focus)menu.focus({preventScroll:true});}
@@ -27,7 +32,6 @@ export function createChrome({places,canvas,signature}) {
     if(e.key==='Escape'&&document.body.classList.contains('is-recording')){e.stopPropagation();signature.recorder.stop();return;}
     if(e.key==='Escape'&&toolsOpen()&&!document.querySelector('dialog[open]')){e.stopPropagation();closeTools();}
   },true);
-  places?.root.addEventListener('toggle',()=>{if(places.root.open)openTools();});
   $('#sound-btn').addEventListener('click',()=>{$('#sound-btn span').textContent=$('#sound-btn').getAttribute('aria-pressed')==='true'?'On':'Off';});
   const watch=new MutationObserver(()=>{
     if(document.body.classList.contains('is-recording'))openTools();

@@ -66,6 +66,15 @@ test('acquisition time -> local hour -> scene time of day; track direction', () 
   assert.ok(sweepDelay(0, 500, d, -1000, 500) > sweepDelay(0, -500, d, -1000, 500), 'south fields are swept later on a descending pass');
 });
 
+test('field transition and scan front share the same lead-in for both track directions', () => {
+  for(const track of ['148D','083A']){
+    const dir=trackDir(track),speed=1200,start=-4000,lead=1.5;
+    const x=180,z=900,delay=sweepDelay(x,z,dir,start,speed,lead);
+    close(start+(delay-lead)*speed,x*dir[0]+z*dir[1],1e-8);
+    assert.equal(sweepDelay(-10000*dir[0],-10000*dir[1],dir,start,speed,lead),lead);
+  }
+});
+
 test('rng is deterministic and in [0,1)', () => {
   const a = rng(5), b = rng(5);
   for (let i = 0; i < 100; i++) { const x = a(); assert.equal(x, b()); assert.ok(x >= 0 && x < 1); }

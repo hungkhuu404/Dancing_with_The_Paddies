@@ -6,6 +6,7 @@ import {createRecorder} from './recorder.js';
 import {rng} from './paths.js';
 import {dateRange} from '../ui/blockSummary.js';
 import {reveal,dismiss} from '../ui/motion.js';
+import {icon} from '../ui/icons.js';
 
 /** Extra scene controls; contract parsing remains owned by data/load.js. */
 export async function createSignature(ctx) {
@@ -16,13 +17,14 @@ export async function createSignature(ctx) {
   let tour=null,tourTime=0,tourSaved=null,lastScene=-1;
   const bins=onsetBins([...(contract?.props.values()||[])]);
   const panel=document.createElement('section');panel.className='signature-tools';panel.setAttribute('aria-label','Science and video tools');
-  panel.innerHTML=`<div class="signature-views" role="group" aria-label="World view"><button data-view="0" aria-pressed="true">Landscape</button><button data-view="1" aria-pressed="false">Radar</button><button data-view="2" aria-pressed="false">Water arrival</button></div>
+  panel.innerHTML=`<div class="signature-views" role="group" aria-label="World view"><button data-view="0" aria-pressed="true">${icon('landscape')}Landscape</button><button data-view="1" aria-pressed="false">${icon('radar')}Radar</button><button data-view="2" aria-pressed="false">${icon('arrival')}Arrival</button></div>
     <p class="signature-note" id="science-note"></p><div id="calendar-legend" hidden></div>
     <button id="tour-start">Guided tour <span>60 sec</span></button><button id="tour-skip" hidden>End tour</button>
     <button id="record-start">Record 30s</button><button id="record-download" hidden>Download video</button><p id="record-status" role="status"></p>
   `;
   document.body.append(panel);
-  const find=id=>panel.querySelector('#'+id),note=find('science-note');
+  const controls=new Map([...panel.querySelectorAll('[id]')].map(node=>[node.id,node]));
+  const find=id=>controls.get(id),note=find('science-note');
   const subtitle=document.createElement('div');subtitle.className='story-caption';subtitle.hidden=true;subtitle.setAttribute('aria-live','polite');document.body.append(subtitle);
   const viewCaption=document.createElement('p');viewCaption.className='world-view-caption';viewCaption.hidden=true;document.body.append(viewCaption);
   let calData=null,calTexture=null;
@@ -67,7 +69,7 @@ export async function createSignature(ctx) {
   function stopTour(){if(!tour)return;audio?.pause();audio=null;tour=null;dismiss(subtitle);find('tour-skip').hidden=true;find('tour-start').disabled=false;ctx.restoreView(tourSaved.view);setMode(tourSaved.mode);age=tourSaved.age;updateAge();}
   find('tour-start').onclick=startTour;find('tour-skip').onclick=stopTour;
   canvas.addEventListener('pointerdown',()=>{if(tour)stopTour();});
-  addEventListener('keydown',e=>{if(document.querySelector('dialog[open]')||e.target.closest?.('#tools-panel')||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||e.target.isContentEditable)return;if(['1','2','3'].includes(e.key)){if(tour)stopTour();setMode(+e.key-1);}if(e.key==='Escape')stopTour();});
+  addEventListener('keydown',e=>{if(document.body.classList.contains('is-atlas')||document.querySelector('dialog[open]')||e.target.closest?.('#tools-panel')||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||e.target.isContentEditable)return;if(['1','2','3'].includes(e.key)){if(tour)stopTour();setMode(+e.key-1);}if(e.key==='Escape')stopTour();});
   function update(dt){
     const current=ctx.pass(),tod=ctx.tod();
     if(current!==pass){pass=current;age=0;updateAge();

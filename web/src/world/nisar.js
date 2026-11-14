@@ -1,5 +1,5 @@
 // NISAR pass moment: the satellite crosses the sky in the real direction of the track (…D descending north->south,
-// …A ascending south->north), the time of day jumps to the acquisition's local time, and a radar swath sweeps the
+// …A ascending south->north), optionally adopts the acquisition's local time, and a radar swath sweeps the
 // ground; each parcel's water changes when the swath front reaches it (land.setPass with per-parcel delays).
 import * as THREE from 'three';
 import { trackDir, localHour, hourToTod } from './paths.js';
@@ -28,17 +28,16 @@ export function createNisar(ctx) {
   // ground swath: a wide band whose front glows; behind it a fading tint
   const W = 40000, L = 80000; // NISAR's swath is ~240 km: the band covers the whole commune
   const swathMat = new THREE.ShaderMaterial({
-    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false,
+    transparent: true, depthWrite: false, blending: THREE.NormalBlending, fog: false,
     uniforms: { uFront: { value: -1e4 }, uA: { value: 0 }, uCol: { value: COL }, uW: { value: 1 } },
     vertexShader: 'varying vec2 vL; void main(){ vL = position.xz; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }',
     fragmentShader: `uniform float uFront; uniform float uA; uniform vec3 uCol; uniform float uTime; uniform float uW; varying vec2 vL;
       void main(){
         float d = (uFront - vL.y) / uW; // >0 behind the front; uW widens the line when seen from high up
-        float line = exp(-abs(d) * .12) * 1.3 + exp(-abs(d) * .025) * .18;
-        float trail = d > 0. ? exp(-d / 380.) * .09 * (.75 + .25 * sin(vL.y * .35 / uW - uTime * 20.)) : 0.;
+        float line = exp(-abs(d) * .12) * .30;
         float edge = 1. - smoothstep(${(W / 2 - 200).toFixed(1)}, ${(W / 2).toFixed(1)}, abs(vL.x));
-        float a = (line + trail) * edge * uA;
-        gl_FragColor = vec4(uCol * a, 1.);
+        float a = line * edge * uA;
+        gl_FragColor = vec4(uCol, a);
       }`,
   });
   const swath = new THREE.Mesh(new THREE.PlaneGeometry(W, L).rotateX(-Math.PI / 2), swathMat);
@@ -49,10 +48,10 @@ export function createNisar(ctx) {
   beamGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(9), 3));
   beamGeo.setAttribute('aT', new THREE.BufferAttribute(new Float32Array([0, 1, 1]), 1));
   const beamMat = new THREE.ShaderMaterial({
-    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: false,
+    transparent: true, depthWrite: false, blending: THREE.NormalBlending, side: THREE.DoubleSide, fog: false,
     uniforms: { uA: { value: 0 }, uCol: { value: COL } },
     vertexShader: 'attribute float aT; varying float vT; void main(){ vT = aT; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }',
-    fragmentShader: 'uniform float uA; uniform vec3 uCol; varying float vT; void main(){ gl_FragColor = vec4(uCol * uA * (.004 + .05 * vT * vT), 1.); }',
+    fragmentShader: 'uniform float uA; uniform vec3 uCol; varying float vT; void main(){ gl_FragColor = vec4(uCol, uA * .012 * vT * vT); }',
   });
   swathMat.uniforms.uTime = ctx.U.uTime;
   const beam = new THREE.Mesh(beamGeo, beamMat);
@@ -78,8 +77,8 @@ export function createNisar(ctx) {
     st.centre.set(c.x, 0, c.z); st.dir = dir; st.track = pass.track; st.pass = i;
     st.s0 = c.x * dir[0] + c.z * dir[1] - st.back;
     st.end = (st.back + Math.max(1500, view * 1.6)) / st.speed + 1.5;
-    // every field everywhere has switched by st.end (fields beyond the visible sweep switch at the end)
-    ctx.sweepPass(i, { dir, s0: st.s0, speed: st.speed, maxDelay: st.end });
+    // Off-screen fields are capped at the end, including the satellite's lead-in.
+    ctx.sweepPass(i, { dir, s0: st.s0, speed: st.speed, leadIn: 1.5, maxDelay: st.end + 1.5 });
     swathMat.uniforms.uW.value = st.speed / SPEED;
     // put the satellite on the side the camera looks toward, so it crosses the visible sky
     const cam = ctx.camera.position;
@@ -98,6 +97,8 @@ export function createNisar(ctx) {
     const fade = Math.min(1, (st.t + 1.5) / 0.8) * (1 - THREE.MathUtils.smoothstep(st.t, st.end, st.end + 1.5));
     const front = -st.back + Math.max(0, st.t) * st.speed; // relative to the centre, along the track
     ctx.farSweep.set(st.dir[0], st.dir[1], st.s0 + Math.max(0, st.t) * st.speed, 1);
+    ctx.U.uScan.value.set(st.dir[0], st.dir[1], ctx.farSweep.z, fade * (st.t > 0 ? 1 : 0));
+    ctx.U.uScanWidth.value = st.speed;
     const nightK = 1 - 0.6 * ctx.U.uNight.value; // additive light reads much stronger on a dark scene
     swathMat.uniforms.uFront.value = front; swathMat.uniforms.uA.value = fade * (st.t > 0 ? 1 : 0.0) * nightK;
     // 40 degree incidence at swath centre. Altitude, spacecraft and time are
@@ -112,11 +113,13 @@ export function createNisar(ctx) {
     p.set([tmp.x, tmp.y, tmp.z, fx - d[1] * hw, 1.4, fz + d[0] * hw, fx + d[1] * hw, 1.4, fz - d[0] * hw]);
     beamGeo.attributes.position.needsUpdate = true;
     beamMat.uniforms.uA.value = fade * (st.t > 0 ? 1 : 0);
-    if (st.t > st.end + 1.6) { st.on = false; group.visible = false; ctx.farSweep.w = 0; ctx.onPassMomentEnd?.(st.pass); }
+    if (st.t > st.end + 1.6) { st.on = false; group.visible = false; ctx.farSweep.w = 0; ctx.U.uScan.value.w = 0; ctx.onPassMomentEnd?.(st.pass); }
   }
 
   return {
-    group, play, update, get active() { return st.on; }, get state() { return { on: st.on, t: +st.t.toFixed(2), track: st.track, pass: st.pass, sat: sat.position.toArray().map(Math.round), front: Math.round(swathMat.uniforms.uFront.value), vis: sat.visible }; },
+    group, play, update,
+    stop() { if(!st.on)return;ctx.setPassAll(st.pass,true);st.on=false;group.visible=false;ctx.farSweep.w=0;ctx.U.uScan.value.w=0;ctx.onPassMomentEnd?.(st.pass); },
+    get active() { return st.on; }, get state() { return { on: st.on, t: +st.t.toFixed(2), track: st.track, pass: st.pass, sat: sat.position.toArray().map(Math.round), front: Math.round(swathMat.uniforms.uFront.value), vis: sat.visible }; },
     upgrade(name, gltf) {
       if (name !== 'nisar' || !gltf) return false;
       const obj = patchScene(gltf.scene.clone(true), 'nisarglb', { radar: '.9', cast: false });

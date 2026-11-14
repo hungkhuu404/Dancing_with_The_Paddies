@@ -26,7 +26,7 @@ export function createTimeline(root, passes, fractions, onChange, player = null)
       <span class="tl-counter"></span>
       <span class="tl-track"></span>
       <span class="tl-badge"></span>
-    </div>`;
+    </div><p class="control-note observation-note">Observation date <span class="scan-note">Illustrated radar sweep</span></p>`;
   const strip = root.querySelector('.tl-strip');
   const head = root.querySelector('.tl-head');
   const play = root.querySelector('.tl-play');

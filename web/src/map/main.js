@@ -8,15 +8,23 @@ import '@fontsource/ibm-plex-sans/vietnamese-600.css';
 import '@fontsource/newsreader/latin-400.css';
 import '@fontsource/newsreader/vietnamese-400.css';
 import './map.css';
+import '../ui/surfaces.css';
+import {blockCore} from '../ui/blockCore.js';
+import {icon} from '../ui/icons.js';
+import {reveal,dismiss,viewIndicator} from '../ui/motion.js';
 import {CELL_HA,COLORS,STEPS,DURATION_EDGES,ONSET_NOTE,cellSentences,durationColor,fmtDate,onsetBins,onsetColor} from './contract.js';
 import {renderChart,renderStrip} from './panel.js';
-import {blockSummary,dateRange} from '../ui/blockSummary.js';
+import {dateRange} from '../ui/blockSummary.js';
 import {boundedPass,readView,observationAt,observationAreas,viewParams,escapeHTML as esc} from './presentation.js';
 
 setWorkerUrl(workerUrl);
 const $ = id => document.getElementById(id);
 const BASE = import.meta.env.BASE_URL;
 const embedded = parent !== window && new URLSearchParams(location.search).get('embed') === '1';
+document.body.classList.toggle('is-embedded',embedded);
+for(const [selector,name]of [['#back-world','landscape'],['#about-open','info'],['#season','calendar'],['[data-mode=status]','radar'],['[data-mode=onset]','arrival'],['[data-mode=duration]','duration']])document.querySelectorAll(selector).forEach(b=>b.insertAdjacentHTML('afterbegin',icon(name)));
+for(const id of ['map-key','map-options'])document.getElementById(id).open=false;
+viewIndicator(document.querySelector('#questions'));
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const send = (type, detail={}) => { if(embedded) parent.postMessage({channel:'flood-map',type,...detail},location.origin); };
 let stopPlayback = () => {};
@@ -158,8 +166,8 @@ async function start() {
     }
     $('legend').innerHTML='<ul>'+rows+'</ul>';
     $('key-note').textContent=note;
-    $('scope-label').textContent=state.radarOnly?'Radar image':state.scope==='season'?'Season summary':'By selected date';
-    $('layer-description').textContent=state.scope==='image'?'Latest valid water state on or before the selected date.':{status:'Water status at each block’s last valid observation.',onset:'When water first appeared in the latest flood episode.',duration:'Minimum time under water in the latest flood episode.'}[state.mode];
+    $('scope-label').textContent=state.radarOnly?'Radar image':state.scope==='season'?'Season record':'By selected date';
+    $('layer-description').textContent=state.scope==='image'?'Latest valid water state on or before the selected date.':{status:'Select a block to read its water record.',onset:'When water first appeared in the latest flood episode.',duration:'Minimum time under water in the latest flood episode.'}[state.mode];
   }
   for(const b of document.querySelectorAll('#questions button'))b.onclick=()=>{stopPlayback();state.mode=b.dataset.mode;state.scope='season';paint();updateDate();if(state.sel>=0)openPanel(state.sel);};
   $('radar-only').onchange=e=>{state.radarOnly=e.target.checked;for(const id of ['cells-fill','cells-hatch','cells-edge','gt30-yes','gt30-possible'])map.setLayoutProperty(id,'visibility',state.radarOnly?'none':id.startsWith('gt30')?(state.gt30&&state.scope==='season'?'visible':'none'):'visible');legend();};
@@ -167,12 +175,12 @@ async function start() {
   function swapBackdrop(){clearTimeout(backdropTimer);backdropTimer=setTimeout(()=>{backdropAt=performance.now();map.getSource('backdrop')?.updateImage({url:BASE+'data/'+dir+acq[state.pass].backdrop,coordinates:meta.backdrop.corners});},Math.max(0,334-(performance.now()-backdropAt)));}
   function updateDate(){
     const a=acq[state.pass],season=state.scope==='season';
-    $('date-context').textContent=season?'Season summary':`Image ${state.pass+1} of ${acq.length}`;
+    $('date-context').textContent=season?'All observations':'Water observed by';
     $('tl-label').textContent=season?dateRange(acq[0].date_local,acq[last].date_local):fmtDate(a.date_local);
     $('date-slider').value=String(state.pass);$('date-slider').setAttribute('aria-valuetext',`${fmtDate(a.date_local)}, track ${a.track}`);
     $('season').setAttribute('aria-pressed',String(season));
     $('prev').disabled=!season&&state.pass===0;$('next').disabled=!season&&state.pass===last;
-    $('date-note').textContent=season?'Drag the date slider to explore individual observations.':`Track ${a.track}. Gaps use the most recent valid image${a.valid_share<.999?'; this pass covers part of the commune':''}.`;
+    $('date-note').textContent=season?'Select a date to see the latest available water observation.':`Track ${a.track}. Gaps use the most recent valid image${a.valid_share<.999?'; this pass covers part of the commune':''}.`;
   }
   function setPass(i){state.pass=boundedPass(i,acq.length);state.scope='image';swapBackdrop();paint();updateDate();if(state.sel>=0)openPanel(state.sel);}
   $('date-slider').oninput=e=>{stopPlayback();setPass(+e.target.value);};
@@ -195,19 +203,19 @@ async function start() {
     state.sel=i;revision++;
     $('selection-hint').hidden=true;
     $('panel-body').querySelector('.science-details')?.removeAttribute('open');
-    if(i<0){$('panel').hidden=true;document.body.classList.remove('panel-open');map.getCanvas().focus({preventScroll:true});syncUrl();return;}
+    if(i<0){dismiss($('panel'));document.body.classList.remove('panel-open');map.getCanvas().focus({preventScroll:true});syncUrl();return;}
     map.setFeatureState({source:'cells',id:features[i].id},{sel:true});syncUrl();openPanel(i);
     if(zoom){const ring=features[i].geometry.coordinates[0],points=ring.slice(0,-1);const centre=points.reduce((a,p)=>[a[0]+p[0]/points.length,a[1]+p[1]/points.length],[0,0]);map.easeTo({center:centre,zoom:Math.max(map.getZoom(),13),duration:duration()});}
   }
   $('panel-close').onclick=()=>select(-1);
   addEventListener('keydown',e=>{if(e.key!=='Escape'||$('about-dialog').open)return;stopPlayback();if(state.sel>=0){e.stopPropagation();select(-1);}else if(embedded)returnWorld();});
   async function openPanel(i){
-    const stamp=++revision,p=props[i],s=blockSummary(p),old=$('panel-body').querySelector('.science-details')?.open,scroll=$('panel').scrollTop;
+    const stamp=++revision,p=props[i],old=$('panel-body').querySelector('.science-details')?.open,scroll=$('panel').scrollTop;
     const rec=series?.cells[p.cell_id],obs=observationAt(rec?.s,state.pass);
     const observed=obs.state==='W'?'Water observed':obs.state==='N'?'No open water observed':'No observation available';
     const atDate=state.scope==='image'?`<p class="image-state">${observed}<small>${obs.index<0?'No valid image on or before this date.':`${obs.carried?'Carried from':'Observed on'} ${fmtDate(acq[obs.index].date_local)}${obs.missing?'. No image for this block on the selected date.':''}`}</small></p>`:'';
-    $('panel-body').innerHTML=`<p class="eyebrow">250 m block</p><h2 id="block-title">${esc(p.nearest_hamlet||site.name)}</h2>${atDate}<p class="status-label" data-status="${esc(p.status)}">${esc(s.status)}</p>${s.unconfirmed?'<p class="unconfirmed">Not yet confirmed</p>':''}<p class="scope-heading">Full-season record</p><dl class="block-facts">${s.rows.map(r=>`<div><dt>${esc(r.label)}</dt><dd>${esc(r.value)}${r.detail?`<small>${esc(r.detail)}</small>`:''}</dd></div>`).join('')}</dl><div class="record-title"><span>Observation record</span><span>${p.n_obs} valid images</span></div><div id="strip"><p class="key-note">Loading observation record</p></div><p class="strip-key"><span><i class="sw" style="background:var(--water)"></i>Water</span><span><i class="sw empty"></i>No water</span><span><i class="sw hatched"></i>No image</span></p><details class="science-details"${old?' open':''}><summary>Radar measurements and notes</summary><p>${esc(p.cell_id)}</p>${cellSentences(p).filter(t=>t.includes('not yet confirmed')).map(t=>`<p>${esc(t)}</p>`).join('')}<p>${ONSET_NOTE} Radar does not measure depth.</p><p>${p.n_obs} images from ${p.n_tracks} tracks.${p.max_gap_days===null?'':` Longest gap: ${Math.round(p.max_gap_days)} days.`}</p><div id="chart"></div></details><div class="panel-actions">${embedded?'<button class="primary" type="button" id="see-world">View this block in 3D</button>':''}<button type="button" id="copy-link">Copy block link</button></div><p id="copy-status" class="copy-status" role="status"></p>`;
-    $('panel').hidden=false;document.body.classList.add('panel-open');$('panel').scrollTop=scroll;
+    $('panel-body').innerHTML=`${blockCore(p,'block-title')}${atDate}<details class="observation-details"><summary>Observation record <span>${p.n_obs} images</span></summary><div id="strip"></div><p class="strip-key"><span><i class="sw" style="background:var(--water)"></i>Water</span><span><i class="sw empty"></i>No water</span><span><i class="sw hatched"></i>No image</span></p><p class="block-id">${esc(p.cell_id)}</p>${cellSentences(p).filter(t=>t.includes('not yet confirmed')).map(t=>`<p>${esc(t)}</p>`).join('')}<p>${ONSET_NOTE}</p></details><details class="science-details"${old?' open':''}><summary>Radar measurements</summary><p>${p.n_obs} images from ${p.n_tracks} tracks.</p><div id="chart"></div></details><div class="panel-actions">${embedded?`<button class="primary" type="button" id="see-world">${icon('landscape')}Locate in landscape</button>`:''}<button type="button" id="copy-link">${icon('copy')}Copy link</button></div><p id="copy-status" class="copy-status" role="status"></p>`;
+    reveal($('panel'));document.body.classList.add('panel-open');$('panel').scrollTop=scroll;
     $('see-world')?.addEventListener('click',()=>returnWorld(p.cell_id));
     $('copy-link').onclick=async()=>{
       const q=viewParams({...state,cell:p.cell_id},site.id);if(embedded)q.set('view','map');
@@ -216,8 +224,8 @@ async function start() {
     };
     await loadSeries();if(stamp!==revision||state.sel!==i)return;
     const record=series?.cells[p.cell_id];
-    $('strip').innerHTML=record?renderStrip(record.s,acq,state.scope==='image'?state.pass:-1,p).replaceAll(COLORS.ink,COLORS.radar):'<p class="key-note">Observation record unavailable.</p>';
-    function chart(){if(!record||!$('chart')||$('chart').children.length)return;$('chart').innerHTML=renderChart(record,acq,state.pass,p).replaceAll(COLORS.ink,COLORS.radar);$('chart').querySelector('.show-table')?.addEventListener('click',e=>{const t=$('chart').querySelector('table');t.hidden=!t.hidden;e.target.textContent=t.hidden?'Show as table':'Hide table';});}
+    $('strip').innerHTML=record?renderStrip(record.s,acq,state.scope==='image'?state.pass:-1,p):'<p class="key-note">Observation record unavailable.</p>';
+    function chart(){if(!record||!$('chart')||$('chart').children.length)return;$('chart').innerHTML=renderChart(record,acq,state.pass,p);$('chart').querySelector('.show-table')?.addEventListener('click',e=>{const t=$('chart').querySelector('table');t.hidden=!t.hidden;e.target.textContent=t.hidden?'Show as table':'Hide table';});}
     const details=$('panel-body').querySelector('.science-details');details.addEventListener('toggle',()=>{if(details.open)chart();});if(details.open)chart();
   }
   addEventListener('message',e=>{

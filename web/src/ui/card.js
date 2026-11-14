@@ -1,7 +1,8 @@
 // Parcel card: when water came, how long it stayed, whether it is still there, 20-cell state strip.
 import { firstWater, duration, stillThere, fmtDate } from '../data/parcels.js';
 import { cellSentences } from '../map/contract.js';
-import {blockSummary} from './blockSummary.js';
+import {blockCore} from './blockCore.js';
+import {icon} from './icons.js';
 import {reveal,dismiss} from './motion.js';
 
 export function createCard(root, passes, onClose) {
@@ -43,24 +44,19 @@ export function createCard(root, passes, onClose) {
   // Contract data: the same answers as the map's block panel (spec_uiux §6.4), for the 250 m block under the field.
   function openCell(parcel, idx, pass) {
     const p = parcel.cell, s = parcel.s;
-    const summary=blockSummary(p);
     const notes=cellSentences(p).slice(['flooded','water_gone'].includes(p.status)?3:1);
     root.innerHTML = `
       <button class="card-x" type="button" aria-label="Close">
         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9"/></svg>
       </button>
-      <p class="card-kicker">Season summary for a 250 m block</p>
-      <h2 id="card-title" class="card-title">${p.nearest_hamlet?`<span class="location-prefix">Near</span> ${escape(p.nearest_hamlet)}`:'Selected block'}</h2>
-      <p class="block-status status-${escape(p.status)}">${escape(summary.status)}</p>
-      ${summary.unconfirmed?'<p class="confirmation-note">Not yet confirmed</p>':''}
-      <dl class="block-facts">${summary.rows.map(r=>`<div><dt>${escape(r.label)}</dt><dd>${escape(r.value)}${r.detail?`<span>${escape(r.detail)}</span>`:''}</dd></div>`).join('')}</dl>
-      <div class="observation-heading"><span>Observation record</span><span>${p.n_obs??0} valid images</span></div>
+      ${blockCore(p,'card-title')}
+      <details class="observation-details"><summary>Observation record <span>${p.n_obs??0} images</span></summary>
       <div class="card-strip" role="img" aria-label="${stripLabel(s, passes)}">
         ${[...s].map((c, i) => `<i class="c-${c === 'W' ? 'w' : c === 'N' ? 'n' : 'x'}${i === pass ? ' is-cur' : ''}" title="${fmtDate(passes[i].date)}: ${c === 'W' ? 'water' : c === 'N' ? 'dry' : 'no data'}"></i>`).join('')}
       </div>
       <p class="card-legend"><span><i class="c-w"></i>Water</span><span><i class="c-n"></i>Dry</span><span><i class="c-x"></i>No image</span></p>
-      <details class="observation-details"><summary>Observation details</summary><p class="block-id">${escape(p.cell_id)}</p>${notes.map(t=>`<p class="card-answer">${escape(t)}</p>`).join('')}</details>
-      <a class="card-link" href="${import.meta.env.BASE_URL}map/?cell=${encodeURIComponent(p.cell_id)}">View block on map <span aria-hidden="true">↗</span></a>`;
+      <p class="block-id">${escape(p.cell_id)}</p>${notes.map(t=>`<p class="card-answer">${escape(t)}</p>`).join('')}</details>
+      <a class="card-link" href="${import.meta.env.BASE_URL}map/?cell=${encodeURIComponent(p.cell_id)}">${icon('map')}Inspect on map</a>`;
     root.classList.add('is-in');root.scrollTop=0;reveal(root);
     root.querySelector('.card-x').addEventListener('click', close);
     root.querySelector('.card-x').focus({ preventScroll: true });
