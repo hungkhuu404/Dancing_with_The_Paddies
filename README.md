@@ -4,7 +4,7 @@
 
 Team **Dancing with The Paddies** · NASA Space Apps Challenge 2026 · Challenge: *Dancing with the SARs*
 
-**Data status:** The web reads the Tân Hội pixel-method export under contract 2.0.0. The repository includes S1–S5, S7 and a post-hoc S6 comparison; S6 source code, Bang Rakam observations and H7 remain separate work. The interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md) and [data provenance](docs/provenance/tan-hoi-v2.md).
+**Data status:** The web reads the Tân Hội pixel-method export under contract 2.0.0. The repository includes S1–S5, an offline S6 comparison runner and S7. Bang Rakam observations and H7 remain separate work. The interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md), [S6 instructions](docs/s6-comparison.md) and [data provenance](docs/provenance/tan-hoi-v2.md).
 
 **Existing live site:** https://flood-calendar.pages.dev — this migration has not been deployed or verified against that site.
 
@@ -31,7 +31,7 @@ What it does **not** do: it does not measure methane, and it cannot tell whether
 
 ## How it works
 
-The web reads the published pixel export rather than running the pipeline. S6 comparison code remains separate work.
+The web reads the published pixel export rather than running the pipeline. S6 runs offline on explicitly supplied snapshots and records their hashes; only S7 publishes web data.
 
 | Stage | What it does | Folder |
 | --- | --- | --- |
@@ -54,7 +54,7 @@ The file format between the pipeline and the web is defined in [docs/data-contra
 | --- | --- |
 | `pipeline/core/` | S1–S5 pixel pipeline |
 | `pipeline/catalog/`, `pipeline/export/` | S0 catalog and S7 export |
-| `pipeline/validate/` | Placeholder for S6; not migrated |
+| `pipeline/validate/` | S6 comparison, DSWx reader, landcover helpers and report tools |
 | `config/sites/` | Site configuration |
 | `schema/` | JSON Schema for exported files |
 | `tests/` | Pipeline tests. Web tests are in `web/test/` |
@@ -88,6 +88,8 @@ pip install -r requirements.txt
 python -m pytest -q tests/core
 ```
 
+For S6, install `requirements-s6.txt` and follow [the explicit-input runner instructions](docs/s6-comparison.md). Raw snapshots, raster cache and tokens are not distributed with the repository.
+
 Keep the token in a file outside the repository and point to it:
 
 ```bash
@@ -115,7 +117,7 @@ Never commit the token, the image cache or files with signed links.
 
 - The 75% pixel method and 50% temporal guard were selected after examining DSWx-S1; agreement is not an independent test and DSWx-S1 is not ground truth.
 - The local web does not report agreement scores; the supplied comparison is post-hoc.
-- Bang Rakam, H7/final data and S6 pipeline code are not migrated.
+- Bang Rakam and H7/final data are not supplied. The S6 runner currently supports the Tân Hội comparison.
 - One track revisits every 12 days, so water arrival and water leaving are date ranges.
 - Track 148 D does not cover about 13.5% of the commune's cells; the map uses each cell's latest valid image.
 - Water arrival may be dated early on dry, flat fields.

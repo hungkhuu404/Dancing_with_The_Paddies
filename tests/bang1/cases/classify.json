@@ -1,0 +1,118 @@
+[
+  {
+    "id": "both_below",
+    "input": {
+      "hh_db": -14.1,
+      "hv_db": -20.1,
+      "valid": true
+    },
+    "expected": "W"
+  },
+  {
+    "id": "hh_equal",
+    "input": {
+      "hh_db": -14,
+      "hv_db": -21,
+      "valid": true
+    },
+    "expected": "N"
+  },
+  {
+    "id": "hv_equal",
+    "input": {
+      "hh_db": -15,
+      "hv_db": -20,
+      "valid": true
+    },
+    "expected": "N"
+  },
+  {
+    "id": "both_equal",
+    "input": {
+      "hh_db": -14,
+      "hv_db": -20,
+      "valid": true
+    },
+    "expected": "N"
+  },
+  {
+    "id": "hh_above",
+    "input": {
+      "hh_db": -13,
+      "hv_db": -21,
+      "valid": true
+    },
+    "expected": "N"
+  },
+  {
+    "id": "hv_above",
+    "input": {
+      "hh_db": -15,
+      "hv_db": -19,
+      "valid": true
+    },
+    "expected": "N"
+  },
+  {
+    "id": "invalid_water",
+    "input": {
+      "hh_db": -30,
+      "hv_db": -30,
+      "valid": false
+    },
+    "expected": "-"
+  },
+  {
+    "id": "invalid_missing",
+    "input": {
+      "hh_db": null,
+      "hv_db": null,
+      "valid": false
+    },
+    "expected": "-"
+  },
+  {
+    "id": "q1_track_thresholds",
+    "input": {
+      "hh_db": -16,
+      "hv_db": -23,
+      "valid": true,
+      "hh_threshold_db": -17,
+      "hv_threshold_db": -24
+    },
+    "expected": "N"
+  },
+  {
+    "id": "q1_water",
+    "input": {
+      "hh_db": -18,
+      "hv_db": -25,
+      "valid": true,
+      "hh_threshold_db": -17,
+      "hv_threshold_db": -24
+    },
+    "expected": "W"
+  },
+  {
+    "id": "q1_hh_equal",
+    "input": {
+      "hh_db": -17,
+      "hv_db": -25,
+      "valid": true,
+      "hh_threshold_db": -17,
+      "hv_threshold_db": -24
+    },
+    "expected": "N"
+  },
+  {
+    "id": "q1_hv_equal",
+    "input": {
+      "hh_db": -18,
+      "hv_db": -24,
+      "valid": true,
+      "hh_threshold_db": -17,
+      "hv_threshold_db": -24
+    },
+    "expected": "N"
+  }
+]
