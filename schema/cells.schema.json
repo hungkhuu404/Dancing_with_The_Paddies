@@ -1,0 +1,279 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "cells",
+  "$comment": "Implements CONTRACT-001 1.0.0 in docs/data-contract.md. QUAN-3 compatibility: null ongoing/status_confirmed/n_episodes allowed only for no_data, matching S5.",
+  "type": "object",
+  "properties": {
+    "type": {
+      "const": "FeatureCollection"
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "Feature"
+          },
+          "geometry": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "const": "Polygon"
+              },
+              "coordinates": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "prefixItems": [
+                      {
+                        "type": "number",
+                        "minimum": -180,
+                        "maximum": 180
+                      },
+                      {
+                        "type": "number",
+                        "minimum": -90,
+                        "maximum": 90
+                      }
+                    ],
+                    "items": false,
+                    "minItems": 2,
+                    "maxItems": 2
+                  },
+                  "minItems": 4
+                },
+                "minItems": 1
+              }
+            },
+            "required": [
+              "type",
+              "coordinates"
+            ]
+          },
+          "properties": {
+            "type": "object",
+            "properties": {
+              "cell_id": {
+                "type": "string",
+                "pattern": "^E\\d+N\\d+$"
+              },
+              "status": {
+                "enum": [
+                  "never_water",
+                  "flooded",
+                  "water_gone",
+                  "always_water",
+                  "no_data"
+                ]
+              },
+              "status_confirmed": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "ongoing": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "onset_after_local": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "onset_by_local": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "end_after_local": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "end_by_local": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "last_obs_local": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "flood_days_min": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "flood_days_max": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "max_gap_days": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "flag_gt30": {
+                "enum": [
+                  "yes",
+                  "possible",
+                  "no",
+                  "na"
+                ]
+              },
+              "cropland": {
+                "type": "boolean"
+              },
+              "nearest_hamlet": {
+                "type": "string",
+                "minLength": 1
+              },
+              "n_obs": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "n_tracks": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "n_episodes": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "cell_id",
+              "status",
+              "status_confirmed",
+              "ongoing",
+              "onset_after_local",
+              "onset_by_local",
+              "end_after_local",
+              "end_by_local",
+              "last_obs_local",
+              "flood_days_min",
+              "flood_days_max",
+              "max_gap_days",
+              "flag_gt30",
+              "cropland",
+              "nearest_hamlet",
+              "n_obs",
+              "n_tracks",
+              "n_episodes"
+            ],
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "status": {
+                      "not": {
+                        "const": "no_data"
+                      }
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "ongoing": {
+                      "type": "boolean"
+                    },
+                    "status_confirmed": {
+                      "type": "boolean"
+                    },
+                    "n_episodes": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "id": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "type",
+          "geometry",
+          "properties",
+          "id"
+        ]
+      },
+      "minItems": 0
+    }
+  },
+  "required": [
+    "type",
+    "features"
+  ]
+}

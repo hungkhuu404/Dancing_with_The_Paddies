@@ -55,3 +55,7 @@ After the exact initial import above, `web/src/ui/locationAtlas.js` replaces the
 ## Documentation follow-up
 
 The documentation index `docs/README.md` is intentionally updated after the initial byte-preservation check to link this migration. All other 317 protected tracked files remain byte-identical. The module map and verification are in `docs/plans/location-entrance.md`.
+
+## Release integration
+
+The authorized release branch combines the existing product frontend lineage with main a6fbb05. Current main wins the sole meta.json conflict; only generated_utc differs from the earlier frontend data. Main configuration, Schema and S0/S7 implementation are retained. The root README and documentation index now reflect the combined tree. Initial import hashes above continue to identify the source UI bytes and the recorded fallback adaptation; initial whole-checkout preservation claims apply to the local preparation checkpoint. The new consolidated PR supersedes frontend PRs #1/#3 and excludes the separate S1-S5 and H5 PRs. No source history is rewritten or deployment added.

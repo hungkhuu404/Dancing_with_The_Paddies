@@ -23,13 +23,13 @@ The real-data loader, allowlisted sync, package/lockfile, existing infrastructur
 - Confirmed Intel UHD D3D11 low tier: entrance/arrival RAF sample approximately 35.5 FPS, longest 125 ms, one frame over 100 ms. This is a smoke sample, not full traversal or a 50 FPS claim for Intel. No new controlled high-tier benchmark is claimed for this migration.
 - A separate final no-WebGL check verifies the readable message and real observation-map link after the product adaptation.
 - Local chooser readiness measured 1.2 seconds; scene readiness 34.5 seconds while repeatedly resizing during preparation. Warm-up remains variable; no latency guarantee is made. Skip completed in 170 ms in that run.
-- Initial import preserved 318 other tracked files byte for byte. The documentation index is subsequently updated intentionally; all 317 other protected tracked files, including public data and product-specific guards, remain unchanged. Source/import hashes are checked again before handoff.
+- Initial import preserved 318 other tracked files byte for byte. The documentation index is subsequently updated intentionally; all 317 other protected tracked files were unchanged at that local checkpoint. The subsequent integration intentionally retains main's newer metadata and updates the documentation; product-specific real-data guards remain intact. Source/import hashes are checked again before handoff.
 
 Local evidence is held outside Git in runtime/map-redesign/entrance-migration: test/build logs, atlas-local/results.json and screenshots, atlas-low/results.json, fallback-final.json and image, protected-before.json and imported.json. Owned preview servers and browsers are closed. No secrets, private input, build output, environments or old Git history are imported.
 
 ## Integration state and limits
 
-This is a local prepared migration, not a published deployment. It has not been committed, pushed or merged. Existing product PRs #1 and #3 remain unchanged and unmerged. The branch inherits their reviewed web baseline; product main a6fbb05 already contains the separately merged Quan S0/S7 and v1 export. This local branch does not integrate or replace that main-only work. Human review must resolve the integration order before merging the new UI.
+The integration branch combines the frontend lineage of PRs #1 and #3 with product main a6fbb05, including Quan S0/S7 and the public v1 export. The only data merge conflict was meta.json: current main was retained, changing only generated_utc compared with the earlier web snapshot. The consolidated migration PR targets main and supersedes those frontend PRs; the separate pipeline and H5 PRs are excluded. CI/merge status is recorded on the PR. No deployment host or workflow is added.
 
 Validation/H5 is still an open separate product PR, not part of this migration. H7 and Bang Rakam observations are not supplied here. Existing lack of validation is disclosed by the product build; no validation score is generated. Contract remains 1.0.0. S1-S6 and data-team changes are outside this UI task. No deploy workflow or host is added.
 

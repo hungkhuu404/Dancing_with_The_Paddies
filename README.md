@@ -4,7 +4,7 @@
 
 Team **Dancing with The Paddies** · NASA Space Apps Challenge 2026 · Challenge: *Dancing with the SARs*
 
-**Local migration status:** the Tân Hội 3D view and `/map/` are migrated from Nasa_prep snapshot `963333c`. The public H4 export contains 20 acquisitions (11 Aug–27 Oct 2026). Validation results, Bang Rakam, H7/final data and pipeline S0–S7 have **not been migrated**. See [local instructions](web/README.md) and the [review](docs/reviews/web-local-review.md).
+**Migration status:** T?n H?i landscape, same-tab observation map, location entrance and compact controls are integrated from the pinned Nasa_prep revisions recorded in provenance. Current main's S0 catalogue, S7 export, site configuration, JSON Schema and public v1 data are retained. S1?S6, validation/H5, Bang Rakam observations and H7 remain separate pending work. See [web instructions](web/README.md) and [integration review](docs/plans/location-entrance.md).
 
 **Existing live site:** https://flood-calendar.pages.dev — this migration has not been deployed or verified against that site.
 
