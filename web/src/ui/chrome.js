@@ -4,6 +4,7 @@ import {icon} from './icons.js';
 export function createChrome({canvas,signature}) {
   const $=s=>document.querySelector(s), menu=$('#menu-btn'),panel=$('#tools-panel');
   $('.calendar-launch').insertAdjacentHTML('afterbegin',icon('calendar'));
+  $('.method-launch').insertAdjacentHTML('afterbegin',icon('info'));
   $('#scene-views').prepend($('.signature-views'));
   viewIndicator($('.signature-views'));
   $('#presentation-tools').append($('.signature-tools'));

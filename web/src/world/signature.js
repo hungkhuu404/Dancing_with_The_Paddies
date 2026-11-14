@@ -1,12 +1,15 @@
 import * as THREE from 'three';
 import {U} from '../scene/shaderlib.js';
 import {onsetBins,onsetColor,COLORS,fmtDate} from '../map/contract.js';
-import {hourlyWeather,celestial,sceneDate,ease,TOUR_TEXT,tourPose} from './signatureRules.js';
+import {hourlyWeather,celestial,sceneDate,ease,tourPose} from './signatureRules.js';
 import {createRecorder} from './recorder.js';
 import {rng} from './paths.js';
 import {dateRange} from '../ui/blockSummary.js';
 import {reveal,dismiss} from '../ui/motion.js';
 import {icon} from '../ui/icons.js';
+import {tourCaption} from './tourScript.js';
+import {createTourAudio} from './tourAudio.js';
+import {createTourScore} from './tourScore.js';
 
 /** Extra scene controls; contract parsing remains owned by data/load.js. */
 export async function createSignature(ctx) {
@@ -26,6 +29,8 @@ export async function createSignature(ctx) {
   const controls=new Map([...panel.querySelectorAll('[id]')].map(node=>[node.id,node]));
   const find=id=>controls.get(id),note=find('science-note');
   const subtitle=document.createElement('div');subtitle.className='story-caption';subtitle.hidden=true;subtitle.setAttribute('aria-live','polite');document.body.append(subtitle);
+  const evidence=document.createElement('section');evidence.className='tour-evidence';evidence.hidden=true;evidence.setAttribute('aria-label','Water calendar preview');document.body.append(evidence);
+  const voiceButton=document.createElement('button');voiceButton.className='tour-voice';voiceButton.type='button';voiceButton.hidden=true;voiceButton.setAttribute('aria-pressed','false');voiceButton.innerHTML=icon('sound')+'<span>Mute narration</span>';document.body.append(voiceButton);
   const viewCaption=document.createElement('p');viewCaption.className='world-view-caption';viewCaption.hidden=true;document.body.append(viewCaption);
   let calData=null,calTexture=null;
   if(grid&&parcelTex){
@@ -47,7 +52,7 @@ export async function createSignature(ctx) {
   setMode(0);panel.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>setMode(b.dataset.view));
   function updateAge(){U.uAgeHaze.value=0;}
   function applyWeather(){world.atmo.setHistorical(weatherOn?weather:null);if(!weatherOn||!weather){world.atmo.setWeather('clear');sky.sky.material.uniforms.cloudCoverage.value=.32;oldTod=-1;}}
-  const recorder=createRecorder(canvas,{subtitle:()=>tour?TOUR_TEXT[Math.min(4,Math.floor(tourTime/12))].join('. '):note.textContent,credit:()=>`${contract?.meta.fixture?'Fixture data, not results. ':''}Flood Calendar, Tân Hội. ${fmtDate(ctx.passes[pass]?.date)}. Illustrated landscape.`,onState:s=>{
+  const recorder=createRecorder(canvas,{subtitle:()=>tour?tourCaption(tourTime,voiceManifest):note.textContent,credit:()=>`${contract?.meta.fixture?'Fixture data, not results. ':''}Flood Calendar, Tân Hội. ${fmtDate(ctx.passes[pass]?.date)}. Illustrated landscape.`,onState:s=>{
     document.body.classList.toggle('is-recording',s.active);find('record-start').textContent=s.active?'Stop recording':'Record 30s';find('record-download').hidden=!s.url;find('record-status').textContent=s.error||(s.active?'Recording':s.url?`Video ready (${(s.bytes/1e6).toFixed(1)} MB)`:'');
   }});
   find('record-start').onclick=()=>recorder.state.active?recorder.stop():recorder.start({wide:true,hide:true});find('record-download').onclick=()=>recorder.download();
@@ -57,8 +62,14 @@ export async function createSignature(ctx) {
   const stars=new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xeef0ec,size:1.6,sizeAttenuation:false,transparent:true,opacity:0,depthWrite:false,fog:false}));stars.name='illustrative-stars';stars.frustumCulled=false;scene.add(stars);
   const moonMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,side:THREE.DoubleSide,uniforms:{uPhase:{value:0},uAngle:{value:0},uOpacity:{value:0}},vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:`varying vec2 vUv;uniform float uPhase;uniform float uAngle;uniform float uOpacity;void main(){vec2 p=vUv*2.-1.;float r=dot(p,p);if(r>1.)discard;vec3 n=vec3(p,sqrt(1.-r));float z=-cos(uPhase*6.2831853);float xy=sqrt(max(0.,1.-z*z));vec3 light=vec3(sin(uAngle)*xy,cos(uAngle)*xy,z);float lit=smoothstep(-.02,.02,dot(n,light));gl_FragColor=vec4(vec3(.85,.86,.80)*lit,uOpacity*(1.-smoothstep(.96,1.,r)));}`});
   const moon=new THREE.Mesh(new THREE.PlaneGeometry(52,52),moonMat);moon.name='astronomical-moon-phase';moon.frustumCulled=false;scene.add(moon);
-  const pose={};let audio=null,audioAvailable=false;
-  try {const r=await fetch(import.meta.env.BASE_URL+'audio/tour-en.mp3',{method:'HEAD'});audioAvailable=r.ok&&(r.headers.get('content-type')||'').startsWith('audio/');}catch{/* subtitles only */}
+  const pose={};let voiceManifest=null,legacyVoice=false;
+  try {const r=await fetch(import.meta.env.BASE_URL+'audio/tour/manifest.json');if(r.ok&&(r.headers.get('content-type')||'').includes('json'))voiceManifest=await r.json();}catch{/* subtitles only */}
+  if(!voiceManifest)try {const r=await fetch(import.meta.env.BASE_URL+'audio/tour-en.mp3',{method:'HEAD'});legacyVoice=r.ok&&(r.headers.get('content-type')||'').startsWith('audio/');}catch{/* subtitles only */}
+  const score=createTourScore();
+  const narration=createTourAudio({base:import.meta.env.BASE_URL+'audio/'+(voiceManifest?'tour/':''),manifest:voiceManifest,legacy:legacyVoice,onSpeaking:active=>{world.sound.setNarrating(active);score.setSpeaking(active);}});
+  voiceButton.querySelector('span').textContent='Mute tour audio';
+  voiceButton.onclick=()=>{const muted=narration.toggle();score.setMuted(muted);voiceButton.setAttribute('aria-pressed',String(muted));voiceButton.querySelector('span').textContent=muted?'Unmute tour audio':'Mute tour audio';};
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)stopTour();});
   let tourCalendar=null;
   addEventListener('message',e=>{if(e.origin!==location.origin||e.source!==tourCalendar?.contentWindow||e.data?.channel!=='flood-reference')return;if(e.data.type==='map')ctx.openCalendarMap?.(e.data.query);if(e.data.type==='close')stopTour();});
   function startTour(){
@@ -66,9 +77,9 @@ export async function createSignature(ctx) {
     tour=[ctx.target().x,ctx.target().z];
     let nearest=Infinity;for(const t of tiles.ready)for(const p of t.layout.parcels){let x=0,z=0;for(const v of p.poly){x+=v[0];z+=v[1];}x/=p.poly.length;z/=p.poly.length;const d=(x-ctx.target().x)**2+(z-ctx.target().z)**2;if(d<nearest){nearest=d;tour[0]=x;tour[1]=z;}}
     age=0;updateAge();tourTime=0;lastScene=-1;reveal(subtitle);find('tour-skip').hidden=false;find('tour-start').disabled=true;
-    if(audioAvailable){audio=new Audio(import.meta.env.BASE_URL+'audio/tour-en.mp3');audio.play().catch(()=>{});}
+    document.body.classList.add('is-touring');subtitle.textContent=tourCaption(0,voiceManifest);score.start();score.update(0);narration.start();narration.update(0);voiceButton.hidden=!narration.available&&!score.available;
   }
-  function stopTour(){if(!tour)return;audio?.pause();audio=null;tour=null;tourCalendar=null;dismiss(subtitle);find('tour-skip').hidden=true;find('tour-start').disabled=false;ctx.restoreView(tourSaved.view);setMode(tourSaved.mode);age=tourSaved.age;updateAge();}
+  function stopTour(){if(!tour)return;score.stop();narration.stop();document.body.classList.remove('is-touring','tour-has-calendar');voiceButton.hidden=true;tour=null;tourCalendar=null;dismiss(subtitle);dismiss(evidence);find('tour-skip').hidden=true;find('tour-start').disabled=false;ctx.restoreView(tourSaved.view);setMode(tourSaved.mode);age=tourSaved.age;updateAge();}
   find('tour-start').onclick=startTour;find('tour-skip').onclick=stopTour;
   canvas.addEventListener('pointerdown',()=>{if(tour)stopTour();});
   addEventListener('keydown',e=>{if(document.body.classList.contains('is-atlas')||document.querySelector('dialog[open]')||e.target.closest?.('#tools-panel')||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||e.target.isContentEditable)return;if(['1','2','3'].includes(e.key)){if(tour)stopTour();setMode(+e.key-1);}if(e.key==='Escape')stopTour();});
@@ -85,7 +96,7 @@ export async function createSignature(ctx) {
     if(Math.abs(tod-oldTod)>.0008){const date=contract?.acq?.[pass]?.date_local||ctx.passes[pass].date;astronomy=celestial(sceneDate(date,tod));sky.setAstronomy(astronomy);sky.set(tod);oldTod=tod;}
     if(weatherOn&&weather){sky.state.cloud=weather.cloud_cover/100;sky.sky.material.uniforms.cloudCoverage.value=weather.cloud_cover/100;const a=weather.wind_direction_10m*Math.PI/180;ctx.wind.set(-Math.sin(a)*weather.wind_speed_10m,Math.cos(a)*weather.wind_speed_10m);}
     radar+=(+(mode===1)-radar)*Math.min(1,dt*6);calendar+=(+(mode===2)-calendar)*Math.min(1,dt*6);if(reduced){radar=+(mode===1);calendar=+(mode===2);}U.uRadarMode.value=radar;U.uCalendarMode.value=calendar;
-    if(tour){tourTime+=dt;tourPose(tourTime,tour,pose);if(!reduced||pose.scene!==lastScene)ctx.pose(pose);if(pose.scene!==lastScene){lastScene=pose.scene;setMode([0,0,1,0,2][lastScene]);subtitle.replaceChildren(Object.assign(document.createElement('strong'),{textContent:TOUR_TEXT[lastScene][0]}),Object.assign(document.createElement('span'),{textContent:TOUR_TEXT[lastScene][1]}));if(lastScene===3)ctx.selectAt(tour[0],tour[1]);if(lastScene===4){tourCalendar=document.createElement('iframe');tourCalendar.className='tour-calendar';tourCalendar.title='Hamlet water calendar';const id=typeof contract?.meta.site==='string'?contract.meta.site:contract?.meta.site?.id||'tan_hoi';tourCalendar.src=import.meta.env.BASE_URL+'calendar/?'+new URLSearchParams({site:id,embed:'1',preview:'1'});const full=document.createElement('a');full.href=import.meta.env.BASE_URL+'calendar/?'+new URLSearchParams({site:id});full.textContent='Open full calendar';subtitle.append(tourCalendar,full);}}if(tourTime>=60)stopTour();}
+    if(tour){tourTime+=dt;tourPose(tourTime,tour,pose);if(!reduced||pose.scene!==lastScene)ctx.pose(pose);if(pose.scene!==lastScene){lastScene=pose.scene;setMode([0,0,1,0,2][lastScene]);if(lastScene===3)ctx.selectAt(tour[0],tour[1]);if(lastScene===4){tourCalendar=document.createElement('iframe');tourCalendar.className='tour-calendar';tourCalendar.title='Hamlet water calendar';const id=typeof contract?.meta.site==='string'?contract.meta.site:contract?.meta.site?.id||'tan_hoi';tourCalendar.src=import.meta.env.BASE_URL+'calendar/?'+new URLSearchParams({site:id,embed:'1',preview:'1'});const full=document.createElement('a');full.href=import.meta.env.BASE_URL+'calendar/?'+new URLSearchParams({site:id});full.textContent='Open full calendar';evidence.replaceChildren(tourCalendar,full);document.body.classList.add('tour-has-calendar');reveal(evidence);}}const caption=tourCaption(tourTime,voiceManifest);if(subtitle.textContent!==caption){subtitle.textContent=caption;if(!reduced)subtitle.animate([{opacity:.35},{opacity:1}],{duration:180,easing:'ease-out'});}score.update(tourTime);narration.update(tourTime);if(tourTime>=60)stopTour();}
     stars.position.copy(camera.position);stars.material.opacity=(astronomy?Math.max(0,1-astronomy.fraction/.15):0)*sky.state.night*(1-(weatherOn&&weather?weather.cloud_cover/100:sky.state.cloud))*.9*(1-radar);stars.visible=stars.material.opacity>.01;
     if(astronomy){moon.position.copy(camera.position).addScaledVector(moonDirection.fromArray(astronomy.moon),5500);moon.quaternion.copy(camera.quaternion);moonMat.uniforms.uPhase.value=astronomy.phase;moonMat.uniforms.uAngle.value=astronomy.angle;moonMat.uniforms.uOpacity.value=(1-radar)*(1-sky.state.cloud*.8);moon.visible=astronomy.moonElevation>0&&sky.state.night>.01;}
   }
