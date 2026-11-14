@@ -1,6 +1,4 @@
-// Map tool (QUOC-1): frame, base map, radar backdrop, cell grid, three questions, pass strip, block panel.
-// Reads only CONTRACT-001 files under /data/ (spec_uiux §6.3–6.8).
-import { Map as MLMap, Marker, setWorkerUrl } from 'maplibre-gl';
+import {Map as MLMap, Marker, setWorkerUrl} from 'maplibre-gl';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import '@fontsource/ibm-plex-sans/latin-400.css';
@@ -10,296 +8,228 @@ import '@fontsource/ibm-plex-sans/vietnamese-600.css';
 import '@fontsource/newsreader/latin-400.css';
 import '@fontsource/newsreader/vietnamese-400.css';
 import './map.css';
-import {
-  CELL_HA, COLORS, STEPS, DURATION_EDGES, ONSET_NOTE, cellSentences, durationColor, fmtDate, onsetBins, onsetColor, stateAsOf,
-} from './contract.js';
-import { renderChart, renderStrip } from './panel.js';
+import {CELL_HA,COLORS,STEPS,DURATION_EDGES,ONSET_NOTE,cellSentences,durationColor,fmtDate,onsetBins,onsetColor} from './contract.js';
+import {renderChart,renderStrip} from './panel.js';
+import {blockSummary,dateRange} from '../ui/blockSummary.js';
+import {boundedPass,readView,observationAt,observationAreas,viewParams,escapeHTML as esc} from './presentation.js';
 
 setWorkerUrl(workerUrl);
-const SHOW_GT30 = true; // first layer to cut if late (spec_uiux §6.3)
-const BASE = import.meta.env.BASE_URL + 'data/';
-const $ = (id) => document.getElementById(id);
-const errors = [];
-const fail = (file) => { errors.push(file); $('errors').textContent = `Could not load: ${errors.join(', ')}`; $('errors').hidden = false; };
-const getJSON = (file) => fetch(BASE + file).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); }).catch(() => { fail(file); return null; });
+const $ = id => document.getElementById(id);
+const BASE = import.meta.env.BASE_URL;
+const embedded = parent !== window && new URLSearchParams(location.search).get('embed') === '1';
+const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+const send = (type, detail={}) => { if(embedded) parent.postMessage({channel:'flood-map',type,...detail},location.origin); };
+let stopPlayback = () => {};
+let surfaceActive = true;
+function returnWorld(cell) { stopPlayback(); if(embedded) send('close',{cell}); else location.assign(BASE); }
+for(const id of ['world-link','back-world']) $(id).onclick = e => {if(embedded){e.preventDefault();returnWorld();}};
+$('about-open').onclick = () => {stopPlayback();$('about-dialog').showModal();};
+$('about-close').onclick = () => $('about-dialog').close();
+$('about-dialog').addEventListener('close', () => $('about-open').focus());
+$('about-dialog').addEventListener('click', e => {if(e.target !== $('about-dialog'))return;const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close();});
+if(matchMedia('(max-width:700px), (max-height:540px)').matches) $('map-key').open = false;
 
+const missing=[];
+async function getJSON(file,required=true) {
+  try {const r=await fetch(BASE+'data/'+file);if(!r.ok)throw Error(r.status);return await r.json();}
+  catch {if(required)missing.push(file);return null;}
+}
 async function start() {
-const sites = await getJSON('sites.json');
-const site = sites?.sites.find((s) => s.id === new URLSearchParams(location.search).get('site')) || sites?.sites.find((s) => s.default) || sites?.sites[0];
-if (!site) throw new Error('no site');
-$('site-name').textContent = `${site.name}${site.region ? ', ' + site.region.split(',')[0] : ''}`;
-const dir = `${site.id}/`;
-const [meta, cells, aoi, places, summary] = await Promise.all(['meta.json', 'cells.geojson', 'aoi.geojson', 'places.geojson', 'summary.json'].map((f) => getJSON(dir + f)));
-if (!meta || !cells) throw new Error('core data missing');
-if (meta.fixture) throw new Error('Synthetic contract data is not allowed');
-$('fixture').hidden = !meta.fixture;
-$('credit').textContent = `Sources: ${meta.sources.join('; ')}`;
-
-const acq = meta.acquisitions;
-const last = acq.length - 1;
-const props = cells.features.map((f) => f.properties); // index = feature id
-const byCellId = new globalThis.Map(cells.features.map((f) => [f.properties.cell_id, f.id]));
-const bins = onsetBins(props);
-let series = null, seriesPromise = null;
-const loadSeries = () => (seriesPromise ||= getJSON(dir + 'series.json').then((s) => (series = s)));
-
-// ---------------------------------------------------------------- map
-const map = new MLMap({
-  container: 'map',
-  style: { version: 8, sources: {}, layers: [{ id: 'bg', type: 'background', paint: { 'background-color': COLORS.radar } }] },
-  bounds: site.bounds, fitBoundsOptions: { padding: 24 }, attributionControl: { compact: true }, dragRotate: false, pitchWithRotate: false,
-});
-map.touchZoomRotate.disableRotation();
-if (new URLSearchParams(location.search).has('debug')) window.__map = map; // alignment checks (QUOC-1 done-criterion)
-
-const hatch = () => {
-  const s = 8, c = document.createElement('canvas'); c.width = c.height = s;
-  const g = c.getContext('2d'); g.strokeStyle = 'rgba(231,236,232,0.75)'; g.lineWidth = 1.2;
-  g.beginPath(); g.moveTo(0, s); g.lineTo(s, 0); g.moveTo(-2, 2); g.lineTo(2, -2); g.moveTo(s - 2, s + 2); g.lineTo(s + 2, s - 2); g.stroke();
-  return { width: s, height: s, data: new Uint8Array(g.getImageData(0, 0, s, s).data.buffer) };
-};
-
-map.on('load', () => {
-  map.addImage('hatch', hatch());
-  // 1. vector base (external; the map must work without it)
-  map.addSource('base', { type: 'vector', url: 'https://tiles.openfreemap.org/planet', attribution: '© OpenStreetMap contributors' });
-  map.addLayer({ id: 'base-water', type: 'fill', source: 'base', 'source-layer': 'water', paint: { 'fill-color': '#22302C' } });
-  map.addLayer({ id: 'base-waterway', type: 'line', source: 'base', 'source-layer': 'waterway', paint: { 'line-color': '#2C4A45', 'line-width': ['interpolate', ['linear'], ['zoom'], 10, 0.6, 14, 2] } });
-  // 2. radar backdrop of the selected pass
-  map.addSource('backdrop', { type: 'image', url: BASE + dir + acq[last].backdrop, coordinates: meta.backdrop.corners });
-  map.addLayer({ id: 'backdrop', type: 'raster', source: 'backdrop', paint: { 'raster-opacity': 0.6, 'raster-fade-duration': 0 } });
-  // 3. cells (colour via feature state, by integer id)
-  map.addSource('cells', { type: 'geojson', data: cells });
-  const fs = (k, d) => ['coalesce', ['feature-state', k], d];
-  map.addLayer({ id: 'cells-fill', type: 'fill', source: 'cells', paint: { 'fill-color': ['to-color', fs('fill', 'rgba(0,0,0,0)')], 'fill-opacity': fs('op', 0.95), 'fill-opacity-transition': { duration: 150 } } });
-  map.addLayer({ id: 'cells-hatch', type: 'fill', source: 'cells', minzoom: 11.7, paint: { 'fill-pattern': 'hatch', 'fill-opacity': ['case', ['boolean', ['feature-state', 'hatch'], false], 1, 0] } });
-  map.addLayer({ id: 'cells-grid', type: 'line', source: 'cells', minzoom: 11.7, paint: { 'line-color': COLORS.radar, 'line-width': 1 } });
-  map.addLayer({ id: 'cells-edge', type: 'line', source: 'cells', minzoom: 12.3, paint: { 'line-color': COLORS.water, 'line-width': 1.2, 'line-opacity': ['case', ['boolean', ['feature-state', 'edge'], false], 1, 0] } });
-  map.addLayer({ id: 'gt30-yes', type: 'line', source: 'cells', minzoom: 12.3, filter: ['==', ['get', 'flag_gt30'], 'yes'], layout: { visibility: 'none' }, paint: { 'line-color': COLORS.ink, 'line-width': 2 } });
-  map.addLayer({ id: 'gt30-possible', type: 'line', source: 'cells', minzoom: 12.3, filter: ['==', ['get', 'flag_gt30'], 'possible'], layout: { visibility: 'none' }, paint: { 'line-color': COLORS.ink, 'line-width': 1.5, 'line-dasharray': [2, 2] } });
-  map.addLayer({ id: 'cells-hover', type: 'line', source: 'cells', paint: { 'line-color': COLORS.ink, 'line-width': 1, 'line-opacity': ['case', ['boolean', ['feature-state', 'hover'], false], 1, 0] } });
-  map.addLayer({ id: 'sel-outer', type: 'line', source: 'cells', paint: { 'line-color': COLORS.radar, 'line-width': 6, 'line-opacity': ['case', ['boolean', ['feature-state', 'sel'], false], 1, 0] } });
-  map.addLayer({ id: 'sel-inner', type: 'line', source: 'cells', paint: { 'line-color': COLORS.ink, 'line-width': 2, 'line-opacity': ['case', ['boolean', ['feature-state', 'sel'], false], 1, 0] } });
-  // 4. commune boundary + hamlet labels as HTML (no glyph server, Vietnamese diacritics stay intact)
-  if (aoi) {
-    map.addSource('aoi', { type: 'geojson', data: aoi });
-    map.addLayer({ id: 'aoi', type: 'line', source: 'aoi', paint: { 'line-color': COLORS.ink, 'line-width': 1.5, 'line-opacity': 0.85 } });
+  const sites=await getJSON('sites.json');
+  const query=new URLSearchParams(location.search);
+  const site=sites?.sites.find(s=>s.id===query.get('site'))||sites?.sites.find(s=>s.default)||sites?.sites[0];
+  if(!site)throw Error('Site information could not be loaded.');
+  const dir=site.id+'/';
+  const [meta,cells,aoi,places,summary]=await Promise.all(['meta.json','cells.geojson','aoi.geojson','places.geojson','summary.json'].map(f=>getJSON(dir+f)));
+  if(!meta||!cells||!meta.acquisitions?.length)throw Error('Required water observations could not be loaded.');
+  if(meta.fixture)throw Error('This map requires published observations, not synthetic data.');
+  $('site-name').textContent=site.name;
+  $('explorer-title').textContent='Explore '+site.name;
+  $('credit').textContent=meta.sources.join('; ');
+  const acq=meta.acquisitions,last=acq.length-1;
+  const features=cells.features, props=features.map(f=>f.properties), bins=onsetBins(props);
+  const byCell=new Map(features.map((f,i)=>[f.properties.cell_id,i]));
+  const initial=readView(location.search,acq.length);
+  const state={...initial,sel:-1,hover:-1,radarOnly:false,gt30:false};
+  let series=null,seriesPromise=null,revision=0,playTimer=0,backdropTimer=0,backdropAt=0;
+  const loadSeries=()=>seriesPromise||=getJSON(dir+'series.json').then(s=>{
+    series=s;
+    if(!s){$('errors').textContent='The observation record could not be loaded. Try reloading the map.';$('errors').hidden=false;}
+    return s;
+  });
+  const ha=n=>`${Math.round(n).toLocaleString('en-US')} ha`;
+  const duration=()=>reduced()?0:600;
+  const map=new MLMap({container:'map',style:{version:8,sources:{},layers:[{id:'bg',type:'background',paint:{'background-color':'#C8D0C7'}}]},
+    bounds:site.bounds,fitBoundsOptions:{padding:40},attributionControl:{compact:true},dragRotate:false,pitchWithRotate:false});
+  map.touchZoomRotate.disableRotation();
+  const placeVisibility=()=>map.getContainer().classList.toggle('hide-place-labels',map.getZoom()<11.6);
+  map.on('zoom',placeVisibility);placeVisibility();
+  if(query.has('debug'))window.__map=map;
+  const padding=()=>innerHeight<540?{top:20,bottom:135,left:260,right:70}:innerWidth<=700?{top:210,bottom:185,left:24,right:24}:{top:35,bottom:190,left:innerWidth>1000?350:310,right:90};
+  const fit=()=>map.fitBounds(site.bounds,{padding:padding(),duration:duration(),maxZoom:13});
+  $('whole').onclick=fit;
+  $('zoom-in').onclick=()=>map.zoomIn({duration:duration()});
+  $('zoom-out').onclick=()=>map.zoomOut({duration:duration()});
+  function syncUrl() {
+    const q=viewParams({...state,cell:state.sel<0?null:props[state.sel].cell_id},site.id);
+    if(embedded)q.set('embed','1');
+    if(query.has('debug'))q.set('debug','1');
+    history.replaceState(null,'',location.pathname+'?'+q);
+    send('state',{query:viewParams({...state,cell:state.sel<0?null:props[state.sel].cell_id},site.id).toString()});
   }
-  for (const f of places?.features || []) {
-    const el = document.createElement('span'); el.className = 'hamlet'; el.textContent = f.properties.name;
-    new Marker({ element: el }).setLngLat(f.geometry.coordinates).addTo(map);
+  function hatch() {
+    const c=document.createElement('canvas');c.width=c.height=8;
+    const g=c.getContext('2d');g.strokeStyle='#eef0ecaa';g.lineWidth=1.2;g.beginPath();g.moveTo(0,8);g.lineTo(8,0);g.moveTo(-2,2);g.lineTo(2,-2);g.moveTo(6,10);g.lineTo(10,6);g.stroke();
+    return {width:8,height:8,data:new Uint8Array(g.getImageData(0,0,8,8).data.buffer)};
   }
-  ready();
-});
-map.on('error', (e) => { if (e.sourceId === 'base') console.warn('base map unavailable; continuing without it'); });
-
-// ---------------------------------------------------------------- state + painting
-const state = { mode: 'status', pass: last, gt30: false, radarOnly: false, sel: -1, hover: -1 };
-
-function cellLook(p, id) {
-  const none = { fill: null, op: 0.95, hatch: false, edge: false };
-  if (state.pass !== last) { // as-of-pass view (spec_uiux §6.3)
-    const s = series?.cells[p.cell_id]?.s;
-    if (!s) return none;
-    const st = stateAsOf(s, state.pass);
-    if (st === '-') return { ...none, fill: COLORS.missing, hatch: true };
-    return st === 'W' ? { ...none, fill: COLORS.water } : none;
-  }
-  if (p.status === 'no_data') return { ...none, fill: COLORS.missing, hatch: true };
-  if (p.status === 'never_water') return none;
-  if (p.status === 'always_water') return { ...none, fill: map.getZoom() < 12.3 ? COLORS.water : null, op: 0.4, edge: true };
-  let fill;
-  if (state.mode === 'status') fill = p.status === 'flooded' ? COLORS.water : COLORS.silt;
-  else if (state.mode === 'onset') fill = onsetColor(bins, p.onset_by_local);
-  else fill = durationColor(p.flood_days_min);
-  const halfTone = state.mode === 'status' && p.status_confirmed === false;
-  return { ...none, fill, op: halfTone ? 0.5 : 0.95 };
-}
-
-function paint() {
-  if (!map.getSource('cells')) return;
-  for (let id = 0; id < props.length; id++) {
-    const l = cellLook(props[id], id);
-    let op = l.op;
-    if (state.gt30 && !['yes', 'possible'].includes(props[id].flag_gt30)) op = 0.35;
-    map.setFeatureState({ source: 'cells', id }, { fill: l.fill || 'rgba(0,0,0,0)', op, hatch: l.hatch, edge: l.edge });
-  }
-  legend();
-}
-map.on('zoomend', () => { if (state.pass === last) paint(); });
-
-// ---------------------------------------------------------------- legend
-const ha = (n) => `${Math.round(n).toLocaleString('en-US')} ha`;
-function legend() {
-  const rows = [];
-  const sw = (c, extra = '') => `<span class="sw ${extra}" style="background:${c}"></span>`;
-  const tot = summary?.totals?.status_ha;
-  const countHa = (pred) => props.filter(pred).length * CELL_HA;
-  if (state.pass !== last) {
-    const p = summary?.passes?.[state.pass];
-    rows.push(`<li>${sw(COLORS.water)}Water seen as of this pass${p ? ` <b>${ha(p.asof_water_ha)}</b>` : ''}</li>`);
-    rows.push(`<li>${sw(COLORS.missing, 'hatched')}No image yet</li>`);
-  } else if (state.mode === 'status') {
-    rows.push(`<li>${sw(COLORS.water)}Still under water <b>${ha(tot?.flooded ?? countHa((p) => p.status === 'flooded'))}</b></li>`);
-    rows.push(`<li>${sw(COLORS.silt)}Water gone <b>${ha(tot?.water_gone ?? countHa((p) => p.status === 'water_gone'))}</b></li>`);
-    rows.push(`<li>${sw('transparent', 'empty')}No water seen <b>${ha(tot?.never_water ?? 0)}</b></li>`);
-    rows.push(`<li>${sw('transparent', 'edge')}Water in every image <b>${ha(tot?.always_water ?? 0)}</b></li>`);
-    rows.push(`<li>${sw(COLORS.missing, 'hatched')}Not enough images <b>${ha(tot?.no_data ?? 0)}</b></li>`);
-    rows.push(`<li class="note">Pale: seen in one image only.</li>`);
-  } else if (state.mode === 'onset') {
-    rows.push('<li class="note">Water first seen between… ' + ONSET_NOTE + '</li>');
-    for (const b of bins) rows.push(`<li>${sw(b.color)}${b.from === b.to ? fmtDate(b.from) : `${fmtDate(b.from)} – ${fmtDate(b.to)}`} <b>${ha(countHa((p) => p.onset_by_local >= b.from && p.onset_by_local <= b.to))}</b></li>`);
-  } else {
-    rows.push('<li class="note">Days under water (at least)</li>');
-    for (let b = 4; b >= 0; b--) {
-      const lo = DURATION_EDGES[b], hi = DURATION_EDGES[b + 1];
-      const lbl = hi === Infinity ? `${lo}+ days` : `${lo}–${hi} days`;
-      rows.push(`<li>${sw(STEPS[b])}${lbl} <b>${ha(countHa((p) => p.flood_days_min !== null && p.flood_days_min >= lo && p.flood_days_min < hi))}</b></li>`);
+  map.on('load', async()=>{try{
+    map.addImage('hatch',hatch());
+    map.addSource('base',{type:'vector',url:'https://tiles.openfreemap.org/planet',attribution:'© OpenStreetMap contributors'});
+    map.addLayer({id:'base-water',type:'fill',source:'base','source-layer':'water',paint:{'fill-color':'#AABFBB'}});
+    map.addLayer({id:'base-waterway',type:'line',source:'base','source-layer':'waterway',paint:{'line-color':'#91A9A0','line-width':['interpolate',['linear'],['zoom'],10,.6,14,2]}});
+    map.addSource('backdrop',{type:'image',url:BASE+'data/'+dir+acq[state.pass].backdrop,coordinates:meta.backdrop.corners});
+    map.addLayer({id:'backdrop',type:'raster',source:'backdrop',paint:{'raster-opacity':.72,'raster-fade-duration':0}});
+    map.addSource('cells',{type:'geojson',data:cells});
+    const fs=(k,d)=>['coalesce',['feature-state',k],d];
+    map.addLayer({id:'cells-fill',type:'fill',source:'cells',paint:{'fill-color':['to-color',fs('fill','rgba(0,0,0,0)')],'fill-opacity':fs('op',.9),'fill-opacity-transition':{duration:reduced()?0:180}}});
+    map.addLayer({id:'cells-hatch',type:'fill',source:'cells',minzoom:11.7,paint:{'fill-pattern':'hatch','fill-opacity':['case',['boolean',['feature-state','hatch'],false],1,0]}});
+    map.addLayer({id:'cells-grid',type:'line',source:'cells',minzoom:11.7,paint:{'line-color':'#1b211f55','line-width':.6}});
+    map.addLayer({id:'cells-edge',type:'line',source:'cells',paint:{'line-color':COLORS.water,'line-width':1.5,'line-opacity':['case',['boolean',['feature-state','edge'],false],1,0]}});
+    for(const [flag,width,dash] of [['yes',2,null],['possible',1.5,[2,2]]])map.addLayer({id:'gt30-'+flag,type:'line',source:'cells',filter:['==',['get','flag_gt30'],flag],layout:{visibility:'none'},paint:{'line-color':COLORS.radar,'line-width':width,...(dash?{'line-dasharray':dash}:{})}});
+    map.addLayer({id:'cells-hover',type:'line',source:'cells',paint:{'line-color':COLORS.ink,'line-width':2,'line-opacity':['case',['boolean',['feature-state','hover'],false],1,0]}});
+    map.addLayer({id:'sel-outer',type:'line',source:'cells',paint:{'line-color':COLORS.radar,'line-width':6,'line-opacity':['case',['boolean',['feature-state','sel'],false],1,0]}});
+    map.addLayer({id:'sel-inner',type:'line',source:'cells',paint:{'line-color':COLORS.ink,'line-width':2,'line-opacity':['case',['boolean',['feature-state','sel'],false],1,0]}});
+    if(aoi){map.addSource('aoi',{type:'geojson',data:aoi});map.addLayer({id:'aoi',type:'line',source:'aoi',paint:{'line-color':COLORS.ink,'line-width':1.5}});}
+    for(const f of places?.features||[]){const el=document.createElement('span');el.className='hamlet';el.textContent=f.properties.name;new Marker({element:el}).setLngLat(f.geometry.coordinates).addTo(map);}
+    $('date-slider').max=String(last);
+    $('date-start').textContent=fmtDate(acq[0].date_local);
+    $('date-end').textContent=fmtDate(acq[last].date_local);
+    // Load once so every historical area and panel uses the same public record.
+    await loadSeries();
+    paint();updateDate();fit();
+    if(initial.cell&&byCell.has(initial.cell))select(byCell.get(initial.cell),true);
+    $('map-loading').hidden=true;
+    if(missing.length){$('errors').textContent='Some map resources are unavailable: '+missing.join(', ')+'.';$('errors').hidden=false;}
+    send('ready');
+  }catch(error){$('map-loading').hidden=true;$('errors').textContent='The map could not be prepared. '+error.message; $('errors').hidden=false;send('error',{message:error.message});}
+  });
+  map.on('error',e=>{if(e.sourceId==='base')return;if(e.sourceId==='backdrop'){$('errors').textContent='The radar background is unavailable. Block observations remain visible.';$('errors').hidden=false;}});
+  function cellLook(p) {
+    const look={fill:'rgba(0,0,0,0)',op:.9,hatch:false,edge:false};
+    if(state.scope==='image'){
+      const o=observationAt(series?.cells[p.cell_id]?.s,state.pass);
+      return {...look,fill:o.state==='W'?COLORS.water:o.state==='-'?COLORS.missing:look.fill,hatch:o.state==='-',op:o.carried ? .55 : .9};
     }
+    if(p.status==='no_data')return {...look,fill:COLORS.missing,hatch:true};
+    if(p.status==='never_water')return look;
+    if(p.status==='always_water')return {...look,fill:COLORS.water,op:.35,edge:true};
+    return {...look,fill:(state.mode==='status'?(p.status==='flooded'?COLORS.water:COLORS.silt):state.mode==='onset'?onsetColor(bins,p.onset_by_local):durationColor(p.flood_days_min))||look.fill,op:state.mode==='status'&&p.status_confirmed===false ? .5 : .9};
   }
-  $('legend').innerHTML = `<ul>${rows.join('')}</ul><p class="note">Each block is 250 m (6.25 ha).</p>`;
-}
-
-// ---------------------------------------------------------------- questions + toggles
-for (const b of document.querySelectorAll('#questions button')) {
-  b.addEventListener('click', () => {
-    state.mode = b.dataset.mode;
-    for (const o of document.querySelectorAll('#questions button')) o.setAttribute('aria-pressed', String(o === b));
-    if (state.pass !== last) setPass(last); else paint();
-  });
-}
-$('radar-only').addEventListener('change', (e) => {
-  state.radarOnly = e.target.checked;
-  for (const id of ['cells-fill', 'cells-hatch', 'cells-edge']) map.setLayoutProperty(id, 'visibility', state.radarOnly ? 'none' : 'visible');
-});
-$('gt30-wrap').hidden = !SHOW_GT30;
-$('gt30').addEventListener('change', (e) => {
-  state.gt30 = e.target.checked;
-  for (const id of ['gt30-yes', 'gt30-possible']) map.setLayoutProperty(id, 'visibility', state.gt30 ? 'visible' : 'none');
-  paint();
-});
-$('whole').addEventListener('click', () => map.fitBounds(site.bounds, { padding: 24, duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1200 }));
-
-// ---------------------------------------------------------------- pass strip (one row per track, ticks from meta)
-const tracks = [...new Set(acq.map((a) => a.track))].sort();
-const t0 = Date.parse(acq[0].date_local), t1 = Date.parse(acq[last].date_local);
-const xPct = (d) => (t1 === t0 ? 50 : ((Date.parse(d) - t0) / (t1 - t0)) * 100);
-$('tl-rows').innerHTML = tracks.map((t) => `<div class="tl-row"><span class="tl-track">${t}</span><div class="tl-line">${
-  acq.filter((a) => a.track === t).map((a) => `<button type="button" class="tick" role="option" tabindex="-1" data-i="${a.i}" style="left:${xPct(a.date_local)}%" aria-label="${fmtDate(a.date_local)}, track ${a.track}"></button>`).join('')
-}</div></div>`).join('');
-const ticks = [...document.querySelectorAll('.tick')];
-for (const t of ticks) t.addEventListener('click', () => setPass(+t.dataset.i));
-$('prev').addEventListener('click', () => setPass(Math.max(0, state.pass - 1)));
-$('next').addEventListener('click', () => setPass(Math.min(last, state.pass + 1)));
-$('tl-rows').addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); setPass(Math.max(0, Math.min(last, state.pass + (e.key === 'ArrowLeft' ? -1 : 1)))); }
-});
-
-let backdropAt = 0, backdropTimer = 0;
-function swapBackdrop() { // never faster than 3 images per second (spec_uiux §6.3)
-  clearTimeout(backdropTimer);
-  const wait = Math.max(0, backdropAt + 334 - performance.now());
-  backdropTimer = setTimeout(() => {
-    backdropAt = performance.now();
-    map.getSource('backdrop')?.updateImage({ url: BASE + dir + acq[state.pass].backdrop, coordinates: meta.backdrop.corners });
-  }, wait);
-}
-
-async function setPass(i) {
-  state.pass = i;
-  const a = acq[i];
-  for (const t of ticks) { const on = +t.dataset.i === i; t.classList.toggle('on', on); t.setAttribute('aria-selected', String(on)); }
-  const flash = ticks.find((t) => +t.dataset.i === i); flash?.classList.add('flash'); setTimeout(() => flash?.classList.remove('flash'), 120);
-  $('tl-label').textContent = `${fmtDate(a.date_local)}, track ${a.track}${i === last ? ', latest image' : ''}`;
-  swapBackdrop();
-  const asOf = i !== last;
-  document.body.classList.toggle('as-of', asOf);
-  $('pass-banner').hidden = !asOf;
-  if (asOf) {
-    const outside = a.valid_share < 0.999 ? ' Part of the commune is outside this pass.' : '';
-    $('pass-banner').innerHTML = `Showing the pass of ${fmtDate(a.date_local)}, track ${a.track}.${outside} <button type="button" id="latest">Back to latest</button>`;
-    $('latest').onclick = () => setPass(last);
-    if (!series) { $('tl-label').textContent += ', loading'; await loadSeries(); if (state.pass !== i) return; $('tl-label').textContent = `${fmtDate(a.date_local)} · track ${a.track}`; }
+  function paint() {
+    if(!map.getSource('cells'))return;
+    features.forEach(f=>{const p=f.properties,l=cellLook(p);if(state.gt30&&state.scope==='season'&&!['yes','possible'].includes(p.flag_gt30))l.op=.3;map.setFeatureState({source:'cells',id:f.id},l);});
+    for(const b of document.querySelectorAll('#questions button'))b.setAttribute('aria-pressed',String(state.mode===b.dataset.mode));
+    for(const f of ['yes','possible'])map.setLayoutProperty('gt30-'+f,'visibility',state.gt30&&state.scope==='season'&&!state.radarOnly?'visible':'none');
+    $('gt30').disabled=state.scope==='image';
+    $('gt30-note').hidden=!(state.gt30&&state.scope==='season');
+    legend();syncUrl();
   }
-  paint();
-  if (state.sel >= 0) openPanel(state.sel);
-}
-
-// ---------------------------------------------------------------- hover, select, panel
-const coarse = matchMedia('(pointer: coarse)').matches;
-map.on('mousemove', 'cells-fill', (e) => {
-  const id = e.features[0]?.id;
-  if (id === state.hover) return;
-  if (state.hover >= 0) map.setFeatureState({ source: 'cells', id: state.hover }, { hover: false });
-  state.hover = id; map.setFeatureState({ source: 'cells', id }, { hover: true });
-  map.getCanvas().style.cursor = 'pointer';
-});
-map.on('mouseleave', 'cells-fill', () => {
-  if (state.hover >= 0) map.setFeatureState({ source: 'cells', id: state.hover }, { hover: false });
-  state.hover = -1; map.getCanvas().style.cursor = '';
-});
-map.on('click', 'cells-fill', (e) => {
-  const id = e.features[0]?.id;
-  if (id === undefined) return;
-  // on a phone a whole-commune cell is ~6 px: first tap selects and zooms to 13 so neighbours are tappable
-  if (coarse && map.getZoom() < 12.5) map.easeTo({ center: e.lngLat, zoom: 13, duration: 600 });
-  select(id);
-});
-
-function select(id) {
-  if (state.sel >= 0) map.setFeatureState({ source: 'cells', id: state.sel }, { sel: false });
-  state.sel = id;
-  if (id < 0) { $('panel').hidden = true; document.body.classList.remove('panel-open'); history.replaceState(null, '', location.pathname + location.search.replace(/[?&]cell=[^&]*/, '')); return; }
-  map.setFeatureState({ source: 'cells', id }, { sel: true });
-  const url = new URL(location.href); url.searchParams.set('cell', props[id].cell_id); history.replaceState(null, '', url);
-  openPanel(id);
-}
-$('panel-close').addEventListener('click', () => select(-1));
-addEventListener('keydown', (e) => { if (e.key === 'Escape' && state.sel >= 0) select(-1); });
-
-async function openPanel(id) {
-  const p = props[id];
-  $('panel').hidden = false; document.body.classList.add('panel-open');
-  const gap = p.max_gap_days === null ? '' : `, longest gap ${Math.round(p.max_gap_days)} days`;
-  $('panel-body').innerHTML = `
-    <p class="kicker">Block ${p.cell_id}</p>
-    <h2>Near ${p.nearest_hamlet}</h2>
-    ${cellSentences(p).map((s) => `<p class="answer">${s}</p>`).join('')}
-    <div id="strip" class="strip-wrap"><p class="note">Loading the pass record…</p></div>
-    <div id="chart"></div>
-    <p class="limits">${p.n_obs} images, ${p.n_tracks} track${p.n_tracks === 1 ? '' : 's'}${gap}.</p>
-    <div class="panel-actions">
-      <button type="button" disabled title="Sound comes with QUOC-6">Listen to this block</button>
-      <button type="button" id="copy-link">Copy link to this block</button>
-    </div>`;
-  $('copy-link').onclick = async () => {
-    try { await navigator.clipboard.writeText(location.href); $('copy-link').textContent = 'Link copied'; } catch { $('copy-link').textContent = location.href; }
+  function legend() {
+    const row=(color,label,area,cls='')=>`<li><i class="sw ${cls}" style="background:${color}" aria-hidden="true"></i><span>${esc(label)}</span>${area===null?'':`<b>${ha(area)}</b>`}</li>`;
+    const count=pred=>props.filter(pred).length*CELL_HA;
+    let rows='',note='';
+    if(state.radarOnly){rows=row('#59615E','HH radar backscatter',null);note=`Image from ${fmtDate(acq[state.pass].date_local)}. Darker is a weaker radar return, not greater depth.`;}
+    else if(state.scope==='image'){
+      const a=observationAreas(props.map(p=>series?.cells[p.cell_id]?.s||''),state.pass,CELL_HA);
+      rows=row(COLORS.water,'Water observed',a.W)+row('transparent','No water observed',a.N,'empty')+row(COLORS.missing,'No observation yet',a['-'],'hatched');
+      note=`Pale blocks use an earlier image. ${ha(a.carried)} carried forward.`;
+    }else if(state.mode==='status'){
+      const tot=summary?.totals?.status_ha;
+      rows=row(COLORS.water,'Water present',tot?.flooded??count(p=>p.status==='flooded'))+row(COLORS.silt,'Water receded',tot?.water_gone??count(p=>p.status==='water_gone'))+row('transparent','No water observed',tot?.never_water??count(p=>p.status==='never_water'),'empty')+row('transparent','Water throughout',tot?.always_water??count(p=>p.status==='always_water'),'edge')+row(COLORS.missing,'Insufficient images',tot?.no_data??count(p=>p.status==='no_data'),'hatched');
+      note='Pale status colours indicate an unconfirmed observation.';
+    }else if(state.mode==='onset'){
+      for(const b of bins)rows+=row(b.color,dateRange(b.from,b.to),count(p=>['flooded','water_gone'].includes(p.status)&&p.onset_by_local>=b.from&&p.onset_by_local<=b.to));
+      rows+=row('transparent','No water observed',count(p=>p.status==='never_water'),'empty')+row('transparent','Water throughout',count(p=>p.status==='always_water'),'edge')+row(COLORS.missing,'Insufficient images',count(p=>p.status==='no_data'),'hatched');
+      note='Lighter means earlier. Arrival dates are bounded by satellite visits.';
+    }else{
+      for(let b=4;b>=0;b--){const lo=DURATION_EDGES[b],hi=DURATION_EDGES[b+1];rows+=row(STEPS[b],hi===Infinity?`${lo}+ days`:`${lo} to under ${hi} days`,count(p=>['flooded','water_gone'].includes(p.status)&&p.flood_days_min!==null&&p.flood_days_min>=lo&&p.flood_days_min<hi));}
+      rows+=row('transparent','No water observed',count(p=>p.status==='never_water'),'empty')+row('transparent','Water throughout',count(p=>p.status==='always_water'),'edge')+row(COLORS.missing,'Insufficient images',count(p=>p.status==='no_data'),'hatched');
+      note='Minimum duration. Select a block for its full date range.';
+    }
+    $('legend').innerHTML='<ul>'+rows+'</ul>';
+    $('key-note').textContent=note;
+    $('scope-label').textContent=state.radarOnly?'Radar image':state.scope==='season'?'Season summary':'By selected date';
+    $('layer-description').textContent=state.scope==='image'?'Latest valid water state on or before the selected date.':{status:'Water status at each block’s last valid observation.',onset:'When water first appeared in the latest flood episode.',duration:'Minimum time under water in the latest flood episode.'}[state.mode];
+  }
+  for(const b of document.querySelectorAll('#questions button'))b.onclick=()=>{stopPlayback();state.mode=b.dataset.mode;state.scope='season';paint();updateDate();if(state.sel>=0)openPanel(state.sel);};
+  $('radar-only').onchange=e=>{state.radarOnly=e.target.checked;for(const id of ['cells-fill','cells-hatch','cells-edge','gt30-yes','gt30-possible'])map.setLayoutProperty(id,'visibility',state.radarOnly?'none':id.startsWith('gt30')?(state.gt30&&state.scope==='season'?'visible':'none'):'visible');legend();};
+  $('gt30').onchange=e=>{state.gt30=e.target.checked;paint();};
+  function swapBackdrop(){clearTimeout(backdropTimer);backdropTimer=setTimeout(()=>{backdropAt=performance.now();map.getSource('backdrop')?.updateImage({url:BASE+'data/'+dir+acq[state.pass].backdrop,coordinates:meta.backdrop.corners});},Math.max(0,334-(performance.now()-backdropAt)));}
+  function updateDate(){
+    const a=acq[state.pass],season=state.scope==='season';
+    $('date-context').textContent=season?'Season summary':`Image ${state.pass+1} of ${acq.length}`;
+    $('tl-label').textContent=season?dateRange(acq[0].date_local,acq[last].date_local):fmtDate(a.date_local);
+    $('date-slider').value=String(state.pass);$('date-slider').setAttribute('aria-valuetext',`${fmtDate(a.date_local)}, track ${a.track}`);
+    $('season').setAttribute('aria-pressed',String(season));
+    $('prev').disabled=!season&&state.pass===0;$('next').disabled=!season&&state.pass===last;
+    $('date-note').textContent=season?'Drag the date slider to explore individual observations.':`Track ${a.track}. Gaps use the most recent valid image${a.valid_share<.999?'; this pass covers part of the commune':''}.`;
+  }
+  function setPass(i){state.pass=boundedPass(i,acq.length);state.scope='image';swapBackdrop();paint();updateDate();if(state.sel>=0)openPanel(state.sel);}
+  $('date-slider').oninput=e=>{stopPlayback();setPass(+e.target.value);};
+  $('prev').onclick=()=>{stopPlayback();setPass(Math.max(0,state.pass-1));};
+  $('next').onclick=()=>{stopPlayback();setPass(Math.min(last,state.pass+1));};
+  $('season').onclick=()=>{stopPlayback();state.scope='season';state.pass=last;swapBackdrop();paint();updateDate();if(state.sel>=0)openPanel(state.sel);};
+  stopPlayback=()=>{clearInterval(playTimer);playTimer=0;$('play').setAttribute('aria-pressed','false');$('play').setAttribute('aria-label','Play observations');};
+  $('play').onclick=()=>{
+    if(playTimer){stopPlayback();return;}
+    setPass(state.scope==='season'||state.pass===last?0:state.pass);
+    $('play').setAttribute('aria-pressed','true');$('play').setAttribute('aria-label','Pause observations');
+    playTimer=setInterval(()=>{if(state.pass===last){stopPlayback();return;}setPass(state.pass+1);},1500);
   };
-  await loadSeries();
-  if (state.sel !== id) return;
-  const rec = series?.cells[p.cell_id];
-  $('strip').innerHTML = rec ? renderStrip(rec.s, acq, state.pass, p) : '<p class="note">No pass record for this block.</p>';
-  $('chart').innerHTML = rec ? renderChart(rec, acq, state.pass, p) : '';
-  $('chart').querySelector('.show-table')?.addEventListener('click', (e) => {
-    const t = $('chart').querySelector('table'); t.hidden = !t.hidden; e.target.textContent = t.hidden ? 'Show as table' : 'Hide table';
-  });
-}
-
-// ---------------------------------------------------------------- start
-function ready() {
-  map.resize();
-  map.fitBounds(site.bounds, { padding: 16, duration: 0 }); // the grid layout settles after construction
-  setPass(last);
-  const cid = new URLSearchParams(location.search).get('cell');
-  if (cid && byCellId.has(cid)) {
-    const id = byCellId.get(cid);
-    const c = cells.features[id].geometry.coordinates[0][0];
-    map.jumpTo({ center: c, zoom: 13 });
-    select(id);
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)stopPlayback();});
+  map.on('mousemove','cells-fill',e=>{const id=e.features[0]?.id;if(id===state.hover)return;if(state.hover>=0)map.setFeatureState({source:'cells',id:state.hover},{hover:false});state.hover=id;if(id!==undefined)map.setFeatureState({source:'cells',id},{hover:true});map.getCanvas().style.cursor='pointer';});
+  map.on('mouseleave','cells-fill',()=>{if(state.hover>=0)map.setFeatureState({source:'cells',id:state.hover},{hover:false});state.hover=-1;map.getCanvas().style.cursor='';});
+  map.on('click','cells-fill',e=>{const id=e.features[0]?.id;if(id!==undefined){const i=features.findIndex(f=>f.id===id);if(i>=0)select(i,innerWidth<=700);}});
+  function select(i,zoom=false){
+    if(state.sel>=0)map.setFeatureState({source:'cells',id:features[state.sel].id},{sel:false});
+    state.sel=i;revision++;
+    $('selection-hint').hidden=true;
+    $('panel-body').querySelector('.science-details')?.removeAttribute('open');
+    if(i<0){$('panel').hidden=true;document.body.classList.remove('panel-open');map.getCanvas().focus({preventScroll:true});syncUrl();return;}
+    map.setFeatureState({source:'cells',id:features[i].id},{sel:true});syncUrl();openPanel(i);
+    if(zoom){const ring=features[i].geometry.coordinates[0],points=ring.slice(0,-1);const centre=points.reduce((a,p)=>[a[0]+p[0]/points.length,a[1]+p[1]/points.length],[0,0]);map.easeTo({center:centre,zoom:Math.max(map.getZoom(),13),duration:duration()});}
   }
+  $('panel-close').onclick=()=>select(-1);
+  addEventListener('keydown',e=>{if(e.key!=='Escape'||$('about-dialog').open)return;stopPlayback();if(state.sel>=0){e.stopPropagation();select(-1);}else if(embedded)returnWorld();});
+  async function openPanel(i){
+    const stamp=++revision,p=props[i],s=blockSummary(p),old=$('panel-body').querySelector('.science-details')?.open,scroll=$('panel').scrollTop;
+    const rec=series?.cells[p.cell_id],obs=observationAt(rec?.s,state.pass);
+    const observed=obs.state==='W'?'Water observed':obs.state==='N'?'No open water observed':'No observation available';
+    const atDate=state.scope==='image'?`<p class="image-state">${observed}<small>${obs.index<0?'No valid image on or before this date.':`${obs.carried?'Carried from':'Observed on'} ${fmtDate(acq[obs.index].date_local)}${obs.missing?'. No image for this block on the selected date.':''}`}</small></p>`:'';
+    $('panel-body').innerHTML=`<p class="eyebrow">250 m block</p><h2 id="block-title">${esc(p.nearest_hamlet||site.name)}</h2>${atDate}<p class="status-label" data-status="${esc(p.status)}">${esc(s.status)}</p>${s.unconfirmed?'<p class="unconfirmed">Not yet confirmed</p>':''}<p class="scope-heading">Full-season record</p><dl class="block-facts">${s.rows.map(r=>`<div><dt>${esc(r.label)}</dt><dd>${esc(r.value)}${r.detail?`<small>${esc(r.detail)}</small>`:''}</dd></div>`).join('')}</dl><div class="record-title"><span>Observation record</span><span>${p.n_obs} valid images</span></div><div id="strip"><p class="key-note">Loading observation record</p></div><p class="strip-key"><span><i class="sw" style="background:var(--water)"></i>Water</span><span><i class="sw empty"></i>No water</span><span><i class="sw hatched"></i>No image</span></p><details class="science-details"${old?' open':''}><summary>Radar measurements and notes</summary><p>${esc(p.cell_id)}</p>${cellSentences(p).filter(t=>t.includes('not yet confirmed')).map(t=>`<p>${esc(t)}</p>`).join('')}<p>${ONSET_NOTE} Radar does not measure depth.</p><p>${p.n_obs} images from ${p.n_tracks} tracks.${p.max_gap_days===null?'':` Longest gap: ${Math.round(p.max_gap_days)} days.`}</p><div id="chart"></div></details><div class="panel-actions">${embedded?'<button class="primary" type="button" id="see-world">View this block in 3D</button>':''}<button type="button" id="copy-link">Copy block link</button></div><p id="copy-status" class="copy-status" role="status"></p>`;
+    $('panel').hidden=false;document.body.classList.add('panel-open');$('panel').scrollTop=scroll;
+    $('see-world')?.addEventListener('click',()=>returnWorld(p.cell_id));
+    $('copy-link').onclick=async()=>{
+      const q=viewParams({...state,cell:p.cell_id},site.id);if(embedded)q.set('view','map');
+      const url=new URL(embedded?BASE:BASE+'map/',location.origin);url.search=q;
+      try{await navigator.clipboard.writeText(url.href);$('copy-status').textContent='Link copied.';}catch{$('copy-status').textContent=url.href;}
+    };
+    await loadSeries();if(stamp!==revision||state.sel!==i)return;
+    const record=series?.cells[p.cell_id];
+    $('strip').innerHTML=record?renderStrip(record.s,acq,state.scope==='image'?state.pass:-1,p).replaceAll(COLORS.ink,COLORS.radar):'<p class="key-note">Observation record unavailable.</p>';
+    function chart(){if(!record||!$('chart')||$('chart').children.length)return;$('chart').innerHTML=renderChart(record,acq,state.pass,p).replaceAll(COLORS.ink,COLORS.radar);$('chart').querySelector('.show-table')?.addEventListener('click',e=>{const t=$('chart').querySelector('table');t.hidden=!t.hidden;e.target.textContent=t.hidden?'Show as table':'Hide table';});}
+    const details=$('panel-body').querySelector('.science-details');details.addEventListener('toggle',()=>{if(details.open)chart();});if(details.open)chart();
+  }
+  addEventListener('message',e=>{
+    if(!embedded||e.origin!==location.origin||e.source!==parent||e.data?.channel!=='flood-world')return;
+    if(e.data.type==='active'){surfaceActive=!!e.data.active;if(!surfaceActive){stopPlayback();map.stop();}else{map.resize();}}
+    if(e.data.type==='navigate'){
+      stopPlayback();const next=readView(e.data.query,acq.length);Object.assign(state,{mode:next.mode,scope:next.scope,pass:next.pass});
+      swapBackdrop();paint();updateDate();if(next.cell&&byCell.has(next.cell))select(byCell.get(next.cell),true);
+    }
+  });
+  // A keyboard alternative to selecting a small block with a pointer.
+  const pick=document.createElement('button');pick.type='button';pick.setAttribute('aria-label','Select the block at the map centre');pick.title='Select centre block';pick.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/></svg>';
+  document.querySelector('.map-navigation').append(pick);pick.onclick=()=>{const f=map.queryRenderedFeatures(map.project(map.getCenter()),{layers:['cells-fill']})[0];if(f){select(features.findIndex(v=>v.id===f.id));$('panel-close').focus();}else{$('selection-hint').hidden=false;$('selection-hint').textContent='Move the map centre over a block, then select it.';}};
 }
-}
-start().catch(error => {
-  $('errors').textContent = `Required public data is unavailable: ${error.message}. No substitute data has been generated.`;
-  $('errors').hidden = false;
-});
+start().catch(error=>{$('map-loading').hidden=true;$('errors').textContent=error.message+' No substitute data has been generated.';$('errors').hidden=false;send('error',{message:error.message});});

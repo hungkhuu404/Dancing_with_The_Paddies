@@ -84,6 +84,11 @@ export function createSound() {
   return {
     update,
     get on() { return st.on; },
+    setPaused(paused) {
+      if(!ac)return;
+      if(paused)ac.suspend().catch(()=>{});
+      else if(st.on)ac.resume().catch(()=>{});
+    },
     toggle() {
       if (!ac) init();
       st.on = !st.on;

@@ -1,4 +1,10 @@
 /* Floating controls. Paper tint provides a contrast floor over the live scene. */
+.map-workspace{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;border-radius:0;background:#EEF0EC;overflow:hidden}
+.map-workspace::backdrop{background:#1B211F}
+.map-workspace iframe{width:100%;height:100%;display:block;border:0}
+.map-workspace-loading{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:14px;background:#EEF0EC;color:#1B211F;font:14px 'IBM Plex Sans',sans-serif}
+.map-workspace-loading button{padding:12px 18px;border:1px solid #1b211f40;border-radius:24px;background:none;color:inherit;font:inherit;cursor:pointer}
+.map-is-open #ui,.map-is-open .view-key,.map-is-open .story-caption,.map-is-open .tour-stop{visibility:hidden}
 :root {
   --glass-fill:rgba(238,240,236,.66);
   --glass-panel:rgba(238,240,236,.84);

@@ -7,15 +7,17 @@
 - [Hướng dẫn làm việc](../AGENTS.md): phạm vi sửa đổi và bảo toàn dữ liệu.
 - [Kế hoạch migration](plans/migration-plan.md), [kết quả đợt 1](plans/migration-batch-01.md).
 - [Manifest kế thừa](provenance/migration-manifest.md), [hash tài liệu đợt 1](provenance/batch-01-sha256.md).
+- [Bản đồ tích hợp MAP-UX-001](plans/integrated-map.md): thiết kế, module hiện hành, phạm vi dữ liệu và kết quả kiểm tra UI sau migration. [Chạy web local](../web/README.md).
 
-## Cấu trúc thực tế sau đợt 1
+## Cấu trúc hiện hành
 
 | Đường dẫn | Hiện trạng |
 | --- | --- |
 | `pipeline/{catalog,core,export,validate}/` | Khung có `.gitkeep`, chưa chuyển implementation |
-| `config/sites/`, `schema/`, `tests/`, `data/` | Khung có `.gitkeep`; chưa chuyển cấu hình site, schema, test hoặc dữ liệu |
+| `config/sites/`, `schema/`, `tests/` | Khung có `.gitkeep`; chưa chuyển cấu hình site, schema hoặc test pipeline |
+| `data/` | Bộ xuất công khai H4 của Tân Hội, 20 lần chụp; chưa có validation, Bang Rakam hoặc H7 |
 | `docs/data-contract.md` | Hợp đồng đã có từ baseline, giữ nguyên |
 | `docs/plans/`, `docs/provenance/` | Bổ sung trong đợt 1 |
-| `web/` | Chưa có trong checkout này |
+| `web/` | Vite, Three.js và MapLibre; 3D và map tích hợp cùng tab, có route `/map/` độc lập; test trong `web/test/` |
 
-README gốc mô tả sản phẩm và lệnh cho các phần chưa được chuyển vào checkout; đợt này giữ nguyên README theo phạm vi bảo toàn nội dung. Chưa có `requirements.txt` hoặc `web/package.json`, vì vậy chưa xác nhận quick start của ứng dụng chạy được tại đích. Liên kết live site trong README có trước đợt này, không phải kết quả deploy của migration.
+Các tài liệu đợt migration là snapshot lịch sử. Web hiện cài từ lockfile và chạy local; pipeline S0–S7 vẫn chưa được chuyển. Liên kết live site trong README có trước migration, không phải bằng chứng deploy từ checkout này. Kết quả kiểm tra local được tách khỏi trạng thái CI và production trong báo cáo từng tác vụ.

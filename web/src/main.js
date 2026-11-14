@@ -36,6 +36,8 @@ import {primeFirstView} from './fx/firstView.js';
 import {uploadMaterialTextures} from './fx/textureWarmup.js';
 import {createSignature} from './world/signature.js';
 import {createChrome} from './ui/chrome.js';
+import {createMapWorkspace} from './ui/mapWorkspace.js';
+import {sceneCellCentre} from './map/presentation.js';
 
 const $ = (s) => document.querySelector(s);
 const params = new URLSearchParams(location.search);
@@ -488,9 +490,12 @@ async function boot() {
   const watch = { n: 0, acc: 0, armed: !params.has('q') };
   const frameLog = { worst: 0, n: 0, long: [] }; // longest frame (ms) since the last read, for the fps report
   let last = performance.now(), frames = 0, modelsRequested = false, modelsDone = false;
+  let mapWorkspace=null;
   const windDir = new THREE.Vector2(3.2, 1.4);
   const lensLabel = $('#lens-label');
   function tick(now) {
+    // Keep the world in memory while the map is open, without rendering two GPUs' worth of work.
+    if(mapWorkspace?.active){last=now;requestAnimationFrame(tick);return;}
     const raw = now - last;
     if (raw > frameLog.worst) frameLog.worst = raw;
     if (raw > 100 && frameLog.long.length < 50) frameLog.long.push([Math.round(raw), renderer.info.programs?.length, tiles.ready.length, tiles.loading]); // what the previous frame did
@@ -673,6 +678,15 @@ async function boot() {
   });
   window.__debug.signature=signature;
   createChrome({places,canvas,signature});
+  mapWorkspace=createMapWorkspace({
+    current:()=>({pass:curPass,site:contract?.meta.site?.id||contract?.meta.site||'tan_hoi',cell:selected?.props?.cell_id||selected?.t?.layout.parcels[selected.i]?.cell?.cell_id}),
+    beforeOpen:()=>{signature.stopTour();timeline.stop();world.timelapse.stop();world.ride.exit();held.clear();clearTimeout(momentTimer);fly.on=false;tilt.on=false;world.sound.setPaused(true);},
+    onReturn:({cell,query})=>{
+      last=performance.now();world.sound.setPaused(false);
+      const q=new URLSearchParams(query);if(q.get('scope')==='image'){const i=Number(q.get('pass'));if(Number.isInteger(i)&&i>=0&&i<nPasses)timeline.set(i);}
+      if(cell){const p=sceneCellCentre(cell,origin);if(p&&cellAt(p.x,p.z)){select(cellAt(p.x,p.z));flyTo(p,700,THREE.MathUtils.degToRad(28));}}
+    },
+  });
   $('#loading-stage').textContent='Warming shaders and models';
   modelsRequested=true;
   await loadModels();
@@ -720,6 +734,7 @@ async function boot() {
   last=performance.now();
   $('#loading').hidden=true;
   requestAnimationFrame(tick);
+  mapWorkspace.openDeepLink();
   // Optional review deep link; normal entry keeps the existing cinematic intro.
   const village = params.get('village');
   if (village) {
