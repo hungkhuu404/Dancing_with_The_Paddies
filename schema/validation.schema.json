@@ -1,0 +1,991 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "validation",
+  "$comment": "Implements CONTRACT-001 1.0.0 in docs/data-contract.md.",
+  "type": "object",
+  "properties": {
+    "reference": {
+      "type": "string",
+      "minLength": 1
+    },
+    "frozen_utc": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "Z$"
+    },
+    "first_dswx_read_utc": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "Z$"
+    },
+    "filtered": {
+      "type": "object",
+      "properties": {
+        "n_pairs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "kappa_median": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": -1,
+              "maximum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kappa_min": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": -1,
+              "maximum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kappa_max": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": -1,
+              "maximum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "by_track": {
+          "type": "object",
+          "patternProperties": {
+            "^\\d{3}[AD]$": {
+              "type": "object",
+              "properties": {
+                "n_pairs": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "kappa_median": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": -1,
+                      "maximum": 1
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "n_pairs",
+                "kappa_median"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "by_n_tracks": {
+          "type": "object",
+          "patternProperties": {
+            "^[1-9]\\d*$": {
+              "type": "object",
+              "properties": {
+                "kappa_median": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": -1,
+                      "maximum": 1
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "kappa_median"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "gt30": {
+          "type": "object",
+          "properties": {
+            "n_cells": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "precision": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "recall": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "n_cells",
+            "precision",
+            "recall"
+          ]
+        },
+        "onset": {
+          "type": "object",
+          "properties": {
+            "n_cells": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "overlap_share": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "median_diff_days": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "not": {
+                    "const": -9999
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "n_cells",
+            "overlap_share",
+            "median_diff_days"
+          ]
+        },
+        "cropland_share_of_flagged": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "water_share_on_builtup": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "n_pairs",
+        "kappa_median",
+        "kappa_min",
+        "kappa_max",
+        "by_track",
+        "by_n_tracks",
+        "gt30",
+        "onset",
+        "cropland_share_of_flagged",
+        "water_share_on_builtup"
+      ]
+    },
+    "unfiltered": {
+      "type": "object",
+      "properties": {
+        "n_pairs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "kappa_median": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": -1,
+              "maximum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kappa_min": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": -1,
+              "maximum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kappa_max": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": -1,
+              "maximum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "by_track": {
+          "type": "object",
+          "patternProperties": {
+            "^\\d{3}[AD]$": {
+              "type": "object",
+              "properties": {
+                "n_pairs": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "kappa_median": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": -1,
+                      "maximum": 1
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "n_pairs",
+                "kappa_median"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "by_n_tracks": {
+          "type": "object",
+          "patternProperties": {
+            "^[1-9]\\d*$": {
+              "type": "object",
+              "properties": {
+                "kappa_median": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": -1,
+                      "maximum": 1
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "kappa_median"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "gt30": {
+          "type": "object",
+          "properties": {
+            "n_cells": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "precision": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "recall": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "n_cells",
+            "precision",
+            "recall"
+          ]
+        },
+        "onset": {
+          "type": "object",
+          "properties": {
+            "n_cells": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "overlap_share": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "median_diff_days": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "not": {
+                    "const": -9999
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "n_cells",
+            "overlap_share",
+            "median_diff_days"
+          ]
+        },
+        "cropland_share_of_flagged": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "water_share_on_builtup": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "n_pairs",
+        "kappa_median",
+        "kappa_min",
+        "kappa_max",
+        "by_track",
+        "by_n_tracks",
+        "gt30",
+        "onset",
+        "cropland_share_of_flagged",
+        "water_share_on_builtup"
+      ]
+    },
+    "pairs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "i": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "dswx_date_local": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "gap_days": {
+            "type": "number",
+            "not": {
+              "const": -9999
+            }
+          },
+          "n_cells": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "kappa": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": -1,
+                "maximum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "precision": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recall": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "i",
+          "dswx_date_local",
+          "gap_days",
+          "n_cells",
+          "kappa",
+          "precision",
+          "recall"
+        ]
+      },
+      "minItems": 0
+    },
+    "posthoc": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^PH-\\d{2,}$"
+          },
+          "changed_utc": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "Z$"
+          },
+          "by": {
+            "type": "string",
+            "minLength": 1
+          },
+          "what": {
+            "type": "string",
+            "minLength": 1
+          },
+          "why": {
+            "type": "string",
+            "minLength": 1
+          },
+          "before": {
+            "type": "object",
+            "properties": {
+              "n_pairs": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "kappa_median": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": -1,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "kappa_min": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": -1,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "kappa_max": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": -1,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "by_track": {
+                "type": "object",
+                "patternProperties": {
+                  "^\\d{3}[AD]$": {
+                    "type": "object",
+                    "properties": {
+                      "n_pairs": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "kappa_median": {
+                        "anyOf": [
+                          {
+                            "type": "number",
+                            "minimum": -1,
+                            "maximum": 1
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "n_pairs",
+                      "kappa_median"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "by_n_tracks": {
+                "type": "object",
+                "patternProperties": {
+                  "^[1-9]\\d*$": {
+                    "type": "object",
+                    "properties": {
+                      "kappa_median": {
+                        "anyOf": [
+                          {
+                            "type": "number",
+                            "minimum": -1,
+                            "maximum": 1
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "kappa_median"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "gt30": {
+                "type": "object",
+                "properties": {
+                  "n_cells": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "precision": {
+                    "anyOf": [
+                      {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "recall": {
+                    "anyOf": [
+                      {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "n_cells",
+                  "precision",
+                  "recall"
+                ]
+              },
+              "onset": {
+                "type": "object",
+                "properties": {
+                  "n_cells": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "overlap_share": {
+                    "anyOf": [
+                      {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "median_diff_days": {
+                    "anyOf": [
+                      {
+                        "type": "number",
+                        "not": {
+                          "const": -9999
+                        }
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "n_cells",
+                  "overlap_share",
+                  "median_diff_days"
+                ]
+              },
+              "cropland_share_of_flagged": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "water_share_on_builtup": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "n_pairs",
+              "kappa_median",
+              "kappa_min",
+              "kappa_max"
+            ]
+          },
+          "after": {
+            "type": "object",
+            "properties": {
+              "n_pairs": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "kappa_median": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": -1,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "kappa_min": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": -1,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "kappa_max": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": -1,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "by_track": {
+                "type": "object",
+                "patternProperties": {
+                  "^\\d{3}[AD]$": {
+                    "type": "object",
+                    "properties": {
+                      "n_pairs": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "kappa_median": {
+                        "anyOf": [
+                          {
+                            "type": "number",
+                            "minimum": -1,
+                            "maximum": 1
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "n_pairs",
+                      "kappa_median"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "by_n_tracks": {
+                "type": "object",
+                "patternProperties": {
+                  "^[1-9]\\d*$": {
+                    "type": "object",
+                    "properties": {
+                      "kappa_median": {
+                        "anyOf": [
+                          {
+                            "type": "number",
+                            "minimum": -1,
+                            "maximum": 1
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "kappa_median"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "gt30": {
+                "type": "object",
+                "properties": {
+                  "n_cells": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "precision": {
+                    "anyOf": [
+                      {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "recall": {
+                    "anyOf": [
+                      {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "n_cells",
+                  "precision",
+                  "recall"
+                ]
+              },
+              "onset": {
+                "type": "object",
+                "properties": {
+                  "n_cells": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "overlap_share": {
+                    "anyOf": [
+                      {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "median_diff_days": {
+                    "anyOf": [
+                      {
+                        "type": "number",
+                        "not": {
+                          "const": -9999
+                        }
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "n_cells",
+                  "overlap_share",
+                  "median_diff_days"
+                ]
+              },
+              "cropland_share_of_flagged": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "water_share_on_builtup": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "n_pairs",
+              "kappa_median",
+              "kappa_min",
+              "kappa_max"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "changed_utc",
+          "by",
+          "what",
+          "why",
+          "before",
+          "after"
+        ]
+      },
+      "minItems": 0
+    }
+  },
+  "required": [
+    "reference",
+    "frozen_utc",
+    "first_dswx_read_utc",
+    "filtered",
+    "unfiltered",
+    "pairs",
+    "posthoc"
+  ]
+}

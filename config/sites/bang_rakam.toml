@@ -1,0 +1,76 @@
+# Khung thử quanh trạm Y.16; đầu vào còn thiếu xem docs/quan-6-code.md.
+# Đường dẫn tương đối tính từ thư mục chứa file TOML.
+site = "bang_rakam"
+# Quy ước date_local của spec mục 5.3, UTC+07:00.
+timezone = "Asia/Bangkok"
+
+[grid]
+epsg = 32647
+cell_size_m = 250
+bbox_utm_m = [610750, 1845000, 627000, 1861250]
+
+[catalog]
+collections = ["NISAR_L2_GCOV_PROVISIONAL_V1", "NISAR_L2_GCOV_V1"]
+mode = "DHDH"
+required_polarizations = ["HH", "HV"]
+# Research_log.md DEC-PLAN-007: khoảng 20 cảnh, trước khi loại 3 SHSH.
+# Ngày địa phương Asia/Bangkok; không xác nhận mức hoàn tất S1–S7.
+start_date_local = 2026-08-13
+end_date_local = 2026-10-31
+keep_latest_crid_per_acquisition = true
+output_file = "../../runtime/bang_rakam/catalog.csv"
+
+[[catalog.passes]]
+track = "011"
+direction = "A"
+frame = "010"
+
+[[catalog.passes]]
+track = "112"
+direction = "A"
+frame = "010"
+
+[[catalog.passes]]
+track = "105"
+direction = "D"
+frame = "080"
+
+[boundary]
+# file: CHƯA XÁC ĐỊNH; Hưng chốt phạm vi/ranh, Quân chuẩn bị file.
+# epsg: CHƯA XÁC ĐỊNH cho file ranh.
+cell_inclusion = "center_in_boundary"
+
+[read]
+gcov_group = "/science/LSAR/GCOV/grids/frequencyA"
+layers = ["HHHH", "HVHV"]
+token_file_env = "EARTHDATA_TOKEN_FILE"
+cache_dir = "../../cache/bang_rakam"
+network_retries = 2
+
+[thresholds]
+# Mặc định phương pháp theo spec Q3; chưa được kiểm P1–P3 cho Bang Rakam.
+hh_db = -14.0
+hv_db = -20.0
+min_valid_pixel_fraction = 0.70
+filter_single_anomaly = true
+
+[references.water]
+status = "pending"
+confirmation_owner = "Tân; Hưng xác nhận phân công cho Bang Rakam"
+min_pixels = 1000
+# geometry và epsg: CHƯA XÁC ĐỊNH.
+
+[references.stable]
+status = "pending"
+confirmation_owner = "Tân; Hưng xác nhận phân công cho Bang Rakam"
+# geometry và epsg: CHƯA XÁC ĐỊNH; chọn trong vùng thử.
+
+[landcover]
+# file: CHƯA XÁC ĐỊNH; cần CSV theo cell_id cho lưới Bang Rakam.
+
+[dswx]
+# tiles: CHƯA XÁC ĐỊNH; Bằng đối chiếu sau khi Hưng chốt vùng thử.
+
+[readiness]
+s0_inputs_complete = true
+later_stage_missing = ["boundary.file", "boundary.epsg", "references.water.geometry", "references.water.epsg", "references.stable.geometry", "references.stable.epsg", "dswx.tiles", "landcover.file"]

@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "series",
+  "$comment": "Implements CONTRACT-001 1.0.0 in docs/data-contract.md.",
+  "type": "object",
+  "properties": {
+    "cells": {
+      "type": "object",
+      "patternProperties": {
+        "^E\\d+N\\d+$": {
+          "type": "object",
+          "properties": {
+            "s": {
+              "type": "string",
+              "pattern": "^[WN-]*$"
+            },
+            "s_raw": {
+              "type": "string",
+              "pattern": "^[WN-]*$"
+            },
+            "hh": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "not": {
+                      "const": -9999
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "minItems": 0
+            },
+            "hv": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "not": {
+                      "const": -9999
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "minItems": 0
+            }
+          },
+          "required": [
+            "s",
+            "s_raw",
+            "hh",
+            "hv"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "cells"
+  ]
+}
