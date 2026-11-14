@@ -1,0 +1,51 @@
+# Secrets; example files must contain dummy values only.
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Guard against accidental copies of workspace-local directories inside the repo.
+/private/
+/runtime/
+/archive/
+/secrets/
+/credentials/
+
+# Local environments/dependencies; these rules do not select an application stack.
+.venv/
+venv/
+env/
+node_modules/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+/cache/
+/temp/
+/tmp/
+/logs/
+/coverage/
+/htmlcov/
+.coverage
+/dist/
+/build/
+/.next/
+/.nuxt/
+/.output/
+
+# Machine/editor scratch files. Source assets and datasets remain eligible.
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+
+# Pipeline: NISAR granules and image cache never go into Git; Earthdata token stays outside the repo.
+*.h5
+*token*.txt
