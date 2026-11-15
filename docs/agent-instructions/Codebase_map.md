@@ -26,3 +26,14 @@ The exported interface remains defined by [CONTRACT-001](../data-contract.md). E
 - world/signature.js and main.js coordinate smooth camera entry, scientific evidence and normal/early-exit restoration; input is suspended only while the tour is active.
 - audio/seasonModel.js and seasonSound.js retain the data mapping with a stronger limited output bus and selected-observation feedback on unmute.
 - web/test/tourExperience.test.mjs covers the pure rules. [Refinement review](../plans/tour-refinement.md).
+
+## Observatory landing (WEB-ATLAS-008)
+
+- web/src/ui/locationAtlas.js: source-based SVG regional overview, real radar preview, honest site entry, keyboard highlighting and the existing cancel/skip/return contract.
+- web/src/ui/atlasLayout.js: pure north-up regional display projection and path generation; no terrain-height or water-depth inference.
+- web/src/ui/atlas.css: editorial composition, responsive map/entry actions and reduced-motion transitions.
+- web/public/atlas/: pinned physical coastline/island geometry and source manifest; no political or maritime boundary layer.
+- web/tools/build-atlas.mjs and build-atlas.py: pinned source acquisition plus topology-preserving offline geometry processing with Shapely.
+- web/test/atlasLayout.test.mjs: projection, physical island retention, group labels and crop-edge/source invariants.
+
+[Design, sources and verification](../plans/observatory-landing.md).

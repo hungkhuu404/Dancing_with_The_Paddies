@@ -5,6 +5,7 @@ import '@fontsource/ibm-plex-sans/latin-400.css';
 import '@fontsource/ibm-plex-sans/vietnamese-400.css';
 import '@fontsource/ibm-plex-sans/latin-600.css';
 import '@fontsource/newsreader/latin-400.css';
+import '@fontsource/newsreader/latin-400-italic.css';
 import '@fontsource/newsreader/vietnamese-400.css';
 import {entryState} from './ui/entryState.js';
 import {bypassAtlas} from './ui/entryRules.js';
