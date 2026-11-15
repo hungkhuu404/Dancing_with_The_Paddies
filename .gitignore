@@ -49,3 +49,6 @@ desktop.ini
 # Pipeline: NISAR granules and image cache never go into Git; Earthdata token stays outside the repo.
 *.h5
 *token*.txt
+
+/.wrangler/
+/web/.wrangler/

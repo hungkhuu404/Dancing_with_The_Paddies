@@ -72,3 +72,7 @@ The science calendar entrypoint sets its acquisition count for compact tour-prev
 - test/recordMix.test.mjs checks late sources, capture-only cleanup, playback survival and unsupported capture.
 
 [Design and verification](../plans/interface-polish.md).
+
+## Product production deployment (DEPLOY-014)
+
+.github/workflows/web-ci.yml retains the web/data checks and publishes their verified artifact to the distinct Cloudflare Pages project floodcalendar only on main. Credentials live in GitHub Actions settings; PRs do not deploy. [Setup, activation and recovery](../plans/dancing-production.md). Nasa hosting remains independent.
