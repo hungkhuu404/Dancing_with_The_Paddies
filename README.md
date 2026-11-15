@@ -6,7 +6,7 @@ Team **Dancing with The Paddies** · NASA Space Apps Challenge 2026 · Challenge
 
 **Data status:** The web reads the Tân Hội H7 and Bang Rakam radar exports under contract 2.0.0. The repository includes S1–S5, an offline S6 comparison runner and S7. Reference agreement is post-hoc, not independent accuracy evidence; the interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md), [S6 instructions](docs/s6-comparison.md) and [H7 data status](docs/provenance/h7-data-status.md).
 
-**Production target:** https://floodcalendar.pages.dev ? the product main branch deploys after Web CI passes. Initial activation requires the Actions credential and a successful production run; see [deployment setup](docs/plans/dancing-production.md). The existing integration site remains at https://flood-calendar.pages.dev.
+**Web app:** https://floodcalendar.pages.dev — built and deployed from this repository's `main` after Web CI passes ([deployment setup](docs/plans/dancing-production.md)). On 15 November 2026 it served the same Tân Hội H7 and Bang Rakam exports as `data/` in this repository (matching `generated_utc` in each `meta.json`).
 
 ## The problem
 
@@ -165,12 +165,12 @@ Never commit the token, the image cache or files with signed links.
 | OPERA DSWx-S1 V1 ([10.5067/OPDSWS1-L3V1](https://doi.org/10.5067/OPDSWS1-L3V1)) | NASA JPL (OPERA project) | Post-hoc comparison (S6) and post-hoc pixel-method selection | NASA open data |
 | ESA WorldCover 10 m 2021 v200 ([10.5281/zenodo.7254221](https://doi.org/10.5281/zenodo.7254221)) | European Space Agency | Cropland mask | CC BY 4.0. © ESA WorldCover project 2021 / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium |
 | OpenStreetMap (via Overpass API; base map tiles from OpenFreeMap) | OpenStreetMap contributors | Commune boundary, hamlet names, roads, bridges and places in the 3D scene; base map | ODbL, © OpenStreetMap contributors |
-| EOxCloudless 2016 | EOX IT Services GmbH (contains modified Copernicus Sentinel data 2016) | Regional imagery in the location entrance | CC BY 4.0 |
+| EOxCloudless 2016 (Sentinel-2 cloudless mosaic, 2016–2017 acquisitions; https://cloudless.eox.at/) | EOX IT Services GmbH (contains modified Copernicus Sentinel data 2016 & 2017) | Regional imagery in the location entrance; reprojected and resampled as the backdrop of the 3D illustration in the video. A multi-date mosaic, not an image of the 2026 flood | CC BY 4.0 |
 | Sentinel-2 scene metadata, via Element 84 Earth Search | Copernicus / ESA | Tile cloud cover shown in the web (not a commune measurement) | Copernicus open data terms |
 | ERA5 reanalysis, via Open-Meteo | ECMWF / Copernicus Climate Change Service | Weather context (cloud cover) in the web | CC BY 4.0 |
 | Natural Earth 1:10m physical layers | Natural Earth | Regional atlas labels and land | Public domain |
 
-<!-- TODO: thêm nguồn ảnh quang học dùng trong video nếu có -->
+Optical imagery credit: EOxCloudless by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2016 & 2017), CC BY 4.0. https://cloudless.eox.at/
 
 ## Limits
 
@@ -193,7 +193,12 @@ Limits:
 
 The backend team used AI coding agents (OpenAI Codex and Claude Code) to write code. Every line was reviewed manually by a team member before it was merged.
 
-<!-- TODO: phần video đang hỏi lại -->
+Video:
+
+- **AI-generated audio:** the English narration in the video is an AI voice made with ElevenLabs Text to Speech (voice "Lyan").
+- **Script, animation and editing:** OpenAI Codex and ChatGPT helped with the script, the Three.js and Remotion animation code, video assembly, subtitle timing, audio mixing and checks.
+- **Subtitle check:** Microsoft Speech Recognition (offline) was used to compare the narration with the subtitles.
+- Three.js, Remotion and FFmpeg are rendering and editing tools, not generative models. The video contains no AI-generated images or video.
 
 
 ## References
