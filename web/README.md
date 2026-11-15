@@ -29,15 +29,15 @@ The regional entrance opens a selected landscape. Map opens inside the same page
 
 The high-tier Tân Hội profile uses four detailed streamed tiles and limited distant simulation/mirrors; farfield retains coverage. Intel low still has occasional streaming stalls. The large map/scene chunks remain a known build warning. Generator source is in tools/ with explicit local input/output options; source recovery does not prove every historic asset is fully reproducible. No raw imagery, tokens, source cache or heldout are included. Some generators require Blender and separate Python/model-compression dependencies; npm ci alone does not install these.
 
-The product package scripts and lockfile are retained. Product production targets Cloudflare Pages project floodcalendar through its own gated Web CI workflow; the Nasa-hosted site remains independent. Production is available at https://floodcalendar.pages.dev/. Its main deployment requires both web and backend contract checks. [Deployment setup and recovery](../docs/plans/dancing-production.md).
+The product package scripts and lockfile are retained. Product production targets Cloudflare Pages project floodcalendar through its own gated Web CI workflow. Production is available at https://floodcalendar.pages.dev/. Its main deployment requires both web and backend contract checks.
 
 
 ## Historical weather and narrated tours
 
 Both sites have static Open-Meteo/ERA5 weather for every published acquisition: Tân Hội 22/22 and Bang Rakam 11/11. Weather is an approximately 25 km reanalysis estimate at the acquisition UTC, not a measurement per field. Missing values are never converted to dry/clear conditions in the archive.
 
-Bang Rakam now has a site-specific 60-second route, invitation, captions and Jon narration, with the existing scene score and focused-tour controls. Its calendar shows the actual four mapped groups and eleven visits. Tân Hội retains its original script/audio. [Sources, reproduction and review](../docs/plans/history-bang-tour.md).
+Bang Rakam now has a site-specific 60-second route, invitation, captions and Jon narration, with the existing scene score and focused-tour controls. Its calendar shows the actual four mapped groups and eleven visits. Tân Hội retains its original script/audio.
 
 ## Interface and video capture
 
-Help shares the scene/map toolbar; Calendar and Method remain separate, directly available views. Repeated radar-release badges are removed while Sources/Method retain the scientific caveats. On browsers without WebGL, the selected site can still open its HTML calendar and Method. Canvas recording includes application narration, score, data tones and enabled ambient playback, respecting mute; it does not capture a microphone or system audio. [Design and checks](../docs/plans/interface-polish.md).
+Help shares the scene/map toolbar; Calendar and Method remain separate, directly available views. Repeated radar-release badges are removed while Sources/Method retain the scientific caveats. On browsers without WebGL, the selected site can still open its HTML calendar and Method. Canvas recording includes application narration, score, data tones and enabled ambient playback, respecting mute; it does not capture a microphone or system audio.

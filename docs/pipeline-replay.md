@@ -1,6 +1,6 @@
 # Replaying the two-site pipeline
 
-The web reads approved S7 files from `data/`; it does not process raw radar imagery. Backend processing lives in this product repository. The Nasa preview retains matching web code, exported data and schemas, with its own hosting workflow.
+The web reads approved S7 files from `data/`; it does not process raw radar imagery. Backend processing lives in this product repository.
 
 ## Site configuration
 

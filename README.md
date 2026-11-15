@@ -85,7 +85,7 @@ The web app includes:
 - A 3D scene of each site with a narrated guided tour. The scene is an illustration (see [Limits](#limits)).
 - A layer for fields flooded more than 30 days before the season. The IPCC 2019 guidelines give such fields a higher methane scaling factor (Table 5.13). The layer only flags blocks, relevant *if the IPCC default factor applies*; it does not estimate emissions.
 
-Bang Rakam (Thailand) has 2,304 blocks and 11 radar passes in a 12 × 12 km study frame, in the same web app. See [two-site integration](docs/plans/two-site-real-data.md).
+Bang Rakam (Thailand) has 2,304 blocks and 11 radar passes in a 12 × 12 km study frame, in the same web app.
 
 What it does **not** do: it does not measure methane, and it cannot tell whether a field was sown right after the water left.
 
@@ -161,7 +161,7 @@ Video:
 
 ## Status and deployment
 
-**Web app:** https://floodcalendar.pages.dev — built and deployed from this repository's `main` after the automated tests pass ([deployment setup](docs/plans/dancing-production.md)). On 15 November 2026 it served the same Tân Hội and Bang Rakam data as `data/` in this repository (matching `generated_utc` in each `meta.json`).
+**Web app:** https://floodcalendar.pages.dev — built and deployed from this repository's `main` after the automated tests pass. On 15 November 2026 it served the same Tân Hội and Bang Rakam data as `data/` in this repository (matching `generated_utc` in each `meta.json`).
 
 **Data status:** The web reads the final Tân Hội and Bang Rakam radar exports (data contract 2.0.0, published 15 November 2026). The repository includes pipeline stages S1–S5, an offline comparison runner (S6) and the exporter (S7). Agreement with the reference product is post-hoc, not independent accuracy evidence; the interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md), [comparison instructions](docs/s6-comparison.md).
 
