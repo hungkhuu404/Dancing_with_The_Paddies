@@ -285,7 +285,7 @@ async function boot() {
   // ---------------------------------------------------------------- UI
   const card = createCard($('#card'), passes, () => { setHi(selected, same(selected, hover) ? 128 : 0); outline(selLine, null); selected = null; },!!contract?.meta.fixture);
   const waterSummary=await json(BASE+'data/'+profile.id+'/summary.json');
-  const dataSound=createSeasonSound({passes:waterSummary.passes,totalHa:waterSummary.totals.area_ha,fixture:!!contract.meta.fixture});
+  const dataSound=createSeasonSound({passes:waterSummary.passes,totalHa:waterSummary.totals.area_ha,fixture:!!contract.meta.fixture,onActivity:active=>world.sound.setNarrating(active)});
   let soundReady=false;
   const timeline = createTimeline($('#timeline'), passes, fractions, (i, user) => {
     curPass = i;

@@ -4,7 +4,7 @@ Task WEB-EXPERIENCE-006; human owner Quoc, actor Codex. Branch feat/season-sound
 
 ## Behaviour
 
-Data sound is enabled by default and starts only after a user interaction permits Web Audio. The speaker beside playback mutes it and remembers that choice across the three views and reloads. Audio is procedural original synthesis, with gentle gain envelopes and no external audio download/API. Ambient sound and tour narration/music remain separate. Data tones are suppressed during the guided tour and stopped at workspace/visibility transitions; missing Web Audio degrades to a disabled, labelled control.
+Data sound is enabled by default and starts only after a user interaction permits Web Audio. The speaker beside playback mutes it and remembers that choice across the three views and reloads when browser storage is available. If storage is blocked, muting still works for the current view. Audio is procedural original synthesis, with gentle gain envelopes and no external audio download/API. Ambient sound and tour narration/music remain separate; ambient effects duck while a data cue plays and recover when it ends. Data tones are suppressed during the guided tour and stopped at workspace/visibility transitions; missing Web Audio degrades to a disabled, labelled control.
 
 Each acquisition reads summary.passes from the same published export. One to four triangle tones encode water_ha / valid_ha; high/low accents mark positive newly observed wet/dry areas, with gain proportional to the corresponding share of valid area. Two short low ticks represent no valid observation; one tick marks coverage below 50%. Missing is never mapped to dry. Neither pitch nor loudness represents water depth or radar intensity. Bang Rakam fixture observations cannot produce data sound. The calendar highlights the corresponding observation column while playing.
 
@@ -18,16 +18,18 @@ Only low Tân Hội uses two detailed tiles (previously four), a 1,400 m streami
 
 146 Node tests pass, including deterministic musical mapping, invalid/missing data, every real acquisition and rendering-budget rules. Build passes with the existing large-chunk warning. All 28 committed published inputs and both generated data outputs pass the exact-byte gate. No scientific export is regenerated.
 
+Additional fallback checks pass with storage writes blocked and Web Audio removed: mute remains effective and the map still works. Evidence: .cache/season-sound/fallback/results.json.
+
 Edge/CDP checks exercise real Web Audio output (nonzero analyser samples), default-on state, mute/reload/shared preference, map/calendar playback, 24 highlighted calendar cells, fixture audio exclusion, reopenable/skippable guidance and mobile overflow. Desktop/mobile captures are opened and visually reviewed; timeline speaker overlap and calendar speaker contrast found in the first captures are corrected. Evidence is task-local under .cache/season-sound/qa/, tests.log and build.log. The harness closes its own Edge and direct Node Vite preview server.
 
-Performance: mains power, 1600 x 900, separate confirmed RTX 4050 and Intel UHD runs. Same four-target, 9.5-second route, no simultaneous browser benchmark. Minimum is the worst complete one-second sample. An obsolete Intel adapter ID selected NVIDIA initially; that run was rejected, the current DXGI ID was read without changing system settings, and the low baseline was rerun against the original build.
+Performance: mains power, 1600 x 900, separate confirmed RTX 4050 and Intel UHD runs. Same four-target, 9.5-second route, no simultaneous browser benchmark. The comparison table below uses reduced motion in both builds; normal-motion Intel repeats are recorded separately. Minimum is the worst complete one-second sample. An obsolete Intel adapter ID selected NVIDIA initially; that run was rejected, the current DXGI ID was read without changing system settings, and the low baseline was rerun against the original build.
 
 | GPU/tier | Flight average FPS before / after | Flight minimum FPS before / after | Longest flight frame before / after | Frames over 100 ms before / after |
 | --- | --- | --- | --- | --- |
 | RTX 4050 high | 135.13 / 139.65 | 117.20 / 130.00 | 34.7 / 20.9 ms | 0 / 0 |
 | Intel UHD low | 42.93 / 50.39 | 36.00 / 47.03 | 131.9 / 62.5 ms | 2 / 0 |
 
-Intel stationary average rises from 39.00 to 51.86 FPS in these samples. Source evidence: .cache/season-sound/before/, before-low/ and after/. These measurements are route/device samples, not a guarantee for every device or village. Large bundles and the unproven 3 MB initial-transfer target remain open. No blanket performance acceptance is claimed.
+With normal motion enabled, a separate Intel repeat measured flight 41.95 to 52.53 average FPS, minimum 35.75 to 48.01 FPS, longest frame 118.0 to 55.5 ms and frames above 100 ms from 2 to 0. Stationary average was 38.61 to 51.76 FPS. Evidence: before-default/results.json and after-default/results.json. Intel stationary average in the reduced-motion pair rises from 39.00 to 51.86 FPS. Source evidence: .cache/season-sound/before/, before-low/ and after/. These measurements are route/device samples, not a guarantee for every device or village. Large bundles and the unproven 3 MB initial-transfer target remain open. No blanket performance acceptance is claimed.
 
 ## Remaining review
 
