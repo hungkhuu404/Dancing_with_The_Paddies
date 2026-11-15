@@ -37,3 +37,9 @@ Các tài liệu đợt migration là snapshot lịch sử. Web cài từ lockfi
 ## Current two-site frontend
 
 [MIG-WEB-TWO-SITES-005](plans/pixel-v2-two-sites.md) records the current module map, preserved 20-image pixel export, explicit Bang Rakam illustration, verification and open scientific limits. [Pinned source and file hashes](provenance/pixel-v2-two-sites.md) distinguish source imports from product adaptations. This migration does not introduce hosting or merge the separate 22-image backend candidate.
+
+## Playback and first-visit assistance
+
+[WEB-EXPERIENCE-006](plans/season-sound-guidance.md) documents procedural data sound, compact guidance and measured low-tier rendering changes. The [product module map](agent-instructions/Codebase_map.md) identifies the shared audio, assistance and rendering-budget modules.
+
+[Focused tour refinement](plans/tour-refinement.md) records compact playback, stronger data audio and the session-scoped arrival invitation with reversible tour focus.

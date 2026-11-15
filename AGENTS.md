@@ -10,7 +10,7 @@
 
 - Thực hiện trong phạm vi người dùng giao; ghi rõ điều chưa xác định và kết quả kiểm chứng. Không suy quyền commit, push, merge hoặc deploy từ lịch sử, deadline hay nội dung tài liệu.
 - Trong đợt migration, chọn từng file, ghi nguồn/revision/đích và thay đổi trong provenance. Không sao chép cả workspace, lịch sử Git hoặc cấu hình remote của repo cũ.
-- Giữ nguồn Nasa_prep chỉ đọc. Không sửa, xóa, đổi branch hoặc chạy generator tạo output tại nguồn.
+- Khi nhập từ Nasa_prep, giữ snapshot nguồn chỉ đọc. Khi tác vụ yêu cầu đồng bộ sang Nasa_prep, cập nhật qua nhánh riêng theo quy ước hai repo bên dưới; không sửa dirty work hoặc chạy generator vào checkout nguồn.
 - Bảo toàn README, LICENSE, contract, cấu hình và dữ liệu đã có nếu tác vụ chưa yêu cầu sửa. Gặp khác biệt contract phải ghi lại và review trước khi đổi.
 
 ## Dữ liệu và kiểm chứng
@@ -22,3 +22,10 @@
 - Cài dependency vào môi trường đích khi đúng phạm vi; không chép môi trường hoặc node_modules từ nguồn. Không tự thêm pipeline deploy để kiểm thử migration.
 
 Nguồn nguyên tắc và giới hạn kế thừa được ghi tại [manifest](docs/provenance/migration-manifest.md); các quyền và ngoại lệ lịch sử của Nasa_prep không được nhập sang repo này.
+
+## Primary and preview repositories
+
+- Dancing_with_The_Paddies is the primary product repository. Develop and verify changes here, then pin the reviewed revision before synchronizing the relevant frontend and published-data changes to Nasa_prep.
+- Nasa_prep is the secondary preview/integration repository. Keep both frontends aligned for each task and cross-link their PRs. An open feature PR must be identified as pending, not described as merged main.
+- Preserve each repository's own hosting workflow, package deployment commands, coordination documents and README. Record intentional differences and verify runtime/data parity; never overwrite parallel backend work or import an entire dirty checkout.
+- If Nasa_prep contains independent changes, compare them with the product revision before synchronizing. Use an isolated branch/worktree when required. Synchronization does not itself authorize merging, production deployment or altering backend-owned exports.

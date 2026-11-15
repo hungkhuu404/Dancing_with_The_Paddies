@@ -1,3 +1,5 @@
+import {createSeasonSound} from '../audio/seasonSound.js';
+import {createQuickGuide} from '../ui/quickGuide.js';
 import {assertSceneMeta} from '../data/contractPolicy.js';
 import {siteProfile} from '../data/siteRules.js';
 import {defaultSite} from '../data/siteRules.js';
@@ -58,6 +60,10 @@ async function start() {
   const [meta,cells,aoi,places,summary]=await Promise.all(['meta.json','cells.geojson','aoi.geojson','places.geojson','summary.json'].map(f=>getJSON(dir+f)));
   if(!meta||!cells||!meta.acquisitions?.length)throw Error('Required water observations could not be loaded.');
   assertSceneMeta(siteProfile(site.id),meta);
+  const dataSound=createSeasonSound({passes:summary?.passes,totalHa:summary?.totals.area_ha,fixture:!!meta.fixture});dataSound.mount(document.querySelector('.date-controls'));
+  const guide=createQuickGuide({view:'map',fixture:!!meta.fixture});if(query.has('debug'))window.__dataSound=dataSound;
+  guide.showOnce();
+
   if(meta.fixture){const notice=document.createElement('p');notice.className='fixture-notice';notice.setAttribute('role','status');notice.textContent='Data pending. Water states are illustrative.';document.body.append(notice);document.body.classList.add('is-fixture');
     $('whole').setAttribute('aria-label','Show the study frame');
     for(const id of ['radar-only','gt30']){$(id).disabled=true;$(id).closest('label').hidden=true;}
@@ -73,7 +79,7 @@ async function start() {
   const features=cells.features, props=features.map(f=>f.properties), bins=onsetBins(props);
   const byCell=new Map(features.map((f,i)=>[f.properties.cell_id,i]));
   const initial=readView(location.search,acq.length);
-  const state={...initial,sel:-1,hover:-1,radarOnly:false,gt30:false};
+  const state={...initial,sel:-1,hover:-1,radarOnly:false,gt30:false};dataSound.select(state.pass);
   let series=null,seriesPromise=null,revision=0,playTimer=0,backdropTimer=0,backdropAt=0;
   const loadSeries=()=>seriesPromise||=getJSON(dir+'series.json').then(s=>{
     series=s;
@@ -204,12 +210,12 @@ async function start() {
     $('prev').disabled=!season&&state.pass===0;$('next').disabled=!season&&state.pass===last;
     $('date-note').textContent=meta.fixture?'Fixture record. Image dates are from the ASF catalogue; water states are illustrative.':season?'Select a date to see the latest available water observation.':`Track ${a.track}. Gaps use the most recent valid image${a.valid_share<.999?'; this pass covers part of the study area':''}.`;
   }
-  function setPass(i){state.pass=boundedPass(i,acq.length);state.scope='image';swapBackdrop();paint();updateDate();if(state.sel>=0)openPanel(state.sel);}
+  function setPass(i){state.pass=boundedPass(i,acq.length);dataSound.play(state.pass);state.scope='image';swapBackdrop();paint();updateDate();if(state.sel>=0)openPanel(state.sel);}
   $('date-slider').oninput=e=>{stopPlayback();setPass(+e.target.value);};
   $('prev').onclick=()=>{stopPlayback();setPass(Math.max(0,state.pass-1));};
   $('next').onclick=()=>{stopPlayback();setPass(Math.min(last,state.pass+1));};
   $('season').onclick=()=>{stopPlayback();state.scope='season';state.pass=last;swapBackdrop();paint();updateDate();if(state.sel>=0)openPanel(state.sel);};
-  stopPlayback=()=>{clearInterval(playTimer);playTimer=0;$('play').setAttribute('aria-pressed','false');$('play').setAttribute('aria-label','Play observations');};
+  stopPlayback=()=>{dataSound.stop();clearInterval(playTimer);playTimer=0;$('play').setAttribute('aria-pressed','false');$('play').setAttribute('aria-label','Play observations');};
   $('play').onclick=()=>{
     if(playTimer){stopPlayback();return;}
     setPass(state.scope==='season'||state.pass===last?0:state.pass);
@@ -252,7 +258,7 @@ async function start() {
   }
   addEventListener('message',e=>{
     if(!embedded||e.origin!==location.origin||e.source!==parent||e.data?.channel!=='flood-world')return;
-    if(e.data.type==='active'){surfaceActive=!!e.data.active;if(!surfaceActive){stopPlayback();map.stop();}else{map.resize();}}
+    if(e.data.type==='active'){surfaceActive=!!e.data.active;dataSound.setPaused(!surfaceActive);if(!surfaceActive){stopPlayback();map.stop();}else{map.resize();}}
     if(e.data.type==='navigate'){
       stopPlayback();const next=readView(e.data.query,acq.length);Object.assign(state,{mode:next.mode,scope:next.scope,pass:next.pass});
       swapBackdrop();paint();updateDate();const hamlet=new URLSearchParams(e.data.query).get('hamlet');if(hamlet){select(-1);focusHamlet(hamlet);}if(next.cell&&byCell.has(next.cell))select(byCell.get(next.cell),true);
