@@ -16,6 +16,7 @@ Design notes, checks and limits for each part of the web app:
 - [Integrated map](plans/integrated-map.md), [calendar and method views](plans/calendar-method.md)
 - [Two-site data integration](plans/two-site-real-data.md), [two-site frontend](plans/pixel-v2-two-sites.md)
 - [Location entrance](plans/location-entrance.md), [observatory landing](plans/observatory-landing.md), [landing-map radar sweep](plans/atlas-sweep.md)
+- [Landing-map marker echoes](plans/atlas-marker-echo.md): marker rings and label illumination synchronized with the sweep.
 - [Guided-tour audio](plans/tour-audio.md), [tour refinement](plans/tour-refinement.md), [acquisition weather and Bang Rakam tour](plans/history-bang-tour.md)
 - [Season playback, sound and guidance](plans/season-sound-guidance.md), [interface polish](plans/interface-polish.md)
 - [Deployment](plans/dancing-production.md)

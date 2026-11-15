@@ -2,6 +2,7 @@ import {siteProfiles,checkSiteIndex,checkSiteMeta} from '../data/siteRules.js';
 import {entryKind} from './entryRules.js';
 import {atlasLayout,atlasPath} from './atlasLayout.js';
 import {atlasSweep} from './atlasSweep.js';
+import {ATLAS_SWEEP_PERIOD,atlasSweepHit} from './atlasSweepTiming.js';
 import {escapeHTML as esc} from '../map/presentation.js';
 import {dateRange} from './blockSummary.js';
 
@@ -61,6 +62,7 @@ export async function createLocationAtlas({choose,back}){
     if(geography){
       layout=atlasLayout(geography.bounds);const {width,height}=layout;
       plane.style.aspectRatio=`${width}/${height}`;
+      plane.style.setProperty('--atlas-sweep-period',ATLAS_SWEEP_PERIOD+'ms');
       const grid=[];for(let lon=95;lon<=120;lon+=5)grid.push([[lon,2],[lon,27]]);for(let lat=5;lat<=25;lat+=5)grid.push([[91,lat],[123,lat]]);
       const land=atlasPath(geography.land.flat(),layout,true),coasts=atlasPath(geography.coasts,layout),rivers=atlasPath(geography.rivers,layout);
       const labels=geography.island_labels.map(l=>{const [x,y]=layout.point(...l.center);return `<g class="atlas-island-label" transform="translate(${x},${y})"><path d="M-10 0h-12m6-6v12"/><text x="0" y="4">${esc(l.name)}</text><text class="atlas-island-international" x="0" y="20">${esc(l.international_name)}</text></g>`;}).join('');
@@ -70,9 +72,11 @@ export async function createLocationAtlas({choose,back}){
       const card=cards.querySelector(`[data-location="${l.id}"]`);
       if(card){card.onclick=()=>startChoice(l);card.onpointerenter=card.onfocus=()=>highlight(l);}
       if(!layout)return;
-      const el=document.createElement(l.available?'button':'div');el.className='atlas-pin'+(l.available?'':' is-pending');
-      el.innerHTML=`<span class="atlas-pin-target" aria-hidden="true"><i></i></span><span class="atlas-pin-label">${esc(l.name)}<small>${l.fixture||!l.available?'Data pending':esc(l.region?.split(',')[0]||'Explore')}</small></span>`;
+      const echo=l.available&&!l.fixture;
+      const el=document.createElement(l.available?'button':'div');el.className='atlas-pin'+(l.available?'':' is-pending')+(echo?' has-scan-echo':'');
+      el.innerHTML=`<span class="atlas-pin-target" aria-hidden="true">${echo?'<span class="atlas-pin-scan-core"></span><span class="atlas-pin-echo"></span><span class="atlas-pin-echo atlas-pin-echo-late"></span>':''}<i></i></span><span class="atlas-pin-label">${esc(l.name)}<small>${l.fixture||!l.available?'Data pending':esc(l.region?.split(',')[0]||'Explore')}</small></span>`;
       const [x,y]=layout.point(...l.center);l.point=[x/layout.width*100,y/layout.height*100];el.style.left=l.point[0]+'%';el.style.top=l.point[1]+'%';
+      if(echo)el.style.setProperty('--atlas-echo-delay',atlasSweepHit(y,layout.height)+'ms');
       if(l.available){el.type='button';el.setAttribute('aria-label','Explore '+l.name+(l.fixture?', data pending':''));el.onclick=()=>startChoice(l);el.onpointerenter=el.onfocus=()=>highlight(l);}
       markers.append(el);l.element=el;
     });
@@ -89,7 +93,11 @@ export async function createLocationAtlas({choose,back}){
     // Retain the final zoom until hide; cancelling here would flash the full map during release.
     return !cancelled;
   }
-  function show(returning=false){flightAnimation?.cancel();flightAnimation=null;flight=false;cancelled=false;root.hidden=false;root.setAttribute('aria-busy','false');root.classList.remove('is-flying','is-preparing','is-leaving');status.hidden=true;root.querySelector('.atlas-cancel').hidden=false;root.querySelector('.atlas-resume').hidden=!returning;if(returning)root.querySelector('.atlas-resume').focus({preventScroll:true});}
+  function show(returning=false){flightAnimation?.cancel();flightAnimation=null;flight=false;cancelled=false;root.hidden=false;root.setAttribute('aria-busy','false');root.classList.remove('is-flying','is-preparing','is-leaving');status.hidden=true;root.querySelector('.atlas-cancel').hidden=false;root.querySelector('.atlas-resume').hidden=!returning;
+    // One shared start for the mask, beam and marker echoes, including after returning to the chooser.
+    const start=document.timeline.currentTime,names=new Set(['atlas-geography-sweep','atlas-pin-echo','atlas-pin-core','atlas-pin-label']);
+    if(start!==null)for(const animation of root.getAnimations({subtree:true}))if(names.has(animation.animationName))animation.startTime=start;
+    if(returning)root.querySelector('.atlas-resume').focus({preventScroll:true});}
   function hide(){flightAnimation?.cancel();flightAnimation=null;cancelled=true;choiceRevision++;root.hidden=true;}
   show(false);
   return {root,locations,show,hide,message,skipFlight(){flightAnimation?.finish();},async leave(instant=false){root.classList.add('is-leaving');if(!instant&&!reduced())await new Promise(r=>setTimeout(r,650));hide();},get cancelled(){return cancelled;},get ready(){return !!layout;}};
