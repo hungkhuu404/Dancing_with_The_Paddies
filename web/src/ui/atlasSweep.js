@@ -1,8 +1,9 @@
 import './atlasSweep.css';
+import {atlasSweepGeometry} from './atlasSweepTiming.js';
 
 /** A decorative scan over the existing geography, never an observation/data layer. */
 export function atlasSweep({width,height,land,coasts,rivers}){
-  const trail=height*.24,distance=height+trail;
+  const {trail,distance,headOffset}=atlasSweepGeometry(height);
   return `<g class="atlas-sweep" aria-hidden="true" style="--atlas-sweep-distance:${distance}px">
     <defs>
       <linearGradient id="atlas-sweep-fade" x1="0" y1="0" x2="0" y2="1">
@@ -34,7 +35,7 @@ export function atlasSweep({width,height,land,coasts,rivers}){
       <path class="atlas-sweep-rivers" d="${rivers}"/>
     </g>
     <g class="atlas-sweep-motion">
-      <rect x="0" y="${-trail*.03}" width="${width}" height="2" fill="url(#atlas-sweep-line)"/>
+      <rect x="0" y="${-headOffset}" width="${width}" height="2" fill="url(#atlas-sweep-line)"/>
     </g>
   </g>`;
 }
