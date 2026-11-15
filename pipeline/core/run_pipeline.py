@@ -1,4 +1,4 @@
-"""Tân's local S1–S5 runner, producing the agreed internal handoff formats."""
+"""Local S1–S5 runner: read, grid, reference checks, classification and indicators."""
 import argparse
 from collections import Counter
 import csv
@@ -196,7 +196,7 @@ def process(config_path, output, track=None, read_network=True, force=False, fre
         "skipped": manifest["skipped"],
         "acquisitions": [{k: row[k] for k in ("acq_utc", "track", "direction", "frame", "crid", "granule")} for row in rows],
         "quality": quality, "status_counts": status_counts,
-        "internal_handoff_ready": False, "notes": ["External BANG-1 acceptance is recorded separately in acceptance.json after this processing run; internal synthetic tests are separate.", "CONTRACT-001 approval not inferred from draft docs.", "WorldCover 2021 selection does not establish current ground truth."]}
+        "internal_handoff_ready": False, "notes": ["Protocol-suite acceptance is recorded separately in acceptance.json after this processing run; synthetic tests are separate.", "Data-contract approval is not inferred from draft docs.", "WorldCover 2021 selection does not establish current ground truth."]}
     write_json(run, output / "run_manifest.json")
     freeze_definition = build_method_definition(cfg, run, rules, quality)
     write_json(freeze_definition, output / "method_freeze.draft.json")

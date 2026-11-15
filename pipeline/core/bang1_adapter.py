@@ -1,4 +1,4 @@
-"""BANG-1 protocol adapter; all classification, filtering and metrics use Tân's core."""
+"""Protocol-suite adapter; all classification, filtering and metrics use the core science module."""
 from pathlib import Path
 import sys
 

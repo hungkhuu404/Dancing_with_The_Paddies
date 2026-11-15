@@ -1,4 +1,4 @@
-"""BANG-4: pure functions for NISAR-vs-DSWx validation (spec s.8). No tuning anywhere."""
+"""Pure functions for the NISAR-vs-DSWx comparison. No tuning anywhere."""
 from datetime import datetime, timedelta, timezone
 
 import numpy as np
@@ -17,7 +17,7 @@ def utc_z(value):
 
 
 def normalize_timestamps(document):
-    """Normalize public S6 timestamps without changing gate/H3 evidence."""
+    """Normalize public S6 timestamps without changing recorded evidence."""
     out = dict(document)
     for key in ("frozen_utc", "first_dswx_read_utc"):
         out[key] = utc_z(out[key])

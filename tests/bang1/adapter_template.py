@@ -1,4 +1,4 @@
-"""Tân fills in imports and delegates to actual S4/S5 functions.
+"""Template: fill in the imports and delegate to the actual S4/S5 functions.
 
 This is a proposed test interface, not a change to the team's file contract.
 Do not replace calls with hardcoded fixture results or an alternate algorithm.

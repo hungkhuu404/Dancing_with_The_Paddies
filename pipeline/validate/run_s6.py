@@ -106,7 +106,7 @@ def run(args):
     trk = [str(x) for x in cube["track"]]
     dutc = [V.utc_z(str(x) if V._dt(str(x)).tzinfo is not None else str(x)+"Z") for x in dsw["TD_utc"]]
     require(V._dt(V.utc_z(gate["first_dswx_read_utc"])) > V._dt(V.utc_z(gate["frozen_utc"])),
-            "Historical first DSWx read must follow original H3 freeze")
+            "Historical first DSWx read must follow the original method freeze")
     dloc = [str(x)[:10] for x in dsw["TD"]]
     nloc = [V._dt(a).astimezone(ZoneInfo("Asia/Ho_Chi_Minh")).date().isoformat() for a in acq]
     pairs_idx = V.pair_acquisitions(acq, dutc, 3.0)
@@ -240,7 +240,7 @@ def run(args):
     schema = json.loads((REPO / "schema/validation.schema.json").read_text(encoding="utf-8"))
     Draft202012Validator(schema, format_checker=FormatChecker()).validate(result)
     require(hashes == input_hashes(args), "An input changed during S6 run")
-    evidence = dict(task="BANG-6-S6", input_sha256=hashes,
+    evidence = dict(task="S6", input_sha256=hashes,
                     validation_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
                     n_cells=len(ids), n_acquisitions=len(acq), schema_errors=0,
                     source_sha256={p.name: hashlib.sha256(p.read_bytes()).hexdigest()

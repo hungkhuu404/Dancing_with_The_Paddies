@@ -40,7 +40,7 @@ def probe(url, token_file):
 
 if __name__ == "__main__":
     root = Path(__file__).resolve().parent
-    rows = list(csv.DictReader((root / "inputs/quan-1/QUAN-1-DANH-MUC-CAU-HINH/catalog.csv").open()))
+    rows = list(csv.DictReader((root / "inputs/catalog.csv").open()))
     try:
         result = probe(rows[-1]["url"], os.environ["EARTHDATA_TOKEN_FILE"])
     except Exception as error:

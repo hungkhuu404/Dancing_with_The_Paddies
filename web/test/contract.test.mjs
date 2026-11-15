@@ -62,7 +62,7 @@ test('scales: 5 onset bins, earliest brightest; 30 days is an edge', () => {
   assert.notEqual(durationColor(29.9), durationColor(30));
 });
 
-test('onset note (DEC-PLAN-016) only when there is a real onset window', async () => {
+test('onset note only when there is a real onset window', async () => {
   const { ONSET_NOTE } = await import('../src/map/contract.js');
   assert.ok(cellSentences({ status: 'flooded', ...cellMetrics('NNNWWW', acq) }).includes(ONSET_NOTE));
   assert.ok(!cellSentences({ ...cellMetrics('WWWNNN', acq) }).includes(ONSET_NOTE)); // water already there in the first image

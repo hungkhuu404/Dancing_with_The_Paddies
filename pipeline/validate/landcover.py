@@ -1,4 +1,4 @@
-"""BANG-2: ESA WorldCover 2021 cropland/built-up share per 250 m cell (Tan Hoi)."""
+"""ESA WorldCover 2021 cropland/built-up share per 250 m cell (Tan Hoi)."""
 import argparse
 import json
 import os

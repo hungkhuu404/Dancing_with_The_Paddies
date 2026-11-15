@@ -1,7 +1,7 @@
 import {isPixelV2} from '../science/pixelMethod.js';
 import {checkSiteMeta} from './siteRules.js';
 export function assertPublishedMeta(meta){
- if(!isPixelV2(meta))throw Error('Expected published CONTRACT-001 2.0.0 pixel observations.');
+ if(!isPixelV2(meta))throw Error('Expected published data-contract 2.0.0 pixel observations.');
  return meta;
 }
 /** A labelled landscape illustration is separate from published water results. */

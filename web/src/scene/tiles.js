@@ -114,7 +114,7 @@ export function createTiles(S) {
     await step('ecosystem');
     const life = await createLife(group, layout, land, pickIndex, S.quality, { centre, reduced:S.reduced, identity:S.profile.identity, roost:props.veg.find(v=>v.kind==='tram') }, (k) => step('life:' + k));
     mark('life'); await step('life');
-    // village walkers/carts/cattle (PR #5), per tile; kept out of the scientific radar-lens pass
+    // village walkers/carts/cattle, per tile; kept out of the scientific radar-lens pass
     const rural = createRuralLife(group, layout, pickIndex, S.quality, { reduced: S.reduced, enabled: S.rural !== false, motorbikes: false });
     S.lensHidden?.push(rural.group);
     const ctx = Object.assign(Object.create(S.wctx), {

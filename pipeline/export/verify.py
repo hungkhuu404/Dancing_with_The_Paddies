@@ -136,8 +136,8 @@ def verify(data,site,schemas):
         "cell_id_bijection":"pass","series_lengths":"pass","area_totals":"pass",
         "passes_recomputed":"pass","asof_invariants":"pass","backdrop_paths_sizes":"pass",
         "hamlet_names":"pass","metrics_vs_series":"pass","file_size_limits":"pass",
-        "validation_json":"pass" if validation_path.exists() else "pending S6/QUAN-7",
-        "osm_overlay":"pending Quốc","web_opens_without_manual_edits":"pending Quốc",
+        "validation_json":"pass" if validation_path.exists() else "pending S6",
+        "osm_overlay":"pending browser check","web_opens_without_manual_edits":"pending browser check",
         "initial_transfer_3mb":"pending web HTML/JS/CSS and transport",
         "n_cells":len(ids),"n_acquisitions":n,"site_bytes":sum(sizes.values()),"file_bytes":sizes}
 

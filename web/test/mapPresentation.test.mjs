@@ -27,7 +27,7 @@ test('return to 3D uses the block centre and the south-positive scene axis',()=>
 test('text supplied by the public export is escaped in panel and legend markup',()=>{
   assert.equal(escapeHTML('<Tân Hội & "fields">'), '&lt;Tân Hội &amp; &quot;fields&quot;&gt;');
 });
-test('every migrated public record retains CONTRACT-001 as-of state and area',async()=>{
+test('every public record retains data-contract as-of state and area',async()=>{
   const data=JSON.parse(await readFile(new URL('../../data/tan_hoi/series.json',import.meta.url)));
   const records=Object.values(data.cells).map(c=>c.s);
   assert.ok(records.length>0);

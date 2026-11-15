@@ -8,7 +8,7 @@ import numpy as np
 
 
 def test_received_suite_tampering_is_rejected(tmp_path):
-    suite = tmp_path / "BANG-1"
+    suite = tmp_path / "protocol_suite"
     suite.mkdir()
     (suite / "test.py").write_bytes(b"changed")
     receipt = {"files": {"test.py": hashlib.sha256(b"received").hexdigest()}}

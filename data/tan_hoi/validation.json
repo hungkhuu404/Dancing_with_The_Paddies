@@ -673,7 +673,7 @@
       "changed_utc": "2026-11-14T07:58:38Z",
       "by": "Tân",
       "what": "S4 changed from cell-mean classification to pixel_fraction_75_dual_50: a cell is W when >=75% of jointly valid 10 m pixels have HH and HV below the acquisition thresholds; single-flip filter fills N->W only when the middle image has >=50% water pixels (PR #4, contract 2.0.0).",
-      "why": "Selected after comparing several options against DSWx-S1 on the H5 cells (DEC-PLAN-015 allows tuning with DSWx). Agreement after tuning, not independent validation.",
+      "why": "Selected after comparing several options against DSWx-S1 on the comparison cells. Agreement after tuning, not independent validation.",
       "before": {
         "n_pairs": 17,
         "kappa_median": 0.5073,
@@ -796,7 +796,7 @@
       "changed_utc": "2026-11-14T16:46:10.137539Z",
       "by": "Tan",
       "what": "Applied GCOV validity mask to both the study grid and reference windows and added the 30 October 083A and 3 November 148D acquisitions.",
-      "why": "Exclude unfocused or out-of-extent GCOV samples and incorporate additional acquisitions reported by the QUAN-8 catalog; the reference comparison remains post-hoc.",
+      "why": "Exclude unfocused or out-of-extent GCOV samples and incorporate additional acquisitions reported by the updated catalogue; the reference comparison remains post-hoc.",
       "before": {
         "n_pairs": 17,
         "kappa_median": 0.5594,

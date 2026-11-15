@@ -27,7 +27,7 @@ export function normalizeLayout(layout, n = layout.passes?.length || 0) {
   return layout;
 }
 
-/** CONTRACT-001 data of the default site (the same files as the map page), or null when missing. */
+/** Data-contract data of the default site (the same files as the map page), or null when missing. */
 export async function loadContract(profile=siteProfile()) {
   try {
     const sites = await json(BASE + 'data/sites.json');

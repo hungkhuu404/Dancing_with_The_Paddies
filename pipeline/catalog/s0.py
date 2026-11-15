@@ -2,7 +2,7 @@
 """NISAR metadata only: configuration -> CMR -> deduplicated catalog CSV.
 
 No Earthdata token or HDF5 download. Paths in TOML are relative to that TOML.
-H0 replay is explicit and never writes the live catalog.csv.
+baseline replay is explicit and never writes the live catalog.csv.
 """
 from __future__ import annotations
 
@@ -252,16 +252,16 @@ def read_h0(path):
             name = Path(urllib.parse.unquote(urllib.parse.urlsplit(url).path)).stem
             match = NAME.fullmatch(name)
             if not match:
-                raise CatalogError(f"H0 URL has unrecognized granule basename: {name}")
+                raise CatalogError(f"baseline URL has unrecognized granule basename: {name}")
             parts = match.groupdict()
-            # H0 row fields must agree with the actual product filename.
+            # baseline row fields must agree with the actual product filename.
             for field, h0field in (("track", "track"), ("direction", "huong"), ("frame", "frame"),
                                    ("crid", "crid"), ("polarization", "phan_cuc")):
                 if parts[field] != row[h0field]:
-                    raise CatalogError(f"H0 field {h0field} disagrees with product filename: {name}")
+                    raise CatalogError(f"baseline field {h0field} disagrees with product filename: {name}")
             stamp = iso_utc(datetime.strptime(parts["start"], "%Y%m%dT%H%M%S").replace(tzinfo=timezone.utc))
             if stamp != row["utc"]:
-                raise CatalogError(f"H0 UTC disagrees with product filename: {name}")
+                raise CatalogError(f"baseline UTC disagrees with product filename: {name}")
             records.append({"collection": "H0_OFFLINE", "item": {
                 "umm": {"GranuleUR": name, "RelatedUrls": [{"URL": url, "Type": "GET DATA"}]}, "meta": {},
             }})
@@ -280,7 +280,7 @@ def reconcile(rows, baseline, audit):
         new, old = actual.get(key), expected.get(key)
         if old is None:
             changes.append({"kind": "added", "granule": new["granule"],
-                            "reason": "Returned by current CMR query and passes config; absent from selected H0 baseline. New footprint/time metadata vs later ingest cannot be distinguished from H0 CSV alone."})
+                            "reason": "Returned by current CMR query and passes config; absent from the selected baseline. New footprint/time metadata vs later ingest cannot be distinguished from baseline CSV alone."})
         elif new is None:
             changes.append({"kind": "missing", "granule": old["granule"],
                             "reason": rejected.get(old["granule"], "Acquisition absent from completed current CMR query; deletion/metadata change not established by this query.")})
@@ -301,24 +301,24 @@ def csv_text(rows):
 
 
 def comparison_markdown(manifest, rows, baseline, changes, h0_audit):
-    lines = ["# S0 — đối chiếu danh mục", "", f'- Nguồn chạy: `{manifest["source"]}`.',
-             f'- Trạng thái: `{manifest["status"]}`; metadata UTC: `{manifest["started_utc"]}`.',
-             "- Chỉ kiểm metadata và URL; không tải hoặc xác nhận nội dung HDF5.", "",
-             "| Track/hướng/frame | H0 sau lọc | Kết quả |", "| --- | ---: | ---: |"]
+    lines = ["# S0 — catalogue comparison", "", f'- Run source: `{manifest["source"]}`.',
+             f'- Status: `{manifest["status"]}`; metadata UTC: `{manifest["started_utc"]}`.',
+             "- Checks metadata and URLs only; does not download or validate HDF5 content.", "",
+             "| Track/direction/frame | Baseline after filtering | Result |", "| --- | ---: | ---: |"]
     old_counts, new_counts = counts(baseline), counts(rows)
     for track in sorted(old_counts.keys() | new_counts.keys()):
         lines.append(f"| {track} | {old_counts.get(track, 0)} | {new_counts.get(track, 0)} |")
-    lines += ["", f"Tổng: {len(baseline)} H0 hợp lệ; {len(rows)} dòng kết quả.", "", "## Chênh lệch", ""]
+    lines += ["", f"Total: {len(baseline)} valid baseline rows; {len(rows)} result rows.", "", "## Differences", ""]
     if not changes:
-        lines.append("Không có chênh lệch granule hoặc URL so với H0 sau lọc.")
+        lines.append("No granule or URL differences from the filtered baseline.")
     for change in changes:
         lines += [f'- **{change["kind"]}** `{change["granule"]}`: {change["reason"]}']
         if "previous" in change:
-            lines.append(f'  - Bản H0: `{change["previous"]}`.')
-    lines += ["", "## Các granule H0 bị loại theo cấu hình", ""]
+            lines.append(f'  - Baseline version: `{change["previous"]}`.')
+    lines += ["", "## Baseline granules excluded by the configuration", ""]
     lines += [f'- `{a["granule"]}`: {a["reason"]}.' for a in h0_audit]
     if manifest["source"] != "CMR_LIVE":
-        lines += ["", "**Đây chỉ là kiểm lại H0. Chưa xác nhận metadata hiện tại, phân trang mạng hoặc phủ khung UTM mới.**"]
+        lines += ["", "**This is a baseline re-check only. Current metadata, network paging and coverage of the new UTM frame are not confirmed.**"]
     return "\n".join(lines) + "\n"
 
 

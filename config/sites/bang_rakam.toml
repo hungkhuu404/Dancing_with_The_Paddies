@@ -1,7 +1,7 @@
 # Accepted 12 km study frame. Replay inputs are described in
 # docs/pipeline-replay.md. Paths are relative to this file.
 site = "bang_rakam"
-# Quy ước date_local của spec mục 5.3, UTC+07:00.
+# date_local uses UTC+07:00.
 timezone = "Asia/Bangkok"
 
 [grid]
@@ -13,8 +13,7 @@ bbox_utm_m = [613250, 1846250, 625250, 1858250]
 collections = ["NISAR_L2_GCOV_PROVISIONAL_V1", "NISAR_L2_GCOV_V1"]
 mode = "DHDH"
 required_polarizations = ["HH", "HV"]
-# Research_log.md DEC-PLAN-007: khoảng 20 cảnh, trước khi loại 3 SHSH.
-# Ngày địa phương Asia/Bangkok; không xác nhận mức hoàn tất S1–S7.
+# Local dates in Asia/Bangkok.
 start_date_local = 2026-08-13
 end_date_local = 2026-10-31
 keep_latest_crid_per_acquisition = true
@@ -55,17 +54,17 @@ min_valid_pixel_fraction = 0.70
 filter_single_anomaly = true
 
 [references.water]
-status = "confirmed_for_run_by_Quan"
+status = "confirmed_for_run"
 epsg = 32647
 bbox_utm_m = [618500, 1846250, 619000, 1847250]
 min_pixels = 1000
-selection_basis = "WorldCover 2021 BANG-2 mean water share 0.9698375; Quân confirmed in current task. Native sample count required."
+selection_basis = "WorldCover 2021 mean water share 0.9698375. Native sample count required."
 
 [references.stable]
-status = "confirmed_for_run_by_Quan"
+status = "confirmed_for_run"
 epsg = 32647
 bbox_utm_m = [619000, 1852500, 619250, 1852750]
-selection_basis = "WorldCover 2021 BANG-2 builtup_share 0.9350; Quân confirmed in current task."
+selection_basis = "WorldCover 2021 builtup_share 0.9350."
 
 [landcover]
 file = "../../runtime/bang_rakam/bang_rakam_landcover.csv"

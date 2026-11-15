@@ -1,8 +1,8 @@
-"""BANG-3: OPERA DSWx-S1 reader -> per-cell water fractions per pass.
+"""OPERA DSWx-S1 reader -> per-cell water fractions per pass.
 
 Config-driven (TOML). Token path from env EARTHDATA_TOKEN_FILE; token and signed
 URLs are never printed. Modes: cells_250 (product, Tan Hoi) and dev_npz
-(reproduces the H0 dev-site reference).
+(reproduces the development-site reference).
 """
 import argparse
 import csv
@@ -90,7 +90,7 @@ def build_grid(cfg):
 # ---------------------------------------------------------------- aggregation
 def aggregate(a, tf, bounds, th):
     """a: 2D code array, tf: Affine of a. Returns F1, F3, VS (n,) float arrays.
-    Pixel geometry: cell bounds -> pixel index range by rounding (same as H0 prototype)."""
+    Pixel geometry: cell bounds -> pixel index range by rounding (same as the prototype)."""
     n = len(bounds)
     f1 = np.full(n, np.nan)
     f3 = np.full(n, np.nan)

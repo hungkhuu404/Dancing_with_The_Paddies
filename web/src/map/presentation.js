@@ -1,4 +1,4 @@
-// Presentation state only. CONTRACT-001 water metrics remain authoritative.
+// Presentation state only. Data-contract water metrics remain authoritative.
 export const MODES = ['status', 'onset', 'duration'];
 export const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function boundedPass(value, count) {

@@ -1,4 +1,4 @@
-// Pure helpers for CONTRACT-001 (spec_backend §5.5–5.6, spec_uiux §5.3, §6.3–6.4). No DOM, no MapLibre:
+// Pure helpers for the data contract (docs/data-contract.md). No DOM, no MapLibre:
 // used by the map page, the fixture generator and the node tests.
 
 export const CELL_HA = 6.25;
@@ -57,19 +57,19 @@ export function flagGt30(m, cropland) {
   return 'no';
 }
 
-// "As of pass i": latest valid state at or before i (spec_uiux §6.3, summary asof_*).
+// "As of pass i": latest valid state at or before i (summary asof_*).
 export function stateAsOf(s, i) {
   for (let k = i; k >= 0; k--) if (s[k] !== '-') return s[k];
   return '-';
 }
 
-// Panel sentences (spec_uiux §6.4). Dates and numbers always come from the data.
+// Panel sentences. Dates and numbers always come from the data.
 export function fmtDate(d) {
   if (!d) return '';
   const [y, m, dd] = d.split('-').map(Number);
   return `${dd} ${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][m - 1]} ${y}`;
 }
-// DEC-PLAN-016 §7: the radar can mark the start of flooding early on dry, flat fields.
+// The radar can mark the start of flooding early on dry, flat fields.
 export const ONSET_NOTE = 'Radar can date the start early on dry, flat fields.';
 export function cellSentences(p) {
   const out = [];
@@ -91,7 +91,7 @@ export function cellSentences(p) {
   return out;
 }
 
-// 5-step scales (spec_uiux §5.2). Step 5 = brightest = earliest / longest.
+// 5-step scales. Step 5 = brightest = earliest / longest.
 export const STEPS = ['#047686', '#3593A3', '#58B0C0', '#8ACCD8', '#B9E8F1'];
 export const COLORS = { water: '#3D9AAA', silt: '#EDB65A', missing: '#59615E', radar: '#1B211F', ink: '#E7ECE8' };
 
@@ -109,7 +109,7 @@ export function onsetBins(cells) {
 }
 export const onsetColor = (bins, d) => (d ? (bins.find((b) => d >= b.from && d <= b.to) || {}).color : null);
 
-// Duration bins (days). 30 days must be a bin edge (spec_uiux §6.3); final edges are set after H4.
+// Duration bins (days). 30 days must be a bin edge.
 export const DURATION_EDGES = [0, 15, 30, 45, 60, Infinity];
 export function durationColor(days) {
   if (days === null || days === undefined) return null;

@@ -21,7 +21,7 @@ jobs:
         run: python -m pip install -r requirements-s6.txt
       - name: Core and comparison regressions
         run: python -I -m pytest -q tests/core tests/validate
-      - name: BANG-1 protocol regressions
+      - name: Protocol regression suite
         run: python -I -m pytest -q tests/bang1/tests --bang1-adapter pipeline/core/bang1_adapter.py --bang1-require-adapter
       - name: Check effective site configuration
         run: |

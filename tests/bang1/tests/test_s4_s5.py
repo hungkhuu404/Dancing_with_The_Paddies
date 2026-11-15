@@ -1,4 +1,4 @@
-"""Independent expected values from spec §§5.4, 5.5, 7; synthetic inputs only."""
+"""Independent expected values; synthetic inputs only."""
 import copy
 import json
 from datetime import datetime
@@ -51,7 +51,7 @@ def test_metrics(tan_adapter, case):
 
 @pytest.mark.parametrize('name', ['classify', 'filter', 'metrics'])
 def test_fixture_integrity(name):
-    """Validate handoff data only. Passing this is not a pass for Tân's code."""
+    """Validate fixture data only. Passing this does not validate the pipeline code."""
     cases = load(name)
     assert len({c['id'] for c in cases}) == len(cases)
     for case in cases:
