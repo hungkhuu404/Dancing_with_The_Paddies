@@ -14,6 +14,7 @@ from pyproj import Transformer
 from shapely import contains_xy, transform
 from shapely.geometry import shape
 
+from check_inputs import require_inputs
 from read_cache import event, load_inputs, read_batch
 from gcov_io import validate_cached_record
 from science import aggregate_cells, classify, evaluate_references, filter_dual, metrics_for_cell, pixel_fraction_states
@@ -96,6 +97,7 @@ def process(config_path, output, track=None, read_network=True, force=False, fre
     if freeze:
         from freeze_method import finalize
         return finalize(config_path, output, bang_tests, bang_receipt=bang_receipt)
+    require_inputs(config_path)
     cfg, rows, base = load_inputs(config_path, track)
     if cfg["thresholds"]["filter_single_anomaly"] is not True:
         raise ValueError("DualFilterRequired")
@@ -188,7 +190,7 @@ def process(config_path, output, track=None, read_network=True, force=False, fre
     package_versions = {name: importlib.metadata.version(name) for name in ("numpy", "h5py", "fsspec", "aiohttp", "pyproj", "shapely")}
     run = {"site": cfg["site"], "config_sha256": hashlib.sha256(Path(config_path).read_bytes()).hexdigest(),
         "code_sha256": {name: hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest() for name in
-            ("run_pipeline.py", "science.py", "gcov_io.py", "read_cache.py", "probe_access.py", "bang1_adapter.py", "freeze_method.py", "package_handoff.py")},
+            ("run_pipeline.py", "science.py", "check_inputs.py", "gcov_io.py", "read_cache.py", "probe_access.py", "bang1_adapter.py", "freeze_method.py", "package_handoff.py")},
         "generated_utc": datetime.now(timezone.utc).isoformat(), "duration_s": round(time.monotonic() - started, 3),
         "libraries": package_versions, "stage_timings_s": stage_timings,
         "skipped": manifest["skipped"],
@@ -216,5 +218,5 @@ if __name__ == "__main__":
     try:
         process(args.config, args.output, args.track, not args.offline, args.force, args.freeze, args.bang_tests, args.bang_receipt)
     except Exception as error:
-        event("pipeline.failed", error_type=type(error).__name__, error_code=str(error) if type(error) is ValueError and str(error).isidentifier() else "SeeSafeStageEvents")
+        event("pipeline.failed", error_type=type(error).__name__, error_code=str(error) if type(error) is ValueError and (str(error).isidentifier() or str(error).startswith("PipelineInputsIncomplete:")) else "SeeSafeStageEvents")
         raise SystemExit(2)

@@ -9,6 +9,8 @@ Start with the [product README](../README.md): the problem, intended users, meth
 - [Comparison with OPERA DSWx-S1](s6-comparison.md): how to run the offline comparison and what it does and does not show.
 - [Web app instructions](../web/README.md): running, testing and building the web app.
 
+- [Pipeline replay](pipeline-replay.md): effective site configurations, local inputs, native 20 m area handling and automated checks.
+
 ## Feature notes (`plans/`)
 
 Design notes, checks and limits for each part of the web app:

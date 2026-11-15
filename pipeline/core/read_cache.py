@@ -42,7 +42,11 @@ def read_batch(config_path, output, track=None, force=False):
             try:
                 cache = read_acquisition(row, cfg, base, force=force)
                 record = {**metadata, **cache, "duration_s": round(time.monotonic() - started, 3)}
-                manifest["acquisitions"].append(record)
+                if cache["valid_pixel_fraction"] == 0:
+                    manifest["skipped"].append({**metadata, "reason": "other", "detail": "NoValidPixelsAfterGCOVMask"})
+                    event("gcov.empty", track=row["track"] + row["direction"], date=row["date_local"])
+                else:
+                    manifest["acquisitions"].append(record)
                 event("gcov.cache", track=row["track"] + row["direction"], date=row["date_local"], cache_hit=cache["cache_hit"], valid_pixel_fraction=round(cache["valid_pixel_fraction"], 5), duration_s=record["duration_s"])
                 break
             except Exception as error:

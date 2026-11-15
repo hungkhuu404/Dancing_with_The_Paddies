@@ -5,7 +5,44 @@ from datetime import datetime, timedelta, timezone
 import numpy as np
 
 
+def classification_grid(hh, hv, xs, ys):
+    """Represent aligned native 20 m pixels as four equal 10 m area samples.
+
+    Power and missing masks are copied, never interpolated. Reference windows
+    stay native. Existing 10 m coordinates and calculations remain unchanged.
+    """
+    hh, hv = np.asarray(hh, float), np.asarray(hv, float)
+    xs, ys = np.asarray(xs, float), np.asarray(ys, float)
+    if xs.ndim != 1 or ys.ndim != 1 or hh.shape != (len(ys), len(xs)) or hv.shape != hh.shape:
+        raise ValueError('incompatible raster or coordinate shapes')
+    steps = []
+    for axis in (xs, ys):
+        if not len(axis) or not np.isfinite(axis).all():
+            raise ValueError('empty or nonfinite pixel coordinates')
+        if len(axis) > 1:
+            step = float(axis[1] - axis[0])
+            if not np.allclose(np.diff(axis), step, atol=1e-6, rtol=0) or not any(
+                    np.isclose(abs(step), size, atol=1e-6, rtol=0) for size in (10, 20)):
+                raise ValueError('pixel centers must have regular 10 m or 20 m spacing')
+            steps.append(abs(step))
+    if steps and not np.allclose(steps, steps[0], atol=1e-6, rtol=0):
+        raise ValueError('mixed raster axis spacing')
+    if not steps or np.isclose(steps[0], 10, atol=1e-6, rtol=0):
+        return hh, hv, xs, ys
+    if min(len(xs), len(ys)) < 2:
+        raise ValueError('20 m raster requires two centers on each axis')
+    # A 10 m half-pixel grid makes area overlap exact at 250 m boundaries.
+    if any(not np.allclose(axis / 10, np.round(axis / 10), atol=1e-7, rtol=0) for axis in (xs, ys)):
+        raise ValueError('20 m pixel footprints must align to the 10 m area grid')
+    def split(axis):
+        offset = 5 * np.sign(axis[1] - axis[0])
+        return np.column_stack((axis - offset, axis + offset)).ravel()
+    return (np.repeat(np.repeat(hh, 2, axis=0), 2, axis=1),
+            np.repeat(np.repeat(hv, 2, axis=0), 2, axis=1), split(xs), split(ys))
+
+
 def pixel_fraction_states(hh, hv, xs, ys, cell_x, cell_y, cell_size_m, min_valid_fraction, hh_db_max, hv_db_max):
+    hh, hv, xs, ys = classification_grid(hh, hv, xs, ys)
     hh, hv = np.asarray(hh, float), np.asarray(hv, float)
     xs, ys = np.asarray(xs, float), np.asarray(ys, float)
     cx, cy = np.asarray(cell_x, float), np.asarray(cell_y, float)
@@ -53,6 +90,7 @@ def filter_dual(raw50, raw75):
 
 
 def aggregate_cells(hh, hv, xs, ys, cell_x, cell_y, cell_size_m, min_valid_fraction):
+    hh, hv, xs, ys = classification_grid(hh, hv, xs, ys)
     hh, hv = np.asarray(hh, dtype=float), np.asarray(hv, dtype=float)
     xs, ys = np.asarray(xs, dtype=float), np.asarray(ys, dtype=float)
     cx, cy = np.asarray(cell_x, dtype=float), np.asarray(cell_y, dtype=float)

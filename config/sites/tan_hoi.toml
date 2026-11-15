@@ -16,9 +16,9 @@ collections = ["NISAR_L2_GCOV_PROVISIONAL_V1", "NISAR_L2_GCOV_V1"]
 mode = "DHDH"
 required_polarizations = ["HH", "HV"]
 # Ngày địa phương, bao gồm cả hai đầu; khoảng ảnh đã kiểm ở spec mục 3.2.
-# Khi tra ảnh mới (QUAN-8), mở rộng end_date_local; không tự chốt ở 27/10.
+# Accepted H7 includes 30 October and 3 November; retain both on refresh.
 start_date_local = 2026-08-11
-end_date_local = 2026-10-27
+end_date_local = 2026-11-03
 keep_latest_crid_per_acquisition = true
 output_file = "../../runtime/tan_hoi/catalog.csv"
 

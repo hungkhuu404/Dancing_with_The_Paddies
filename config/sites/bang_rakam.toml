@@ -1,5 +1,5 @@
-# Khung thử quanh trạm Y.16; đầu vào còn thiếu xem docs/quan-6-code.md.
-# Đường dẫn tương đối tính từ thư mục chứa file TOML.
+# Accepted 12 km study frame. Replay inputs are described in
+# docs/pipeline-replay.md. Paths are relative to this file.
 site = "bang_rakam"
 # Quy ước date_local của spec mục 5.3, UTC+07:00.
 timezone = "Asia/Bangkok"
@@ -36,8 +36,8 @@ direction = "D"
 frame = "080"
 
 [boundary]
-# file: CHƯA XÁC ĐỊNH; Hưng chốt phạm vi/ranh, Quân chuẩn bị file.
-# epsg: CHƯA XÁC ĐỊNH cho file ranh.
+file = "../../data/bang_rakam/aoi.geojson"
+epsg = 4326
 cell_inclusion = "center_in_boundary"
 
 [read]
@@ -48,29 +48,32 @@ cache_dir = "../../cache/bang_rakam"
 network_retries = 2
 
 [thresholds]
-# Mặc định phương pháp theo spec Q3; chưa được kiểm P1–P3 cho Bang Rakam.
+# Published Q0 defaults; per-acquisition Q1 is recomputed from native references.
 hh_db = -14.0
 hv_db = -20.0
 min_valid_pixel_fraction = 0.70
 filter_single_anomaly = true
 
 [references.water]
-status = "pending"
-confirmation_owner = "Tân; Hưng xác nhận phân công cho Bang Rakam"
+status = "confirmed_for_run_by_Quan"
+epsg = 32647
+bbox_utm_m = [618500, 1846250, 619000, 1847250]
 min_pixels = 1000
-# geometry và epsg: CHƯA XÁC ĐỊNH.
+selection_basis = "WorldCover 2021 BANG-2 mean water share 0.9698375; Quân confirmed in current task. Native sample count required."
 
 [references.stable]
-status = "pending"
-confirmation_owner = "Tân; Hưng xác nhận phân công cho Bang Rakam"
-# geometry và epsg: CHƯA XÁC ĐỊNH; chọn trong vùng thử.
+status = "confirmed_for_run_by_Quan"
+epsg = 32647
+bbox_utm_m = [619000, 1852500, 619250, 1852750]
+selection_basis = "WorldCover 2021 BANG-2 builtup_share 0.9350; Quân confirmed in current task."
 
 [landcover]
-# file: CHƯA XÁC ĐỊNH; cần CSV theo cell_id cho lưới Bang Rakam.
+file = "../../runtime/bang_rakam/bang_rakam_landcover.csv"
 
 [dswx]
-# tiles: CHƯA XÁC ĐỊNH; Bằng đối chiếu sau khi Hưng chốt vùng thử.
+tiles = ["T47QPU"]
 
 [readiness]
 s0_inputs_complete = true
-later_stage_missing = ["boundary.file", "boundary.epsg", "references.water.geometry", "references.water.epsg", "references.stable.geometry", "references.stable.epsg", "dswx.tiles", "landcover.file"]
+later_stage_missing = []
+# Config values are resolved; local catalogue, landcover and raster caches are required.
