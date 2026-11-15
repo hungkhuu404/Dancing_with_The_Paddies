@@ -40,8 +40,8 @@ export async function createLocationAtlas({choose,back}){
     for(const l of locations){l.element?.classList.toggle('is-highlighted',l===location);cards.querySelector(`[data-location="${l.id}"]`)?.classList.toggle('is-highlighted',l===location);}
     const figure=root.querySelector('.atlas-radar'),img=figure.querySelector('img');
     const acq=location.meta?.acquisitions?.at(-1),hasRadar=!location.fixture&&!!acq?.backdrop;
-    figure.classList.toggle('has-radar',hasRadar);
-    if(hasRadar){const src=BASE+`data/${location.id}/${acq.backdrop}`;if(img.getAttribute('src')!==src)img.src=src;}
+    figure.classList.remove('has-radar');
+    if(hasRadar){const src=BASE+`data/${location.id}/${acq.backdrop}`;const ready=()=>{if(root.dataset.preview===location.id&&img.getAttribute('src')===src)figure.classList.add('has-radar');};img.onload=ready;if(img.getAttribute('src')!==src)img.src=src;else if(img.complete&&img.naturalWidth>1)ready();}
     figure.querySelector('.atlas-radar-title').textContent=hasRadar?`${location.name} from orbit`:`${location.name}: data pending`;
     figure.querySelector('.atlas-radar-detail').textContent=hasRadar?`HH radar / ${shortDate(acq.date_local)}`:'Explore an illustrative landscape';
   }

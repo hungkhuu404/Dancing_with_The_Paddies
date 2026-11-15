@@ -37,3 +37,14 @@ The exported interface remains defined by [CONTRACT-001](../data-contract.md). E
 - web/test/atlasLayout.test.mjs: projection, physical island retention, group labels and crop-edge/source invariants.
 
 [Design, sources and verification](../plans/observatory-landing.md).
+
+## Two-site real-data integration (WEB-DATA-009)
+
+- data/sites.json and web/scripts/public-data-files.json publish both existing candidate site bundles; fixtures are not generated for registered real sites.
+- web/src/data/releaseContext.js supplies release disclosure, study-frame limits and fixed radar reference/UV mapping without changing exported water states.
+- web/src/ui/releaseNotice.js and releaseNotice.css show compact candidate status across landscape/map/reference pages.
+- main.js, scene/shaderlib.js and world/signature.js map the real padded radar footprint into the selected scene and label its fixed date.
+- science/method.js follows selected-site limits and infrastructure provenance; science/calendar.js retains candidate context.
+- web/test/twoSiteData.test.mjs checks both real snapshots, local times, scene/raster footprint alignment and release semantics.
+
+[Integration design and acceptance limits](../plans/two-site-real-data.md).

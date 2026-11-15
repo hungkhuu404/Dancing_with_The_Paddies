@@ -20,7 +20,7 @@ const names = JSON.parse(readFileSync(join(WEB, 'scripts/public-data-files.json'
 if (!Array.isArray(names) || names.length === 0 || new Set(names).size !== names.length) throw new Error('Invalid public data allowlist');
 const digests = new Map();
 for (const name of names) {
-  if (typeof name !== 'string' || !/^(sites\.json|tan_hoi\/(?:[a-z_]+\.(?:json|geojson)|backdrop\/[0-9a-z_]+\.webp))$/.test(name)) throw new Error('Unsafe public data name');
+  if (typeof name !== 'string' || !/^(sites\.json|(?:tan_hoi|bang_rakam)\/(?:[a-z_]+\.(?:json|geojson)|backdrop\/[0-9a-z_]+\.webp))$/.test(name)) throw new Error('Unsafe public data name');
   const file = resolve(ROOT, 'data', name), repoPath = `data/${name}`;
   noLinks(file, ROOT);
   const entry = git('ls-tree', 'HEAD', '--', repoPath);
@@ -30,8 +30,12 @@ for (const name of names) {
   if (git('hash-object', `--path=${repoPath}`, file) !== committed) throw new Error(`Public input differs from HEAD: ${repoPath}`);
   digests.set(name, createHash('sha256').update(readFileSync(file)).digest('hex'));
 }
-const meta = JSON.parse(readFileSync(join(ROOT, 'data/tan_hoi/meta.json'), 'utf8'));
-if (!isPixelV2(meta)) throw new Error('Expected real CONTRACT-001 2.0.0 pixel input');
+const registry=JSON.parse(readFileSync(join(ROOT,'data/sites.json'),'utf8'));
+for(const site of registry.sites){
+ if(!['tan_hoi','bang_rakam'].includes(site.id)||!names.includes(site.id+'/meta.json'))throw Error('Unsupported or unlisted real site');
+ const meta=JSON.parse(readFileSync(join(ROOT,'data',site.id,'meta.json'),'utf8'));
+ if(meta.site!==site.id||!isPixelV2(meta))throw Error('Expected real CONTRACT-001 2.0.0 pixel input for '+site.id);
+}
 console.log(`Verified ${names.length} committed public inputs at ${git('rev-parse', 'HEAD')}; no synthetic data.`);
 
 function filesIn(dir, prefix = '') {

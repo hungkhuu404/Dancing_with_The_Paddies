@@ -1,6 +1,6 @@
 # Flood Calendar web
 
-The current two-site frontend is imported from Nasa_prep@cb6a2031615264b177c460fad19400b3c99557e8. See [migration review](../docs/plans/pixel-v2-two-sites.md) and [per-file provenance](../docs/provenance/pixel-v2-two-sites.md). The original source PR is [Nasa_prep #24](https://github.com/hungkhuu404/Nasa_prep/pull/24); this product migration records its reviewed head directly.
+The original two-site frontend was imported from Nasa_prep@cb6a2031615264b177c460fad19400b3c99557e8. See [migration review](../docs/plans/pixel-v2-two-sites.md) and [per-file provenance](../docs/provenance/pixel-v2-two-sites.md). The original source PR is [Nasa_prep #24](https://github.com/hungkhuu404/Nasa_prep/pull/24); this product migration records its reviewed head directly.
 
 ## Run locally
 
@@ -14,13 +14,13 @@ node scripts/verify-published-data.mjs
 node node_modules/vite/bin/vite.js preview --host 127.0.0.1
 ```
 
-The regional entrance opens a selected landscape. Map opens inside the same page; /map/ remains a standalone route. /calendar/ and /method/ accept published observations only. The calendar groups the 2,344 blocks by their nearest one of 24 hamlet points, not administrative hamlet boundaries. Captions and optional ElevenLabs narration accompany the Tân Hội tour; ambient audio is illustrative, not data sonification.
+The regional entrance opens a selected landscape. Map opens inside the same page; /map/ remains a standalone route. /calendar/ and /method/ accept published observations only. The calendar groups the 2,344 blocks by their nearest one of 24 hamlet points, not administrative hamlet boundaries. Captions and optional ElevenLabs narration accompany the Tân Hội tour; ambient audio is illustrative, while the separate data sound follows observed water area.
 
 ## Data and illustrations
 
-- The real source registry and its 30 allowlisted public files contain Tân Hội CONTRACT-001 2.0.0: 2,344 cells and 22 acquisitions from 11 August to 3 November 2026. The GCOV mask is applied to this post-hoc candidate, not the final H7 snapshot. The web reads these exports and does not execute S1-S7. It rejects v1 or incompatible metadata instead of supplying replacement observations.
-- Bang Rakam has a separately labelled illustrative landscape within the confirmed 12 x 12 km frontend frame, EPSG:32647. Its synthetic water/HH/HV and derived cards are visibly marked Data pending/Fixture record. They are generated only for the explicit illustration profile and are not committed into data/, accepted by science pages or passed off as published results. Real registry entries take precedence; publishing real Bang Rakam observations requires a reviewed allowlist and frame/contract alignment.
-- The backend Bang Rakam candidate uses a 48×48 study frame. Its observations are in the repository but are not yet registered or allowlisted for the web; the separate illustration is not a published observation.
+- The real source registry and its 48 allowlisted public files contain both real candidate sites. Tân Hội uses CONTRACT-001 2.0.0: 2,344 cells and 22 acquisitions from 11 August to 3 November 2026. The GCOV mask is applied to this post-hoc candidate, not the final H7 snapshot. The web reads these exports and does not execute S1-S7. It rejects v1 or incompatible metadata instead of supplying replacement observations.
+- Bang Rakam now reads the real QUAN-9 candidate: 2,304 cells, 11 acquisitions (14 August–31 October 2026), EPSG:32647, in the confirmed 12 × 12 km study frame. Its data-driven cards, map and calendar are no longer fixtures. Landscape objects remain illustrative.
+- Both sites show Candidate radar release. Bang Rakam Q1 review for 31 October remains pending; Tân Hội is not the final H7 catalogue. [Integration and limits](../docs/plans/two-site-real-data.md).
 - Sync validates required real inputs before rebuilding public/data/. CI verifies committed input bytes and reconstructs the explicit illustration to check both public/data/ and dist/data/ exactly. The retained verify-public-data.mjs command without --output checks real inputs only; use verify-published-data.mjs for two-site outputs.
 - Pixel classification requires 75% water pixels and 70% jointly valid coverage, with the 50% temporal guard. Diagnostic block-average HH/HV are not the classification decision. Selection against DSWx-S1 is post-hoc; it is not independent validation or field accuracy. No comparison scores are displayed. See [provenance](../docs/provenance/tan-hoi-quan8-mask.md).
 - Homes, people, vegetation, water elevation, weather effects and architecture are illustrative. Source-backed OSM locations, the old CC BY optical background and original procedural model notices remain in public/ manifests. Bang Rakam does not invent an operational barrage or a Y.16 marker.

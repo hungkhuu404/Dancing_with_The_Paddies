@@ -1,3 +1,5 @@
+import {releaseContext,radarReference,radarUv} from './data/releaseContext.js';
+import {mountReleaseNotice} from './ui/releaseNotice.js';
 import {createTourInvitation} from './ui/tourInvitation.js';
 import {frameBudget} from './fx/frameBudget.js';
 import {createSeasonSound} from './audio/seasonSound.js';
@@ -126,11 +128,14 @@ async function boot() {
   const infrastructure=await json(BASE+profile.scene.infrastructure).catch(e=>{console.warn('Infrastructure metadata unavailable',e);return null;});
 
   await document.fonts.ready;
-  const [contract, groundTex, radarTex, maskTex, parcelTex] = await Promise.all([
+  const [contract, groundTex, sceneRadarTex, maskTex, parcelTex] = await Promise.all([
     loadContract(profile), tex('ground') ? loadTexture(tex('ground')) : null, tex('radar') ? loadTexture(tex('radar'), false) : null, tex('mask') ? loadTexture(tex('mask'), false) : null,
     index.tiles.length > 1 ? loadTexture(profile.scene.base+'parcel-cells.png', false) : null,
   ]);
-  if(index.provenance){const content=$('#sources-dialog .dialog-content');content.replaceChildren();const title=document.createElement('h3');title.textContent=profile.name+' landscape sources';const details=document.createElement('p');details.textContent=index.provenance.illustration;const imagery=document.createElement('p');imagery.textContent=index.provenance.imagery;const osm=document.createElement('p');osm.textContent=index.provenance.osm;const observations=document.createElement('p');observations.textContent=contract?.meta.fixture?'Data pending. The water record is a fixture; no fixed radar reference image or reference comparison is supplied. Acquisition times come from the ASF DAAC NISAR catalogue.':'Water observations use the selected site export. Scene objects remain illustrative.';content.append(title,observations,details,imagery,osm);if(index.provenance.architecture){const credit=document.createElement('p');credit.textContent=index.provenance.architecture;content.append(credit);}const weather=document.createElement('p');weather.id='weather-source-note';content.append(weather);}
+  const reference=radarReference(profile,index,contract.meta);
+  const radarTex=sceneRadarTex||(reference?await loadTexture(reference.path,false):null);
+  mountReleaseNotice(contract.meta);
+  if(index.provenance){const content=$('#sources-dialog .dialog-content');content.replaceChildren();const title=document.createElement('h3');title.textContent=profile.name+' landscape sources';const details=document.createElement('p');details.textContent=index.provenance.illustration;const imagery=document.createElement('p');imagery.textContent=index.provenance.imagery;const osm=document.createElement('p');osm.textContent=index.provenance.osm;const observations=document.createElement('p');observations.textContent=contract?.meta.fixture?'Data pending. The water record is a fixture; no fixed radar reference image or reference comparison is supplied. Acquisition times come from the ASF DAAC NISAR catalogue.':'Water observations use the selected site export. Scene objects remain illustrative. '+(releaseContext(contract.meta)?.details||'');content.append(title,observations,details,imagery,osm);if(index.provenance.architecture){const credit=document.createElement('p');credit.textContent=index.provenance.architecture;content.append(credit);}const weather=document.createElement('p');weather.id='weather-source-note';content.append(weather);}
   if (parcelTex) { parcelTex.magFilter = parcelTex.minFilter = THREE.NearestFilter; parcelTex.generateMipmaps = false; }
   let passes = contract?.passes;
   if (!passes) passes = normalizeLayout(await json(base + index.tiles[0].layout)).passes;
@@ -141,6 +146,7 @@ async function boot() {
   $('#loading-stage').textContent='Preparing vegetation and field geometry';
   await loadImpostors(BASE,profile.identity?.impostors);
   U.uFrame.value.set(rect.x0, frame.n0 - origin.utm_n, frame.e1 - frame.e0, frame.n1 - frame.n0);
+  U.uRadarUv.value.set(...(!sceneRadarTex&&radarTex?radarUv(profile,contract.meta):[0,0,1,1]));
   U.uRadarTex.value = radarTex; U.uHasRadar.value = radarTex ? 1 : 0;
   const step = contract?.step || 250;
   const grid = contract ? cellGrid(contract.series, frame, step) : null;
@@ -299,7 +305,7 @@ async function boot() {
     else wctx.setPassAll(i, reduced);
     card.markPass(i);
   }, { start: () => {const before=curPass,cinematic=world.timelapse.start();if(curPass===before&&(cinematic||curPass<nPasses-1))dataSound.play(curPass);return cinematic;}, stop: () => {world.timelapse.stop();dataSound.stop();} });
-  $('#lens-label').textContent = radarTex?`NISAR HH · ${fmtDate(index.radar_date || profile.scene.reference_radar_date)}`:'Radar image unavailable';
+  $('#lens-label').textContent = radarTex?`NISAR HH · ${fmtDate(reference?.date)}`:'Radar image unavailable';
   const tod = createTimeOfDay($('#tod'), tod0, reduced);
   wctx.setPassAll(pass0, true);
   timeline.set(pass0);
@@ -705,7 +711,7 @@ async function boot() {
     get world() { const a = tiles.active?.world.stats || {}; return { ...a, ...world.stats, models: [...models.keys()], fps: Math.round(clock.fps), calls: renderer.info.render.calls, tris: renderer.info.render.triangles }; },
   };
   const tourTarget=new THREE.Vector3();
-  signature=await createSignature({profile,scene,camera,canvas,tiles,contract,grid,parcelTex,sky,clouds,world,reduced,frame,passes,wind:windDir,
+  signature=await createSignature({radarReferenceDate:radarTex?reference?.date:null,profile,scene,camera,canvas,tiles,contract,grid,parcelTex,sky,clouds,world,reduced,frame,passes,wind:windDir,
     pass:()=>curPass,tod:()=>tod.value,target:()=>controls.target,groundHit,
     saveView:wctx.saveView,restoreView:wctx.restoreView,
     openCalendarMap:query=>mapWorkspace.open(import.meta.env.BASE_URL+'map/?'+new URLSearchParams(query)),
