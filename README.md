@@ -4,7 +4,7 @@
 
 Team **Dancing with The Paddies** · Ho Chi Minh City University of Technology (HCMUT), Vietnam National University Ho Chi Minh City (VNU-HCM) · NASA Space Apps Challenge 2026 · Challenge: *Dancing with the SARs*
 
-**Team members:** Khưu Huỳnh Gia Hưng (team lead, contact and submission); Lê Nguyễn Minh Tân, Lê Viễn Bằng and Lý Anh Quân (backend: radar pipeline and data); Võ Anh Quốc and Lê Quang (frontend: web and video).
+**Team members:** Khưu Huỳnh Gia Hưng (team lead, contact and submission); Lê Nguyễn Minh Tân, Lê Viễn Bằng and Lý Anh Quân (backend: radar pipeline and data); Phạm Anh Quốc and Lê Quang (frontend: web and video).
 
 **Web app:** https://floodcalendar.pages.dev · **Demo video (30 s):** https://drive.google.com/file/d/1Rb9ujhvlkRmKDEZBBRMMePUZH5zd6cvU/view
 
