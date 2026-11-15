@@ -1,3 +1,6 @@
+import {frameBudget} from './fx/frameBudget.js';
+import {createSeasonSound} from './audio/seasonSound.js';
+import {createQuickGuide} from './ui/quickGuide.js';
 import {siteProfile,requestedSite,checkSiteIndex} from './data/siteRules.js';
 import * as THREE from 'three';
 import { MapControls } from 'three/examples/jsm/controls/MapControls.js';
@@ -281,19 +284,24 @@ async function boot() {
 
   // ---------------------------------------------------------------- UI
   const card = createCard($('#card'), passes, () => { setHi(selected, same(selected, hover) ? 128 : 0); outline(selLine, null); selected = null; },!!contract?.meta.fixture);
+  const waterSummary=await json(BASE+'data/'+profile.id+'/summary.json');
+  const dataSound=createSeasonSound({passes:waterSummary.passes,totalHa:waterSummary.totals.area_ha,fixture:!!contract.meta.fixture});
+  let soundReady=false;
   const timeline = createTimeline($('#timeline'), passes, fractions, (i, user) => {
     curPass = i;
+    if(soundReady&&!document.body.classList.contains('is-touring'))dataSound.play(i);
     clearTimeout(momentTimer);
     world.nisar.stop();
     if (momentOpts) world.nisar.play(i, momentOpts);
     else if (user && !reduced) momentTimer = setTimeout(() => world.nisar.play(i, {keepTime:true}), 280); // compare dates without changing scene lighting or the camera
     else wctx.setPassAll(i, reduced);
     card.markPass(i);
-  }, { start: () => world.timelapse.start(), stop: () => world.timelapse.stop() });
+  }, { start: () => world.timelapse.start(), stop: () => {world.timelapse.stop();dataSound.stop();} });
   $('#lens-label').textContent = radarTex?`NISAR HH · ${fmtDate(index.radar_date || profile.scene.reference_radar_date)}`:'Radar image unavailable';
   const tod = createTimeOfDay($('#tod'), tod0, reduced);
   wctx.setPassAll(pass0, true);
   timeline.set(pass0);
+  soundReady=true;dataSound.mount($('#timeline'));
   $('#data-src').textContent = (!contract ? 'Water states: scene layout (contract data not loaded).' : contract.meta.fixture ? 'Fixture data, not results.' : '') + (index.fixture ? ' Commune tiles: development stand-in.' : '');
 
   // world controls: weather, NISAR pass, boat ride, sound, whole commune
@@ -353,7 +361,7 @@ async function boot() {
     post.dofPass.enabled=quality.dof;post.dof.target=END.target;
     document.body.classList.remove('ready');title.classList.remove('is-out');title.classList.add('is-in');
   };
-  entryState.pauseSound=paused=>{if(paused){signature?.stopTour();timeline.stop();world.timelapse.stop();world.nisar.stop();world.ride.exit();held.clear();clearTimeout(momentTimer);fly.on=false;tilt.on=false;}world.sound.setPaused(paused);};
+  entryState.pauseSound=paused=>{if(paused){signature?.stopTour();timeline.stop();world.timelapse.stop();world.nisar.stop();world.ride.exit();held.clear();clearTimeout(momentTimer);fly.on=false;tilt.on=false;}world.sound.setPaused(paused);dataSound.setPaused(paused);};
 
   // ---------------------------------------------------------------- fly-to (double click, whole commune), interruptible
   const fly = { on: false, t: 0, dur: 1.2, from: new THREE.Vector3(), to: new THREE.Vector3(), r0: 0, r1: 0, p0: 0, p1: 0, az: 0 };
@@ -580,7 +588,8 @@ async function boot() {
     // shadows: every frame up close, every 2nd frame from further out (the shadow camera only moves on those frames,
     // so map and matrix always match)
     renderer.shadowMap.autoUpdate = false;
-    if (camDist < 250 || (frames & 1) === 0) { sky.fitShadow(view, camDist, quality.shadow); renderer.shadowMap.needsUpdate = true; }
+    const frameCost=frameBudget(quality.tier,camDist,camera.position.y,riding);
+    if (frames % frameCost.shadowEvery === 0) { sky.fitShadow(view, camDist, quality.shadow); renderer.shadowMap.needsUpdate = true; }
     // ambient occlusion only shows up close
     post.ao.enabled = quality.ao && camDist < 300; // (N8AO also walks the whole scene graph every frame)
     clouds.update(S, view);
@@ -598,13 +607,13 @@ async function boot() {
 
     // the mirror: off from high up (reflections are sub-pixel there; the water tints with the sky instead), every 2nd frame
     // unless close up
-    const mirrorOn = riding || camera.position.y < 700;
+    const mirrorOn = frameCost.mirror;
     water.userData.reflect = mirrorOn;
     wu.uMirror.value += ((mirrorOn ? 1 : 0) - wu.uMirror.value) * Math.min(1, dt * 4);
     // world matrices once per frame, not once per render call (mirror, shadows, main, AO each called it)
     signature?.renderState();
     scene.matrixWorldAutoUpdate = true; scene.updateMatrixWorld(); scene.matrixWorldAutoUpdate = false;
-    water.updateMirror(renderer, scene, camera, camDist < 250 || quality.tier === 'low' ? (quality.tier === 'low' ? 2 : 1) : 2);
+    water.updateMirror(renderer, scene, camera, frameCost.mirrorEvery);
     lens.render();
     post.render(dt);
     signature?.recorder.capture();
@@ -683,7 +692,7 @@ async function boot() {
     weather: (k, here = true) => { world.atmo.setWeather(k, { here }); return k; },
     rainbow: (on) => world.atmo.forceRainbow(on),
     box: (n) => world.box(n),
-    _w: world, _tiles: tiles, _r: renderer, _water: water, _post: post, _sky: sky,
+    dataSound, _w: world, _tiles: tiles, _r: renderer, _water: water, _post: post, _sky: sky,
     measure: (sec = 3) => new Promise((res) => { let n = 0; const t0 = performance.now(); const f = () => { n++; if (performance.now() - t0 < sec * 1000) requestAnimationFrame(f); else res(Math.round(n / ((performance.now() - t0) / 1000))); }; requestAnimationFrame(f); }),
     heavy: () => { const a = []; scene.traverseVisible((o) => { if (!o.isMesh) return; const g = o.geometry, t = (g.index ? g.index.count : g.attributes.position?.count || 0) / 3; a.push([o.name || o.parent?.name || o.type, Math.round(t * (o.isInstancedMesh ? o.count : 1)), o.isInstancedMesh ? o.count : 1, o.castShadow]); }); return a.sort((x, y) => y[1] - x[1]).slice(0, 15); },
     pass: (i, from) => world.nisar.play(i, { from: from ?? Math.max(0, i - 1) }),
@@ -699,22 +708,24 @@ async function boot() {
     openCalendarMap:query=>mapWorkspace.open(import.meta.env.BASE_URL+'map/?'+new URLSearchParams(query)),
     pose:p=>{tourTarget.set(p.x,0,p.z);pose({target:tourTarget,r:p.r,polar:p.polar,az:p.az});},
     selectAt:(x,z)=>{const field=tiles.pick(x,z);if(field)select(field);},
-    stopActivities:()=>{clearTimeout(momentTimer);world.ride.exit();world.timelapse.stop();world.nisar.stop();timeline.stop();fly.on=false;tilt.on=false;},
+    stopActivities:()=>{dataSound.stop();clearTimeout(momentTimer);world.ride.exit();world.timelapse.stop();world.nisar.stop();timeline.stop();fly.on=false;tilt.on=false;},
   });
   window.__debug.signature=signature;
   createChrome({canvas,signature});
+  const helpControl=document.querySelector('[data-dialog=help-dialog]');document.body.append(helpControl);helpControl.classList.add('quick-guide-toggle','landscape-guide-toggle');
+  const guide=createQuickGuide({trigger:helpControl,fixture:!!contract.meta.fixture});
   mapWorkspace=createMapWorkspace({
     current:()=>({pass:curPass,site:contract?.meta.site?.id||contract?.meta.site||profile.id,cell:selected?.props?.cell_id||selected?.t?.layout.parcels[selected.i]?.cell?.cell_id}),
-    beforeOpen:()=>{signature.stopTour();timeline.stop();world.timelapse.stop();world.nisar.stop();world.ride.exit();held.clear();clearTimeout(momentTimer);fly.on=false;tilt.on=false;world.sound.setPaused(true);},
+    beforeOpen:()=>{signature.stopTour();timeline.stop();world.timelapse.stop();world.nisar.stop();world.ride.exit();held.clear();clearTimeout(momentTimer);fly.on=false;tilt.on=false;world.sound.setPaused(true);dataSound.setPaused(true);guide.close();},
     onReturn:({cell,query})=>{
-      last=performance.now();world.sound.setPaused(false);
+      last=performance.now();world.sound.setPaused(false);dataSound.setPaused(false);
       const q=new URLSearchParams(query);if(q.get('scope')==='image'){const i=Number(q.get('pass'));if(Number.isInteger(i)&&i>=0&&i<nPasses)timeline.set(i);}
       if(cell){const p=sceneCellCentre(cell,origin);if(p&&cellAt(p.x,p.z)){select(cellAt(p.x,p.z));flyTo(p,700,THREE.MathUtils.degToRad(28));}}
     },
   });
   referenceWorkspace=createReferenceWorkspace({site:profile.id,
-    onOpen:()=>{signature.stopTour();timeline.stop();world.timelapse.stop();world.nisar.stop();world.ride.exit();held.clear();clearTimeout(momentTimer);fly.on=false;tilt.on=false;world.sound.setPaused(true);},
-    onClose:()=>{last=performance.now();world.sound.setPaused(!!mapWorkspace?.active);},
+    onOpen:()=>{signature.stopTour();timeline.stop();world.timelapse.stop();world.nisar.stop();world.ride.exit();held.clear();clearTimeout(momentTimer);fly.on=false;tilt.on=false;world.sound.setPaused(true);dataSound.setPaused(true);guide.close();},
+    onClose:()=>{last=performance.now();world.sound.setPaused(!!mapWorkspace?.active);dataSound.setPaused(!!mapWorkspace?.active);},
     openMap:url=>mapWorkspace.open(url),
   });
   $('#loading-stage').textContent='Warming shaders and models';
@@ -762,7 +773,7 @@ async function boot() {
   sky.fitShadow(controls.target,camera.position.distanceTo(controls.target),quality.shadow);
   console.info('final lit/shadow shaders ready in',Math.round(performance.now()-compileStarted),'ms');
   last=performance.now();
-  $('#loading').hidden=true;
+  $('#loading').hidden=true;guide.showOnce();
   entryState.ready=true;entryState.onReady?.();
   requestAnimationFrame(tick);
   mapWorkspace.openDeepLink();

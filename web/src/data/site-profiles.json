@@ -130,6 +130,13 @@
           "worldDist": 450,
           "crownDist": 700,
           "mirrorDist": 250
+        },
+        "low": {
+          "max": 2,
+          "radius": 1400,
+          "worldDist": 350,
+          "crownDist": 450,
+          "mirrorDist": 180
         }
       }
     },

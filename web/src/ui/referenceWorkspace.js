@@ -11,7 +11,7 @@ export function createReferenceWorkspace({site=defaultSite,onOpen,onClose,openMa
     const q=new URLSearchParams({site:siteId,embed:'1'});const target=import.meta.env.BASE_URL+path+'?'+q;if(frame.hasAttribute('src'))frame.contentWindow.location.replace(target);else frame.src=target;enterDialog(dialog);closeButton.focus();
   }
   function close(fromHistory=false,after=null){
-    if(!active)return;active=false;leaveDialog(dialog);onClose();(origin?.isConnected?origin:document.querySelector('#gl'))?.focus({preventScroll:true});
+    if(!active)return;frame.contentWindow?.postMessage({channel:'flood-reference',type:'active',active:false},location.origin);active=false;leaveDialog(dialog);onClose();(origin?.isConnected?origin:document.querySelector('#gl'))?.focus({preventScroll:true});
     if(owned&&!fromHistory){owned=false;if(after)addEventListener('popstate',after,{once:true});history.back();}else{owned=false;after?.();}
   }
   dialog.addEventListener('close',()=>{if(!active)(origin?.isConnected?origin:document.querySelector('#gl'))?.focus({preventScroll:true});});

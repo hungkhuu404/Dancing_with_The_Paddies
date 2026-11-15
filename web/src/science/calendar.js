@@ -1,3 +1,4 @@
+import {createSeasonSound} from '../audio/seasonSound.js';
 import {referenceData} from './referenceData.js';
 import {pageReady,pageError,openCalendarMap} from './referencePage.js';
 import {waterCalendar,calendarColor,calendarMapQuery} from './calendarModel.js';
@@ -5,10 +6,18 @@ import {fmtDate} from '../map/contract.js';
 const pct=v=>Math.round(v*100)+'%';
 let exportData=null;
 async function start(){
-  const {site,data}=await referenceData(['meta.json','cells.geojson','series.json','places.geojson']);
+  const {site,data}=await referenceData(['meta.json','cells.geojson','series.json','places.geojson','summary.json']);
   const acq=data['meta.json'].acquisitions,rows=waterCalendar(data['cells.geojson'],data['series.json'],acq,data['places.geojson']);
   pageReady(site);document.querySelector('#calendar-title').textContent=site.name;
   document.querySelector('#calendar-summary').textContent=`${rows.length} hamlet groups, ${acq.length} observations. ${fmtDate(acq[0].date_local)} to ${fmtDate(acq.at(-1).date_local)}. Ordered by first water observation.`;
+  if(!new URLSearchParams(location.search).has('preview')){
+   const summary=data['summary.json'],sound=createSeasonSound({passes:summary.passes,totalHa:summary.totals.area_ha}),bar=document.createElement('section');bar.className='calendar-audio';bar.setAttribute('aria-label','Season playback');
+   const play=document.createElement('button'),readout=document.createElement('output');play.type='button';play.textContent='Play the season';play.setAttribute('aria-pressed','false');readout.textContent='Sound follows observed water area';bar.append(play,readout);sound.mount(bar);const key=document.createElement('small');key.className='calendar-sound-key';key.textContent='More tones mean more observed water.';bar.append(key);document.querySelector('#calendar-summary').after(bar);let timer=0,index=0;
+   const stop=()=>{clearInterval(timer);timer=0;sound.stop();play.textContent='Play the season';play.setAttribute('aria-pressed','false');};
+   const step=()=>{readout.textContent=fmtDate(acq[index].date_local);sound.play(index);document.querySelectorAll('.calendar-cell').forEach(b=>b.classList.toggle('is-listening',+b.dataset.pass===index));index++;};
+   play.onclick=()=>{if(timer){stop();return;}index=0;play.textContent='Pause';play.setAttribute('aria-pressed','true');step();timer=setInterval(()=>{if(index===acq.length)stop();else step();},1500);};
+   document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});addEventListener('pagehide',stop);addEventListener('message',e=>{if(e.origin===location.origin&&e.source===parent&&e.data?.channel==='flood-reference'&&e.data.type==='active'&&!e.data.active)stop();});
+  }
   const table=document.querySelector('#calendar-table'),thead=table.createTHead(),head=thead.insertRow();
   const th=(row,text,scope)=>{const el=document.createElement('th');el.scope=scope;el.textContent=text;row.append(el);return el;};
   th(head,'Nearest hamlet','col');

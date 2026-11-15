@@ -1,0 +1,20 @@
+import {seasonCue,cueNotes} from './seasonModel.js';
+import {icon} from '../ui/icons.js';
+import './sound.css';
+const KEY='flood-calendar-season-sound';
+export function readSoundPreference(storage){try{return storage.getItem(KEY)!=='off';}catch{return true;}}
+export function createSeasonSound({passes,totalHa,fixture=false,contextFactory=()=>new (window.AudioContext||window.webkitAudioContext)()}={}){
+ let storage;try{storage=localStorage;}catch{}
+ let on=readSoundPreference(storage),context=null,master=null,paused=false,last=-Infinity,disabled=false;const nodes=new Set(),buttons=new Set();
+ function stop(){if(!context)return;const t=context.currentTime;for(const n of nodes){try{n.gain.gain.cancelScheduledValues(t);n.gain.gain.setTargetAtTime(0,t,.012);n.osc.stop(t+.06);}catch{}}nodes.clear();}
+ function refresh(){for(const b of buttons){b.disabled=fixture||disabled;b.setAttribute('aria-pressed',String(on&&!fixture&&!disabled));b.setAttribute('aria-label',disabled?'Data sound unavailable':fixture?'Data sound unavailable for illustrative observations':on?'Mute data sound':'Enable data sound');b.title=b.getAttribute('aria-label');b.dataset.enabled=String(on&&!fixture&&!disabled);b.innerHTML=icon('sound')+'<span class="sound-slash" aria-hidden="true"></span>';}}
+ function fail(){disabled=true;stop();refresh();}
+ function init(){if(context)return true;try{context=contextFactory();master=context.createGain();master.gain.value=.12;master.connect(context.destination);return true;}catch{fail();return false;}}
+ function sync(){if(storage)on=readSoundPreference(storage);if(!on)stop();refresh();}
+ const onStorage=e=>{if(e.key===KEY)sync();};addEventListener('storage',onStorage);addEventListener('season-sound-preference',sync);
+ const visibility=()=>{if(document.hidden){stop();context?.suspend().catch(()=>{});}};document.addEventListener('visibilitychange',visibility);
+ function play(i){if(!on||paused||fixture||disabled||document.hidden)return false;const cue=seasonCue(passes?.[i],totalHa);if(!cue)return false;if(performance.now()-last<90)return false;last=performance.now();if(!init())return false;stop();
+ try{context.resume().catch(fail);const t=context.currentTime+.025;for(const note of cueNotes(cue)){const osc=context.createOscillator(),gain=context.createGain(),a=t+note.offset;osc.type='triangle';osc.frequency.value=note.frequency;gain.gain.setValueAtTime(0,a);gain.gain.linearRampToValueAtTime(note.gain,a+.018);gain.gain.exponentialRampToValueAtTime(.0001,a+note.length);osc.connect(gain).connect(master);const n={osc,gain};nodes.add(n);osc.onended=()=>{nodes.delete(n);osc.disconnect();gain.disconnect();};osc.start(a);osc.stop(a+note.length+.02);}return true;}catch{fail();return false;}}
+ function mount(root){const b=document.createElement('button');b.type='button';b.className='season-sound';const id='sound-note-'+document.querySelectorAll('.season-sound').length,note=document.createElement('span');note.id=id;note.className='sound-description';note.textContent='More tones mean more observed water. High and low accents mark newly wet and newly dry blocks. Two low ticks mean no image; one means less than half observed.';b.setAttribute('aria-describedby',id);root.append(b,note);buttons.add(b);b.onclick=()=>{on=!on;try{storage?.setItem(KEY,on?'on':'off');}catch{}refresh();if(on&&init())context.resume().catch(fail);else stop();dispatchEvent(new Event('season-sound-preference'));};refresh();return b;}
+ return {mount,play,stop,setPaused(value){paused=!!value;if(paused)stop();},get state(){return {enabled:on&&!fixture&&!disabled,available:!disabled&&!fixture,context:context?.state||'idle',voices:nodes.size};},dispose(){stop();context?.close().catch(()=>{});removeEventListener('storage',onStorage);removeEventListener('season-sound-preference',sync);document.removeEventListener('visibilitychange',visibility);}};
+}
