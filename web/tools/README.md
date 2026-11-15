@@ -154,3 +154,7 @@ node web/tools/compress-identity.mjs <raw-directory> <review-compressed-director
 ```
 
 The Blender tool uses only built-in geometry and vertex colours; it exports 13 model presets and a Cycles contact sheet. `--only <model...>` rebuilds a subset; `--skip-contact` omits the contact sheet. Raw output stays outside public/. Inspect the Cycles images and budget report before copying only compressed GLBs to public/models/ and the two PNG atlases plus index to public/impostors/thai/. The compressor refuses in-place raw replacement and checks the 400 KB cap and meshopt extension. Install the pinned CLI in an isolated local tool directory; it is not an application dependency. Regenerate thai-manifest.json hashes after a reviewed model change. Source/cultural limits and measurements: [identity review](https://github.com/hungkhuu404/Nasa_prep/blob/cb6a2031615264b177c460fad19400b3c99557e8/docs/plans/bang_rakam_identity_review.md).
+
+## Regional observatory overview (WEB-ATLAS-008)
+
+`node web/tools/build-atlas.mjs --cache .cache/atlas-source --python <python-with-shapely>` downloads pinned public-domain Natural Earth physical layers and invokes build-atlas.py (Shapely 2.2.0). Use `--out <review-directory>` to generate a review copy. This is optional offline asset generation, not part of npm build or the frontend runtime. No national or maritime boundary layer is generated. Source hashes and label semantics are in public/atlas/manifest.json; [design and verification](../../docs/plans/observatory-landing.md).

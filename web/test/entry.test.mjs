@@ -31,6 +31,6 @@ test('atlas geography is bounded and small, and is not a fabricated flood layer'
   const data=JSON.parse(await readFile(new URL('../public/atlas/region.json',import.meta.url)));
   const manifest=JSON.parse(await readFile(new URL('../public/atlas/manifest.json',import.meta.url)));
   assert.ok(data.land.length>0&&data.rivers.length>0);assert.equal(manifest.license,'Public domain');
-  for(const p of [...data.land.flat(2),...data.rivers.flat()]){assert.ok(p[0]>=95&&p[0]<=112);assert.ok(p[1]>=5&&p[1]<=24);}
-  assert.ok(JSON.stringify(data).length<100000);
+  for(const p of [...data.land.flat(2),...data.rivers.flat()]){assert.ok(p[0]>=91&&p[0]<=123);assert.ok(p[1]>=2&&p[1]<=27);}
+  assert.ok(JSON.stringify(data).length<750000);
 });
