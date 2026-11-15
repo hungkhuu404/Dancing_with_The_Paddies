@@ -1,0 +1,48 @@
+{
+  "site": "bang_rakam",
+  "sources": [
+    {
+      "role": "Rivers, water polygons, roads, places and infrastructure positions",
+      "attribution": "OpenStreetMap contributors",
+      "license": "ODbL-1.0",
+      "url": "https://www.openstreetmap.org/copyright",
+      "snapshot_sha256": "9914a4cc3359674c06c7fe6624b3a5486ee6c20cd872b2fa8ac2e0a74516a57e",
+      "osm_base": "2026-11-14T13:30:21Z",
+      "query": "[out:json][timeout:120][maxsize:134217728];(nwr[\"waterway\"](16.6842,100.03869,16.8319,100.19199);nwr[\"water\"](16.6842,100.03869,16.8319,100.19199);nwr[\"highway\"](16.6842,100.03869,16.8319,100.19199);nwr[\"bridge\"](16.6842,100.03869,16.8319,100.19199);nwr[\"building\"](16.6842,100.03869,16.8319,100.19199);nwr[\"place\"](16.6842,100.03869,16.8319,100.19199);nwr[\"amenity\"~\"place_of_worship|school|marketplace|college\"](16.6842,100.03869,16.8319,100.19199);nwr[\"man_made\"~\"pumping_station|monitoring_station|water_works|water_tower|dam|weir\"](16.6842,100.03869,16.8319,100.19199);nwr[\"monitoring:water_level\"](16.6842,100.03869,16.8319,100.19199);nwr[\"landuse\"~\"reservoir|farmland|forest\"](16.6842,100.03869,16.8319,100.19199);nwr[\"natural\"~\"water|wetland|wood\"](16.6842,100.03869,16.8319,100.19199););out geom;"
+    },
+    {
+      "role": "Historical optical background, not imagery for the selected 2026 date",
+      "attribution": "EOxCloudless 2016 by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2016)",
+      "license": "CC-BY-4.0",
+      "url": "https://tiles.maps.eox.at/wms?service=WMS&version=1.1.1&request=GetMap&layers=s2cloudless_3857&styles=&srs=EPSG%3A3857&bbox=11136256.030426148%2C1884094.8180838083%2C11153321.308364756%2C1901265.9556983265&width=2048&height=2048&format=image%2Fpng",
+      "source_sha256": "c833cc88a440008f5053b7bc552402a8d4dbe3363b690c6d9d260026ddaa5dee"
+    }
+  ],
+  "illustrative": [
+    "Parcel shapes and supplemental houses",
+    "Vegetation, architecture and adult activities",
+    "Fixture water states, HH/HV values, cropland flags and derived areas",
+    "Original Thai architectural presets and adult fishing animation; model shapes and activity are not surveyed"
+  ],
+  "not_supplied": [
+    "Real Bang Rakam water classification",
+    "Verified Y.16 location",
+    "Verified RID barrage or sluices"
+  ],
+  "models": "../../models/thai-manifest.json",
+  "tools": [
+    "web/tools/prepare-osm.mjs",
+    "web/tools/commune/run_all.py",
+    "web/tools/build-infrastructure.mjs",
+    "web/tools/build-site-context.mjs",
+    "web/tools/build-parcel-atlas.mjs"
+  ],
+  "frame": {
+    "epsg": 32647,
+    "e0": 613250,
+    "e1": 625250,
+    "n0": 1846250,
+    "n1": 1858250
+  },
+  "frame_note": "12 km study frame confirmed by the user; derived from the cached wider OSM and optical sources, not an administrative boundary."
+}

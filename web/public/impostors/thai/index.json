@@ -1,0 +1,20 @@
+{
+  "thai_borassus": {
+    "span": 11.817716159820556,
+    "center": 5.007506847381592,
+    "azimuths": 8,
+    "elevations": [
+      20,
+      65
+    ]
+  },
+  "thai_tamarind": {
+    "span": 9.70108772754669,
+    "center": 3.217179536819458,
+    "azimuths": 8,
+    "elevations": [
+      20,
+      65
+    ]
+  }
+}

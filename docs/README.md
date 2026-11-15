@@ -15,7 +15,7 @@
 | --- | --- |
 | `pipeline/{catalog,core,export,validate}/` | S0, S1–S5 pixel processing, offline Tân Hội S6 comparison and S7 export |
 | `config/sites/`, `schema/`, `tests/` | Site configuration and JSON Schema are present; frontend tests are in web/test/ |
-| `data/` | Tân Hội v2 pixel export with 22 acquisitions and post-hoc S6 comparison; no Bang Rakam or H7 export |
+| `data/` | Tân Hội v2 pixel export with 22 acquisitions and Bang Rakam 48×48 candidate; post-hoc S6 comparisons, no final H7 export |
 | `docs/data-contract.md` | Contract 2.0.0 for the pixel export |
 | `docs/plans/`, `docs/provenance/` | Bổ sung trong đợt 1 |
 | `web/` | Vite, Three.js và MapLibre; 3D và map tích hợp cùng tab, có route `/map/` độc lập; test trong `web/test/` |
@@ -33,3 +33,13 @@ Các tài liệu đợt migration là snapshot lịch sử. Web cài từ lockfi
 ## Guided-tour audio migration
 
 [MIG-TOUR-AUDIO-004](plans/tour-audio.md) records the narrated tour, audible scene score, compact captions and independent Calendar/Method entries. [Pinned source and file hashes](provenance/tour-audio.md) cover the selected import from Nasa_prep main. No source hosting workflow or data files are migrated.
+
+## Current two-site frontend
+
+[MIG-WEB-TWO-SITES-005](plans/pixel-v2-two-sites.md) records the frontend migration, its historical 20-image export, explicit Bang Rakam illustration, verification and scientific limits. [Pinned source and file hashes](provenance/pixel-v2-two-sites.md) distinguish source imports from product adaptations. The later 22-image candidate is documented in [its provenance](provenance/tan-hoi-quan8-mask.md); real Bang Rakam data are not yet integrated into the web.
+
+## Playback and first-visit assistance
+
+[WEB-EXPERIENCE-006](plans/season-sound-guidance.md) documents procedural data sound, compact guidance and measured low-tier rendering changes. The [product module map](agent-instructions/Codebase_map.md) identifies the shared audio, assistance and rendering-budget modules.
+
+[Focused tour refinement](plans/tour-refinement.md) records compact playback, stronger data audio and the session-scoped arrival invitation with reversible tour focus.

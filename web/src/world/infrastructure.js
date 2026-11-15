@@ -1,3 +1,4 @@
+import {siteProfile} from '../data/siteRules.js';
 // Source-backed infrastructure plus explicitly illustrative buildings, traffic and irrigation.
 import * as THREE from 'three';
 import {mergeGeometries} from 'three/examples/jsm/utils/BufferGeometryUtils.js';
@@ -22,21 +23,22 @@ function sign(parent,text,x,y,z,rot,width=8,posts=false){
   return mesh;
 }
 export function createInfrastructure(ctx,source){
+  const profile=ctx.profile||siteProfile(),classify=tags=>roadClass(tags,profile.roads);
   const low=ctx.quality.tier==='low',group=new THREE.Group();group.name='infrastructure';
-  const [cx,cz]=ctx.centre,data=tileInfrastructure(ctx.layout,ctx.props,source,cx,cz,low),mat=material(),dummy=new THREE.Object3D();
+  const [cx,cz]=ctx.centre,data=tileInfrastructure(ctx.layout,ctx.props,source,cx,cz,low,profile),mat=material(),dummy=new THREE.Object3D();
   const add=(kind,items,v=0)=>items.length?pool(group,kind,geometry(kind,v),items,mat):null;
-  const bridgeItems=data.bridges.map(p=>({...p,y:-.34,sx:Math.max(10,p.len)/14,sz:Math.min(2,(roadClass(p.tags).width||4)/5)}));
+  const bridgeItems=data.bridges.map(p=>({...p,y:-.34,sx:Math.max(10,p.len)/14,sz:Math.min(2,(classify(p.tags).width||4)/5)}));
   const bridgeMesh=add('bridge',bridgeItems);
-  for(const p of bridgeItems)sign(group,p.name,p.x+Math.sin(p.rot)*3.3,3.2,p.z+Math.cos(p.rot)*3.3,p.rot,Math.min(6.5,Math.max(4.5,p.name.length*.18)),true);
-  const markings=[];for(const r of ctx.layout.roads)if(roadClass(r).surface==='asphalt')for(const p of spacedAlong(r.points,12,0,100))if(ownedByTile(p.x,p.z,cx,cz))markings.push({...p,y:1.08,sx:.12,sz:4});
+  for(const p of bridgeItems)if(p.name)sign(group,p.name,p.x+Math.sin(p.rot)*3.3,3.2,p.z+Math.cos(p.rot)*3.3,p.rot,Math.min(6.5,Math.max(4.5,p.name.length*.18)),true);
+  const markings=[];for(const r of ctx.layout.roads)if(classify(r).surface==='asphalt')for(const p of spacedAlong(r.points,12,0,100))if(ownedByTile(p.x,p.z,cx,cz))markings.push({...p,y:1.08,sx:.12,sz:4});
   if(markings.length)pool(group,'road_markings',new THREE.PlaneGeometry(1,1).rotateX(-Math.PI/2),markings,new THREE.MeshStandardMaterial({color:0xeef0ec,roughness:1}));
-  const arches=[];for(const p of source.places||[]){if(!ownedByTile(p.x,p.z,cx,cz))continue;let best=null;for(const r of ctx.layout.roads){if(roadClass(r).surface==='earth')continue;const q=nearestOnLine(p.x,p.z,r.points);if(q.d<250&&(!best||q.d<best.d))best=q;}if(best){arches.push({x:best.x,z:best.z,rot:best.rot,y:1.06});sign(group,'Ấp văn hóa '+p.name,best.x,6.2,best.z,best.rot,8);}}
+  const arches=[];for(const p of profile.architecture.arch_prefix?source.places||[]:[]){if(!ownedByTile(p.x,p.z,cx,cz))continue;let best=null;for(const r of ctx.layout.roads){if(classify(r).surface==='earth')continue;const q=nearestOnLine(p.x,p.z,r.points);if(q.d<250&&(!best||q.d<best.d))best=q;}if(best){arches.push({x:best.x,z:best.z,rot:best.rot,y:1.06});sign(group,profile.architecture.arch_prefix+p.name,best.x,6.2,best.z,best.rot,8);}}
   add('arch',arches);
   const buildingMeshes=[];
   for(const kind of ['church','school','civic','clinic','community','market','worship','silo','mill','pump','bts','transformer']){
     const items=data.buildings.filter(p=>p.kind===kind).map(p=>({...p,y:ctx.groundAt(p.x,p.z)+.02}));
     if(!items.length)continue;
-    for(let v=0;v<3;v++){const batch=items.filter(p=>infrastructureVariant(p.osm_id)===v),shape=kind==='church'?'church':kind==='school'?'school':['silo','mill','pump','bts'].includes(kind)?kind:'civic';const mesh=add(shape,batch,v);if(mesh)buildingMeshes.push(mesh);}
+    for(let v=0;v<3;v++){const batch=items.filter(p=>infrastructureVariant(p.osm_id)===v),shape=kind==='church'?'church':kind==='school'?'school':['silo','mill','pump','bts'].includes(kind)?kind:'civic';const mesh=kind==='worship'&&profile.identity?null:add(shape,batch,v);if(mesh)buildingMeshes.push(mesh);}
     for(const p of items)if(p.name){const front=kind==='church'?[21,23,20][infrastructureVariant(p.osm_id)]/2+1.4:6.5;sign(group,p.name,p.x+Math.sin(p.rot)*front,p.y+(kind==='church'?6:3),p.z+Math.cos(p.rot)*front,p.rot,8);}
   }
   for(let v=0;v<3;v++)for(const kind of ['shophouse','modern_house'])add(kind,data.houses.filter(p=>p.kind===kind&&p.variant===v).map(p=>({...p,y:ctx.terrainAt(p.x,p.z)+.05})),v);
@@ -49,7 +51,7 @@ export function createInfrastructure(ctx,source){
   const glowMat=new THREE.MeshBasicMaterial({color:0xffdfad,transparent:true,opacity:0});
   const windows=[];
   for(const h of data.houses){const a=h.rot||0,s=h.sx||1,front=h.kind==='shophouse'?4.81:3.48;windows.push({x:h.x+Math.sin(a)*front*s,z:h.z+Math.cos(a)*front*s,y:ctx.terrainAt(h.x,h.z)+1.8*s,rot:a,sx:1.2*s,sy:1.1*s});}
-  for(const p of data.buildings){const a=p.rot||0,base=ctx.groundAt(p.x,p.z)+.02;if(p.kind==='church'){const front=[21,23,20][infrastructureVariant(p.osm_id)]/2+.24;for(const side of [-1,1])windows.push({x:p.x+Math.sin(a)*front+Math.cos(a)*3.4*side,z:p.z+Math.cos(a)*front-Math.sin(a)*3.4*side,y:base+4.7,rot:a,sx:1.2,sy:.8});}else windows.push({x:p.x+Math.sin(a)*5.7,z:p.z+Math.cos(a)*5.7,y:base+2,rot:a,sx:2,sy:1.3});}
+  for(const p of data.buildings){const a=p.rot||0,base=ctx.groundAt(p.x,p.z)+.02;if(p.kind==='church'){const front=[21,23,20][infrastructureVariant(p.osm_id)]/2+.24;for(const side of [-1,1])windows.push({x:p.x+Math.sin(a)*front+Math.cos(a)*3.4*side,z:p.z+Math.cos(a)*front-Math.sin(a)*3.4*side,y:base+4.7,rot:a,sx:1.2,sy:.8});}else windows.push({x:p.x+Math.sin(a)*(profile.identity&&p.kind==='worship'?6.12:5.7),z:p.z+Math.cos(a)*(profile.identity&&p.kind==='worship'?6.12:5.7),y:base+(profile.identity&&p.kind==='worship'?2.9:2),rot:a,sx:2,sy:1.3});}
   for(const p of ctx.props.moored_boats.slice(0,low?2:5))lights.push({x:p.x,z:p.z,y:.8,sx:.65,sy:.65,sz:.65});
   const windowMesh=pool(group,'night_windows',new THREE.PlaneGeometry(1,1),windows,glowMat);
   const bulbs=pool(group,'solar_bulbs',new THREE.SphereGeometry(.24,5,3),lights,glowMat);
@@ -73,7 +75,7 @@ export function createInfrastructure(ctx,source){
   const extras=data.houses.filter((p,i)=>i%7===0).map(p=>({x:p.x+2,z:p.z,y:ctx.terrainAt(p.x,p.z)+5,sx:.5,sy:.3,sz:.5}));
   if(extras.length)pool(group,'water_tanks',new THREE.CylinderGeometry(.65,.65,1.4,8),extras,new THREE.MeshStandardMaterial({color:0xa5aaa7,metalness:.8,roughness:.3}));
   const actors=[];
-  const roads=ctx.layout.roads.filter(r=>roadClass(r).surface==='asphalt');
+  const roads=ctx.layout.roads.filter(r=>classify(r).surface==='asphalt');
   for(const r of roads.slice(0,low?2:5)){const points=r.points,L=points.reduce((s,p,i)=>i?s+Math.hypot(p[0]-points[i-1][0],p[1]-points[i-1][1]):s,0);if(L<25)continue;for(let i=0;i<(low?1:4);i++)actors.push({points,L,d:L*(i+.3)/4,speed:i===3?4:7+i*2,kind:['car','truck','bus','tricycle'][i%4]});}
   const traffic=new Map();for(const kind of ['car','truck','bus','tricycle']){const list=actors.filter(a=>a.kind===kind);if(list.length)traffic.set(kind,{list,mesh:pool(group,kind,geometry(kind),list.map(()=>({x:cx,y:1.08,z:cz})),mat,true)});}
   let lastPass=-1;
@@ -100,9 +102,10 @@ export function updateCargoLoad(straw,cargo,dummy,visible=true){straw.count=0;if
 export function textSignGeometry(width,height){const front=new THREE.PlaneGeometry(width,height),back=front.clone().rotateY(Math.PI),geo=mergeGeometries([front,back]);front.dispose();back.dispose();return geo;}
 
 /** Arterial lamps remain visible when detail tiles unload, with no point lights. */
-export function createArterialLights(source){
+export function createArterialLights(source,profile=siteProfile()){
+  const classify=tags=>roadClass(tags,profile.roads),f=profile.frame,o=profile.origin;
   const group=new THREE.Group();group.name='arterial_lights';const pts=[];
-  for(const road of source?.roads||[])if(roadClass(road.tags).arterial)for(const p of spacedAlong(road.points,40,4.2,250))if(p.x>-8875&&p.x<8875&&p.z>-8125&&p.z<8125)pts.push({...p,y:1.09,rot:p.rot+Math.PI/2});
+  for(const road of source?.roads||[])if(classify(road.tags).arterial)for(const p of spacedAlong(road.points,40,4.2,250))if(p.x>f.e0-o.utm_e&&p.x<f.e1-o.utm_e&&p.z>o.utm_n-f.n1&&p.z<o.utm_n-f.n0)pts.push({...p,y:1.09,rot:p.rot+Math.PI/2});
   const m=new THREE.MeshBasicMaterial({color:0xedd6ab,transparent:true,opacity:0,depthWrite:false});
   pool(group,'arterial_light_pools',new THREE.CircleGeometry(4.8,9).rotateX(-Math.PI/2),pts.map(p=>({...p,x:p.x+Math.sin(p.rot)*2,z:p.z+Math.cos(p.rot)*2})),m);
   const lampMat=new THREE.MeshBasicMaterial({color:0xeef0ec,transparent:true,opacity:0});pool(group,'arterial_bulbs',new THREE.SphereGeometry(.5,5,3),pts.map(p=>({...p,x:p.x+Math.sin(p.rot)*2.7,z:p.z+Math.cos(p.rot)*2.7,y:7.16})),lampMat);
@@ -110,7 +113,7 @@ export function createArterialLights(source){
   const neighbours=(source?.buildings||[]).filter(p=>!p.in_commune&&Math.abs(p.x)<14000&&Math.abs(p.z)<14000);
   for(const kind of ['church','school','civic','worship','market','mill','clinic']){const items=neighbours.filter(p=>p.kind===kind).map(p=>({...p,y:.3,sx:kind==='market'?1.5:1,sz:kind==='market'?1.5:1}));if(items.length)pool(group,'neighbour_'+kind,geometry(['church','school','mill'].includes(kind)?kind:'civic'),items,mat);}
   const verts=[],colors=[],banks=[],piers=[];const routes=[];
-  for(const r of source?.roads||[]){const cls=roadClass(r.tags);if(!cls.arterial&&!['trunk','motorway'].includes(r.kind))continue;const height=r.kind==='motorway'?3:1;
+  for(const r of source?.roads||[]){const cls=classify(r.tags);if(!cls.arterial&&!['trunk','motorway'].includes(r.kind))continue;const height=r.kind==='motorway'?3:1;
     for(let i=1;i<r.points.length;i++){const a=r.points[i-1],b=r.points[i];if(Math.max(Math.abs(a[0]),Math.abs(b[0]))>14000||Math.max(Math.abs(a[1]),Math.abs(b[1]))>14000)continue;const dx=b[0]-a[0],dz=b[1]-a[1],L=Math.hypot(dx,dz);if(!L)continue;const ox=-dz/L*cls.width/2,oz=dx/L*cls.width/2;
       for(const p of [[a[0]+ox,a[1]+oz],[b[0]+ox,b[1]+oz],[a[0]-ox,a[1]-oz],[b[0]+ox,b[1]+oz],[b[0]-ox,b[1]-oz],[a[0]-ox,a[1]-oz]]){verts.push(p[0],height,p[1]);colors.push(.09,.105,.10);}if(r.kind==='motorway'&&L>100&&routes.length<12)routes.push({a,b,L,phase:routes.length*.12,height});
       if(!cls.arterial){

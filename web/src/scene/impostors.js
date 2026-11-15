@@ -4,14 +4,16 @@ import * as THREE from 'three';
 import { U } from './shaderlib.js';
 import { impostorLayout } from './impostorView.js';
 const entries = new Map();
-export async function loadImpostors(base) {
+export async function loadImpostors(base,extra) {
   try {
     const response = await fetch(base + 'impostors/index.json');
     if (!response.ok) return;
     const info = await response.json(), loader = new THREE.TextureLoader();
+    const paths=Object.fromEntries(Object.keys(info).map(k=>[k,'impostors/']));
+    if(extra){const r=await fetch(base+extra+'index.json');if(r.ok){const more=await r.json();Object.assign(info,more);for(const key of Object.keys(more))paths[key]=extra;}}
     await Promise.all(Object.entries(info).map(async ([name, meta]) => {
       const layout=impostorLayout(meta);
-      const texture = await loader.loadAsync(base + `impostors/${name}.png`);
+      const texture = await loader.loadAsync(base + `${paths[name]}${name}.png`);
       texture.colorSpace = THREE.SRGBColorSpace;
       const geometry = new THREE.PlaneGeometry(meta.span, meta.span);
       const material = new THREE.ShaderMaterial({

@@ -93,3 +93,7 @@ body.record-clean #tools-panel>:not(.presentation-section),body.record-clean #to
 @media(max-width:680px) and (max-height:500px) and (orientation:landscape){.app-bar{grid-template-columns:1fr auto}.brand{display:none}.card{width:244px}.timeline{width:calc(100vw - 280px)}.signature-views button{font-size:12px;padding:0 8px}}
 .credit>span{background:#1b211fe8;text-shadow:none;padding:2px 5px;border-radius:3px}
 .credit #data-src:empty{display:none}
+
+.fixture-notice{position:fixed;top:78px;left:50%;transform:translateX(-50%);z-index:20;margin:0;padding:8px 14px;border:1px solid #edb65a66;border-radius:14px;background:#1b211fe8;color:#eef0ec;font-size:12px;pointer-events:none}.fixture-record{color:#edb65a;font-size:12px}.is-fixture .calendar-launch,.is-fixture .method-launch{display:none}@media(max-width:700px){.fixture-notice{top:118px;max-width:90vw;width:max-content}}
+
+.is-fixture #data-src{display:none}

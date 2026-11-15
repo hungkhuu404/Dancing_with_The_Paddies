@@ -1,3 +1,8 @@
+import {createSeasonSound} from '../audio/seasonSound.js';
+import {createQuickGuide} from '../ui/quickGuide.js';
+import {assertSceneMeta} from '../data/contractPolicy.js';
+import {siteProfile} from '../data/siteRules.js';
+import {defaultSite} from '../data/siteRules.js';
 import {Map as MLMap, Marker, setWorkerUrl} from 'maplibre-gl';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -28,10 +33,11 @@ viewIndicator(document.querySelector('#questions'));
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const send = (type, detail={}) => { if(embedded) parent.postMessage({channel:'flood-map',type,...detail},location.origin); };
 let stopPlayback = () => {};
+let mapSite=new URLSearchParams(location.search).get('site')||defaultSite;
 let surfaceActive = true;
-function returnWorld(cell) { stopPlayback(); if(embedded) send('close',{cell}); else location.assign(BASE); }
+function returnWorld(cell) { stopPlayback(); if(embedded) send('close',{cell}); else {const u=new URL(BASE,location.origin);u.searchParams.set('site',mapSite);if(cell)u.searchParams.set('cell',cell);location.assign(u);} }
 for(const id of ['world-link','back-world']) $(id).onclick = e => {if(embedded){e.preventDefault();returnWorld();}};
-function openReference(path){stopPlayback();const site=new URLSearchParams(location.search).get('site')||'tan_hoi';if(embedded)send('reference',{path,site});else location.assign(BASE+path+'?'+new URLSearchParams({site}));}
+function openReference(path){stopPlayback();const site=new URLSearchParams(location.search).get('site')||defaultSite;if(embedded)send('reference',{path,site});else location.assign(BASE+path+'?'+new URLSearchParams({site}));}
 $('about-open').onclick=()=>openReference('method/');
 $('calendar-open').onclick=e=>{e.preventDefault();openReference('calendar/');};
 $('about-close').onclick = () => $('about-dialog').close();
@@ -47,20 +53,33 @@ async function getJSON(file,required=true) {
 async function start() {
   const sites=await getJSON('sites.json');
   const query=new URLSearchParams(location.search);
-  const site=sites?.sites.find(s=>s.id===query.get('site'))||sites?.sites.find(s=>s.default)||sites?.sites[0];
-  if(!site)throw Error('Site information could not be loaded.');
+  const site=query.has('site')?sites?.sites.find(s=>s.id===query.get('site')):sites?.sites.find(s=>s.default)||sites?.sites[0];
+  if(!site)throw Error('Observations for this location are not available yet.');
+  mapSite=site.id;for(const id of ['world-link','back-world'])$(id).href=BASE+'?'+new URLSearchParams({site:site.id});
   const dir=site.id+'/';
   const [meta,cells,aoi,places,summary]=await Promise.all(['meta.json','cells.geojson','aoi.geojson','places.geojson','summary.json'].map(f=>getJSON(dir+f)));
   if(!meta||!cells||!meta.acquisitions?.length)throw Error('Required water observations could not be loaded.');
-  if(meta.fixture)throw Error('This map requires published observations, not synthetic data.');
+  assertSceneMeta(siteProfile(site.id),meta);
+  const dataSound=createSeasonSound({passes:summary?.passes,totalHa:summary?.totals.area_ha,fixture:!!meta.fixture});dataSound.mount(document.querySelector('.date-controls'));
+  const guide=createQuickGuide({view:'map',fixture:!!meta.fixture});if(query.has('debug'))window.__dataSound=dataSound;
+  guide.showOnce();
+
+  if(meta.fixture){const notice=document.createElement('p');notice.className='fixture-notice';notice.setAttribute('role','status');notice.textContent='Data pending. Water states are illustrative.';document.body.append(notice);document.body.classList.add('is-fixture');
+    $('whole').setAttribute('aria-label','Show the study frame');
+    for(const id of ['radar-only','gt30']){$(id).disabled=true;$(id).closest('label').hidden=true;}
+    const dialog=$('about-dialog'),heading=dialog.querySelector('.dialog-heading'),credit=$('credit'),description=document.createElement('p');
+    description.textContent='Data pending. This map illustrates a synthetic water record. Acquisition dates come from the ASF DAAC catalogue; water states and derived values are not observations.';
+    dialog.replaceChildren(heading,description,credit);$('about-title').textContent=site.name+' data status';$('about-open').onclick=()=>dialog.showModal();
+  }
   $('site-name').textContent=site.name;
+  $('map').setAttribute('aria-label','Water observations in '+site.name+'. Select a block to inspect its record.');
   $('explorer-title').textContent='Explore '+site.name;
   $('credit').textContent=meta.sources.join('; ');
   const acq=meta.acquisitions,last=acq.length-1;
   const features=cells.features, props=features.map(f=>f.properties), bins=onsetBins(props);
   const byCell=new Map(features.map((f,i)=>[f.properties.cell_id,i]));
   const initial=readView(location.search,acq.length);
-  const state={...initial,sel:-1,hover:-1,radarOnly:false,gt30:false};
+  const state={...initial,sel:-1,hover:-1,radarOnly:false,gt30:false};dataSound.select(state.pass);
   let series=null,seriesPromise=null,revision=0,playTimer=0,backdropTimer=0,backdropAt=0;
   const loadSeries=()=>seriesPromise||=getJSON(dir+'series.json').then(s=>{
     series=s;
@@ -97,8 +116,8 @@ async function start() {
     map.addSource('base',{type:'vector',url:'https://tiles.openfreemap.org/planet',attribution:'© OpenStreetMap contributors'});
     map.addLayer({id:'base-water',type:'fill',source:'base','source-layer':'water',paint:{'fill-color':'#AABFBB'}});
     map.addLayer({id:'base-waterway',type:'line',source:'base','source-layer':'waterway',paint:{'line-color':'#91A9A0','line-width':['interpolate',['linear'],['zoom'],10,.6,14,2]}});
-    map.addSource('backdrop',{type:'image',url:BASE+'data/'+dir+acq[state.pass].backdrop,coordinates:meta.backdrop.corners});
-    map.addLayer({id:'backdrop',type:'raster',source:'backdrop',paint:{'raster-opacity':.72,'raster-fade-duration':0}});
+    if(!meta.fixture){map.addSource('backdrop',{type:'image',url:BASE+'data/'+dir+acq[state.pass].backdrop,coordinates:meta.backdrop.corners});
+    map.addLayer({id:'backdrop',type:'raster',source:'backdrop',paint:{'raster-opacity':.72,'raster-fade-duration':0}});}
     map.addSource('cells',{type:'geojson',data:cells});
     const fs=(k,d)=>['coalesce',['feature-state',k],d];
     map.addLayer({id:'cells-fill',type:'fill',source:'cells',paint:{'fill-color':['to-color',fs('fill','rgba(0,0,0,0)')],'fill-opacity':fs('op',.9),'fill-opacity-transition':{duration:reduced()?0:180}}});
@@ -124,7 +143,7 @@ async function start() {
     send('ready');
   }catch(error){$('map-loading').hidden=true;$('errors').textContent='The map could not be prepared. '+error.message; $('errors').hidden=false;send('error',{message:error.message});}
   });
-  map.on('error',e=>{if(e.sourceId==='base')return;if(e.sourceId==='backdrop'){$('errors').textContent='The radar background is unavailable. Block observations remain visible.';$('errors').hidden=false;}});
+  map.on('error',e=>{if(e.sourceId==='base')return;if(!meta.fixture&&e.sourceId==='backdrop'){$('errors').textContent='The radar background is unavailable. Block observations remain visible.';$('errors').hidden=false;}});
   function focusHamlet(name){
     const group=features.filter(f=>f.properties.nearest_hamlet===name);if(!group.length)return;$('explorer-title').textContent='Near '+name;
     let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;
@@ -189,14 +208,14 @@ async function start() {
     $('date-slider').value=String(state.pass);$('date-slider').setAttribute('aria-valuetext',`${fmtDate(a.date_local)}, track ${a.track}`);
     $('season').setAttribute('aria-pressed',String(season));
     $('prev').disabled=!season&&state.pass===0;$('next').disabled=!season&&state.pass===last;
-    $('date-note').textContent=season?'Select a date to see the latest available water observation.':`Track ${a.track}. Gaps use the most recent valid image${a.valid_share<.999?'; this pass covers part of the commune':''}.`;
+    $('date-note').textContent=meta.fixture?'Fixture record. Image dates are from the ASF catalogue; water states are illustrative.':season?'Select a date to see the latest available water observation.':`Track ${a.track}. Gaps use the most recent valid image${a.valid_share<.999?'; this pass covers part of the study area':''}.`;
   }
-  function setPass(i){state.pass=boundedPass(i,acq.length);state.scope='image';swapBackdrop();paint();updateDate();if(state.sel>=0)openPanel(state.sel);}
+  function setPass(i){state.pass=boundedPass(i,acq.length);dataSound.play(state.pass);state.scope='image';swapBackdrop();paint();updateDate();if(state.sel>=0)openPanel(state.sel);}
   $('date-slider').oninput=e=>{stopPlayback();setPass(+e.target.value);};
   $('prev').onclick=()=>{stopPlayback();setPass(Math.max(0,state.pass-1));};
   $('next').onclick=()=>{stopPlayback();setPass(Math.min(last,state.pass+1));};
   $('season').onclick=()=>{stopPlayback();state.scope='season';state.pass=last;swapBackdrop();paint();updateDate();if(state.sel>=0)openPanel(state.sel);};
-  stopPlayback=()=>{clearInterval(playTimer);playTimer=0;$('play').setAttribute('aria-pressed','false');$('play').setAttribute('aria-label','Play observations');};
+  stopPlayback=()=>{dataSound.stop();clearInterval(playTimer);playTimer=0;$('play').setAttribute('aria-pressed','false');$('play').setAttribute('aria-label','Play observations');};
   $('play').onclick=()=>{
     if(playTimer){stopPlayback();return;}
     setPass(state.scope==='season'||state.pass===last?0:state.pass);
@@ -223,7 +242,7 @@ async function start() {
     const rec=series?.cells[p.cell_id],obs=observationAt(rec?.s,state.pass);
     const observed=obs.state==='W'?'Water observed':obs.state==='N'?'No open water observed':'No observation available';
     const atDate=state.scope==='image'?`<p class="image-state">${observed}<small>${obs.index<0?'No valid image on or before this date.':`${obs.carried?'Carried from':'Observed on'} ${fmtDate(acq[obs.index].date_local)}${obs.missing?'. No image for this block on the selected date.':''}`}</small></p>`:'';
-    $('panel-body').innerHTML=`${blockCore(p,'block-title')}${atDate}<details class="observation-details"><summary>Observation record <span>${p.n_obs} images</span></summary><div id="strip"></div><p class="strip-key"><span><i class="sw" style="background:var(--water)"></i>Water</span><span><i class="sw empty"></i>No water</span><span><i class="sw hatched"></i>No image</span></p><p class="block-id">${esc(p.cell_id)}</p>${cellSentences(p).filter(t=>t.includes('not yet confirmed')).map(t=>`<p>${esc(t)}</p>`).join('')}<p>${ONSET_NOTE}</p></details><details class="science-details"${old?' open':''}><summary>Radar measurements</summary><p>${p.n_obs} images from ${p.n_tracks} tracks.</p><div id="chart"></div></details><div class="panel-actions">${embedded?`<button class="primary" type="button" id="see-world">${icon('landscape')}Locate in landscape</button>`:''}<button type="button" id="copy-link">${icon('copy')}Copy link</button></div><p id="copy-status" class="copy-status" role="status"></p>`;
+    $('panel-body').innerHTML=`${meta.fixture?'<p class="fixture-record">Fixture record. Water data pending.</p>':''}${blockCore(p,'block-title')}${atDate}<details class="observation-details"><summary>Observation record <span>${p.n_obs} images</span></summary><div id="strip"></div><p class="strip-key"><span><i class="sw" style="background:var(--water)"></i>Water</span><span><i class="sw empty"></i>No water</span><span><i class="sw hatched"></i>No image</span></p><p class="block-id">${esc(p.cell_id)}</p>${cellSentences(p).filter(t=>t.includes('not yet confirmed')).map(t=>`<p>${esc(t)}</p>`).join('')}<p>${ONSET_NOTE}</p></details><details class="science-details"${old?' open':''}><summary>${meta.fixture?'Synthetic fixture values':'Radar measurements'}</summary><p>${p.n_obs} images from ${p.n_tracks} tracks.</p><div id="chart"></div></details><div class="panel-actions">${embedded?`<button class="primary" type="button" id="see-world">${icon('landscape')}Locate in landscape</button>`:''}<button type="button" id="copy-link">${icon('copy')}Copy link</button></div><p id="copy-status" class="copy-status" role="status"></p>`;
     reveal($('panel'));document.body.classList.add('panel-open');$('panel').scrollTop=scroll;
     $('see-world')?.addEventListener('click',()=>returnWorld(p.cell_id));
     $('copy-link').onclick=async()=>{
@@ -239,7 +258,7 @@ async function start() {
   }
   addEventListener('message',e=>{
     if(!embedded||e.origin!==location.origin||e.source!==parent||e.data?.channel!=='flood-world')return;
-    if(e.data.type==='active'){surfaceActive=!!e.data.active;if(!surfaceActive){stopPlayback();map.stop();}else{map.resize();}}
+    if(e.data.type==='active'){surfaceActive=!!e.data.active;dataSound.setPaused(!surfaceActive);if(!surfaceActive){stopPlayback();map.stop();}else{map.resize();}}
     if(e.data.type==='navigate'){
       stopPlayback();const next=readView(e.data.query,acq.length);Object.assign(state,{mode:next.mode,scope:next.scope,pass:next.pass});
       swapBackdrop();paint();updateDate();const hamlet=new URLSearchParams(e.data.query).get('hamlet');if(hamlet){select(-1);focusHamlet(hamlet);}if(next.cell&&byCell.has(next.cell))select(byCell.get(next.cell),true);

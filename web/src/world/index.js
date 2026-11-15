@@ -105,7 +105,7 @@ export async function createWorld(ctx) {
     ctx.setTod(tod, true);
     const next = ctx.passIndex() + 1;
     if (next >= ctx.passes.length) { if (!nisar.active) { tl.on = false; ctx.onTimelapseEnd?.(); } return; }
-    const h = ctx.acq?.[next] ? localHour(ctx.acq[next].acq_utc) : 18;
+    const h = ctx.acq?.[next] ? localHour(ctx.acq[next].acq_utc,ctx.profile?.timezone??7) : 18;
     const at = Math.min(0.97, hourToTod(h ?? 18));
     if (!tl.fired && tod >= at) { tl.fired = true; ctx.gotoPass(next, false, { keepTime: true }); }
   }

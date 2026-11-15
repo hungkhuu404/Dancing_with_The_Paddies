@@ -4,7 +4,7 @@
 
 Team **Dancing with The Paddies** · NASA Space Apps Challenge 2026 · Challenge: *Dancing with the SARs*
 
-**Data status:** The web reads the Tân Hội pixel-method export under contract 2.0.0. The repository includes S1–S5, an offline S6 comparison runner and S7. Bang Rakam observations and H7 remain separate work. The interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md), [S6 instructions](docs/s6-comparison.md) and [data provenance](docs/provenance/tan-hoi-quan8-mask.md).
+**Data status:** The web reads the Tân Hội pixel-method export under contract 2.0.0. The repository includes S1–S5, an offline S6 comparison runner and S7. Bang Rakam candidate observations are in the repository but not yet integrated into the web; H7 remains separate work. The interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md), [S6 instructions](docs/s6-comparison.md) and [data provenance](docs/provenance/tan-hoi-quan8-mask.md).
 
 **Existing live site:** https://flood-calendar.pages.dev — this migration has not been deployed or verified against that site.
 
@@ -25,7 +25,7 @@ The local web includes:
 - A map that can be replayed image by image, and a chart for any single cell.
 - A layer for fields flooded more than 30 days before the season, relevant *if the IPCC emission factor is applied* (IPCC 2019, Table 5.13).
 
-Data sonification and the second site, Bang Rakam (Thailand), are planned work and are not available in this checkout. Ambient 3D audio is illustrative, not the planned data sonification.
+Bang Rakam (Thailand) is available as a clearly labelled illustrative landscape with water data pending. Its frontend frame is 12 x 12 km; the backend processing configuration remains separate. Data sonification remains planned; ambient landscape audio is illustrative.
 
 What it does **not** do: it does not measure methane, and it cannot tell whether a field was sown right after the water left.
 
@@ -59,7 +59,7 @@ The file format between the pipeline and the web is defined in [docs/data-contra
 | `schema/` | JSON Schema for exported files |
 | `tests/` | Pipeline tests. Web tests are in `web/test/` |
 | `data/` | Exported data read by the web (`data/sites.json`, `data/{site}/`) |
-| `web/` | Local static website (Vite, MapLibre GL JS, Three.js); asset generators are not migrated |
+| `web/` | Local static website (Vite, MapLibre GL JS, Three.js); original asset-generator sources are included in web/tools/ |
 | `web/src/sound/` | Not present; data sonification is not migrated |
 | `docs/` | Data contract and method notes |
 
@@ -117,7 +117,7 @@ Never commit the token, the image cache or files with signed links.
 
 - The 75% pixel method and 50% temporal guard were selected after examining DSWx-S1; agreement is not an independent test and DSWx-S1 is not ground truth.
 - The local web does not report agreement scores; the supplied comparison is post-hoc.
-- Bang Rakam and H7/final data are not supplied. The S6 runner currently supports the Tân Hội comparison.
+- Bang Rakam candidate observations are not yet connected to the web; its landscape uses an explicit fixture illustration. H7/final data are not supplied. The repository's S6 runner currently supports the Tân Hội comparison.
 - One track revisits every 12 days, so water arrival and water leaving are date ranges.
 - Track 148 D does not cover about 13.5% of the commune's cells; the map uses each cell's latest valid image.
 - Water arrival may be dated early on dry, flat fields.

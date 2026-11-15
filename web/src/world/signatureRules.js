@@ -1,3 +1,4 @@
+import {siteProfile} from '../data/siteRules.js';
 // Pure helpers for the science views. No observed quantities are invented here.
 import SunCalc from 'suncalc';
 export const clamp01 = x => Math.max(0, Math.min(1, x));
@@ -15,7 +16,7 @@ export function hourlyWeather(history, iso) {
   }
   return out;
 }
-export function celestial(iso, lat=10.142, lon=105.186) {
+export function celestial(iso, lat=siteProfile().astronomy_center[1], lon=siteProfile().astronomy_center[0]) {
   const date=new Date(iso), sun=SunCalc.getPosition(date,lat,lon), moon=SunCalc.getMoonPosition(date,lat,lon), phase=SunCalc.getMoonIllumination(date);
   const direction=p=>{const a=p.azimuth+Math.PI,c=Math.cos(p.altitude);return [c*Math.sin(a),Math.sin(p.altitude),-c*Math.cos(a)];};
   return {sun:direction(sun),moon:direction(moon),elevation:sun.altitude*180/Math.PI,moonElevation:moon.altitude, fraction:phase.fraction,phase:phase.phase,angle:phase.angle-moon.parallacticAngle};
@@ -26,7 +27,14 @@ export function todHour(t) {
   t=clamp01(t);for(let i=1;i<k.length;i++)if(t<=k[i][0])return k[i-1][1]+(t-k[i-1][0])/(k[i][0]-k[i-1][0])*(k[i][1]-k[i-1][1]);
   return 19.5;
 }
-export function sceneDate(date,tod) {return new Date(Date.parse(date.slice(0,10)+'T00:00:00+07:00')+todHour(tod)*3600000).toISOString();}
+const localFormatters=new Map();
+export function sceneDate(date,tod,timezone=siteProfile().timezone) {
+  const midnight=Date.parse(date.slice(0,10)+'T00:00:00Z');
+  let local=localFormatters.get(timezone);if(!local){local=new Intl.DateTimeFormat('en-CA',{timeZone:timezone,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'});localFormatters.set(timezone,local);}
+  const p=Object.fromEntries(local.formatToParts(midnight).map(v=>[v.type,v.value]));
+  const shifted=Date.UTC(+p.year,+p.month-1,+p.day,+p.hour,+p.minute,+p.second);
+  return new Date(midnight-(shifted-midnight)+todHour(tod)*3600000).toISOString();
+}
 export function sideLookingPosition(x,z,dir,height=1800,side=1,incidence=40,out={}) {
   const offset=height*Math.tan(incidence*Math.PI/180)*side;
   out.x=x-dir[1]*offset;out.y=height;out.z=z+dir[0]*offset;return out;

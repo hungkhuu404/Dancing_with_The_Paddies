@@ -1,32 +1,32 @@
-# Web local — snapshot 963333c
+# Flood Calendar web
 
-Mã nguồn, test và tài nguyên web lấy từ Nasa_prep tại commit `963333cb68e773706d68a4251d83eeb4daab5bb8`, không lấy từ working tree. Danh sách file, blob và hash: [provenance đợt 2](../docs/provenance/migration-web-local.md).
+The current two-site frontend is imported from Nasa_prep@cb6a2031615264b177c460fad19400b3c99557e8. See [migration review](../docs/plans/pixel-v2-two-sites.md) and [per-file provenance](../docs/provenance/pixel-v2-two-sites.md). The original source PR is [Nasa_prep #24](https://github.com/hungkhuu404/Nasa_prep/pull/24); this product migration records its reviewed head directly.
 
-## Chạy local
+## Run locally
 
-Yêu cầu Node.js 24 và npm. Trong thư mục `web/`:
+Requires Node.js 24. From web/:
 
 ```sh
 npm ci --ignore-scripts
 npm test
-npm run dev -- --host 127.0.0.1
+npm run build
+node scripts/verify-published-data.mjs
+node node_modules/vite/bin/vite.js preview --host 127.0.0.1
 ```
 
-Mở `/` cho cảnh 3D. Nút Map mở không gian bản đồ trong cùng tab; 3D world đưa về cảnh và camera đã giữ lại. Chọn một ô rồi dùng View this block in 3D để xem vị trí tương ứng. Đường dẫn `/map/` vẫn mở bản đồ trực tiếp. Build thử bằng `npm run build`; xem bản build bằng `npm run preview -- --host 127.0.0.1`. Không có script deploy trong bản migrate này. `dist/`, `node_modules/` và `public/data/` là output local được ignore, không phải file chuyển từ nguồn.
+The regional entrance opens a selected landscape. Map opens inside the same page; /map/ remains a standalone route. /calendar/ and /method/ accept published observations only. The calendar groups the 2,344 blocks by their nearest one of 24 hamlet points, not administrative hamlet boundaries. Captions and optional ElevenLabs narration accompany the Tân Hội tour; ambient audio is illustrative, not data sonification.
 
-Thiết kế và bản đồ module hiện hành: [MAP-UX-001](../docs/plans/integrated-map.md). Full season đọc tổng kết mùa từ bộ xuất; kéo ngày chuyển sang trạng thái đã quan sát đến ngày đó. Ảnh thiếu dùng lần quan sát hợp lệ trước, có chú thích rõ. Các chỉ số trên thẻ ô luôn được ghi là bản ghi cả mùa.
+## Data and illustrations
 
-## Dữ liệu và giới hạn
+- The real source registry and its 30 allowlisted public files contain Tân Hội CONTRACT-001 2.0.0: 2,344 cells and 22 acquisitions from 11 August to 3 November 2026. The GCOV mask is applied to this post-hoc candidate, not the final H7 snapshot. The web reads these exports and does not execute S1-S7. It rejects v1 or incompatible metadata instead of supplying replacement observations.
+- Bang Rakam has a separately labelled illustrative landscape within the confirmed 12 x 12 km frontend frame, EPSG:32647. Its synthetic water/HH/HV and derived cards are visibly marked Data pending/Fixture record. They are generated only for the explicit illustration profile and are not committed into data/, accepted by science pages or passed off as published results. Real registry entries take precedence; publishing real Bang Rakam observations requires a reviewed allowlist and frame/contract alignment.
+- The backend Bang Rakam candidate uses a 48×48 study frame. Its observations are in the repository but are not yet registered or allowlisted for the web; the separate illustration is not a published observation.
+- Sync validates required real inputs before rebuilding public/data/. CI verifies committed input bytes and reconstructs the explicit illustration to check both public/data/ and dist/data/ exactly. The retained verify-public-data.mjs command without --output checks real inputs only; use verify-published-data.mjs for two-site outputs.
+- Pixel classification requires 75% water pixels and 70% jointly valid coverage, with the 50% temporal guard. Diagnostic block-average HH/HV are not the classification decision. Selection against DSWx-S1 is post-hoc; it is not independent validation or field accuracy. No comparison scores are displayed. See [provenance](../docs/provenance/tan-hoi-quan8-mask.md).
+- Homes, people, vegetation, water elevation, weather effects and architecture are illustrative. Source-backed OSM locations, the old CC BY optical background and original procedural model notices remain in public/ manifests. Bang Rakam does not invent an operational barrage or a Y.16 marker.
 
-- Chỉ dùng bộ xuất công khai `data/sites.json` và `data/tan_hoi/`: 2.344 ô, 22 lần chụp, ba track, 11/8–03/11/2026; GCOV mask đã áp cho bộ này. Đây là snapshot hậu kiểm, chưa phải bản khóa cuối H7. Không chuyển raw granule, heldout hoặc dữ liệu private.
-- `scripts/public-data-files.json` là danh sách 28 file công khai được phép đồng bộ. `predev`/`prebuild` kiểm đủ input trước khi tạo lại `public/data/`; không quét cả `data/`, không nhận symlink hoặc đường dẫn vượt root, không sinh fixture.
-- Thiếu input bắt buộc làm lệnh đồng bộ thất bại. Khi dữ liệu runtime không tải được, 3D/bản đồ hiện lỗi rõ; 3D không dùng trạng thái trong scene thay cho contract.
-- Snapshot không có `validation.json`, site Bang Rakam hoặc bản H7. Luồng 3D và `/map/` hiện không đọc `validation.json`, nên file này không chặn khám phá dữ liệu; nó vẫn là phần bắt buộc để hoàn thiện bộ xuất theo [contract đích](../docs/data-contract.md). Build và giao diện báo rõ chưa có kết quả validation. Không sinh số kiểm chứng/thống kê cho phần thiếu; chưa đạt bộ dữ liệu cuối đầy đủ.
-- Nhà, cây, người, thời tiết và hạ tầng trong 3D là minh họa theo mô tả nguồn; không phải phép đo radar hay khảo sát thực địa. Giữ các manifest và notice tại `public/licenses/`, `public/models/`, `public/impostors/` và `public/scene/`.
-- Ảnh nền vector của `/map/` có thể gọi OpenFreeMap; chức năng lưới và dữ liệu radar dùng file local. About the data trình bày phương pháp và giới hạn. Nút nghe theo ô chưa có implementation đã được bỏ khỏi giao diện. Chưa chuyển công cụ tái tạo asset hoặc pipeline S0–S7.
+## Rendering and tools
 
-Lockfile giữ nguyên bytes từ nguồn. Các script deploy và fixture đã bỏ khỏi `package.json`; công cụ wrangler vẫn nằm trong dependency tree khóa sẵn nhưng không được gọi. Không đưa workflow deploy cũ sang repo này.
+The high-tier Tân Hội profile uses four detailed streamed tiles and limited distant simulation/mirrors; farfield retains coverage. Intel low still has occasional streaming stalls. The large map/scene chunks remain a known build warning. Generator source is in tools/ with explicit local input/output options; source recovery does not prove every historic asset is fully reproducible. No raw imagery, tokens, source cache or heldout are included. Some generators require Blender and separate Python/model-compression dependencies; npm ci alone does not install these.
 
-## Scientific views
-
-/calendar/ shows the published nearest-hamlet water calendar, with keyboard inspection and full PNG export. /method/ reads the current acquisition method and documents limits, AI assistance and sources. Both are reachable inside the landscape/map without navigating away. The calendar groups blocks by nearest hamlet, not official boundaries.
+The product package scripts and lockfile are retained. No deploy script, Cloudflare project configuration or hosting workflow is imported. Merging this branch updates product main, not the existing Nasa-hosted production site.

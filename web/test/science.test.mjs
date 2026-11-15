@@ -1,8 +1,8 @@
+import {methodDescription} from '../src/science/pixelMethod.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {waterCalendar,calendarColor,calendarMapQuery,methodRows} from '../src/science/calendarModel.js';
-import {methodDescription} from '../src/science/pixelMethod.js';
 const cells=names=>({features:names.map((name,i)=>({properties:{cell_id:String(i),nearest_hamlet:name}}))});
 const acq=[{date_local:'2026-08-11',track:'148D'},{date_local:'2026-08-16',track:'047D'}];
 test('calendar denominator uses W+N for this image only, never carries missing observations',()=>{
@@ -51,3 +51,5 @@ test('every public calendar count reconciles with the real series for all 24 gro
  }
  for(const r of rows)for(const v of r.values){assert.equal(v.display,v.valid>=r.total/2&&v.valid>0);if(v.display)assert.equal(v.ratio,v.wet/v.valid);}
 });
+
+test('pixel interpretation states the fraction and asymmetric temporal rule',()=>{const text=methodDescription({classification:'pixel_fraction_75_dual_50',water_fraction:.75,fill_min_fraction:.5,joint_valid_fraction:.7,selection_status:'post_hoc',single_flip_filter:true});assert.match(text,/75%/);assert.match(text,/50%/);assert.match(text,/70%/);assert.match(text,/post-hoc/);});

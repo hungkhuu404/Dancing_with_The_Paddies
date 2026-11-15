@@ -1,21 +1,22 @@
+import {siteProfile} from '../data/siteRules.js';
 import {ownedByTile,nearestOnLine,houseStyle,spacedAlong,roadClass,inside} from './infrastructureRules.js';
-export function tileInfrastructure(layout,props,source,cx,cz,low=false){
+export function tileInfrastructure(layout,props,source,cx,cz,low=false,profile=siteProfile()){
   const owns=p=>ownedByTile(p.x,p.z,cx,cz);
   const bridges=(source?.bridges||[]).filter(owns);
   const buildings=(source?.buildings||[]).filter(p=>p.in_commune&&owns(p));
-  const houses=(layout.houses||[]).map((h,i)=>({...h,...(h.infrastructurePlacement||placeHouse(h,layout,source)),variant:i%3})).filter(h=>h.kind!=='rural');
+  const houses=(layout.houses||[]).map((h,i)=>({...h,...(h.infrastructurePlacement||placeHouse(h,layout,source,profile)),variant:i%3})).filter(h=>!profile.identity&&h.kind!=='rural');
   const solar=[];for(const r of layout.roads)if(['residential','tertiary'].includes(r.kind))for(const p of spacedAlong(r.points,low?240:140,(r.width_m||4)/2+1.2,20))if(owns(p)&&solar.length<(low?12:32))solar.push(p);
   // Missing OSM sluices are never invented as surveyed features. These demonstration
   // structures use existing illustrative pump positions, which already avoid fields.
   const gates=(source?.gates||[]).filter(owns).map(p=>({...p,illustrative:false}));
-  if(!gates.length&&props.pumps?.length){const p=props.pumps[0];const c=layout.canals.find(c=>nearestOnLine(p.x,p.z,c.points).d<(c.width_m||20));if(c){const q=nearestOnLine(p.x,p.z,c.points);gates.push({x:q.x,z:q.z,rot:q.rot,illustrative:true,name:'Illustrative irrigation gate'});}}
-  const production=[];const nearMain=h=>layout.roads.some(r=>roadClass(r).surface==='asphalt'&&nearestOnLine(h.x,h.z,r.points).d<70);
+  if(profile.architecture.allow_illustrative_gates&&!gates.length&&props.pumps?.length){const p=props.pumps[0];const c=layout.canals.find(c=>nearestOnLine(p.x,p.z,c.points).d<(c.width_m||20));if(c){const q=nearestOnLine(p.x,p.z,c.points);gates.push({x:q.x,z:q.z,rot:q.rot,illustrative:true,name:'Illustrative irrigation gate'});}}
+  const production=[];const nearMain=h=>layout.roads.some(r=>roadClass(r,profile.roads).surface==='asphalt'&&nearestOnLine(h.x,h.z,r.points).d<70);
   for(const h of houses.filter(nearMain).slice(0,low?1:2)){const p={x:h.x+Math.cos(h.rot||0)*16,z:h.z-Math.sin(h.rot||0)*16,rot:h.rot||0};if(owns(p)&&!(layout.parcels||[]).some(f=>inside([p.x,p.z],f.poly))&&!layout.canals.some(c=>nearestOnLine(p.x,p.z,c.points).d<(c.width_m||20)/2+5))production.push({...p,kind:production.length?'silo':'dryer',illustrative:true});}
   return {bridges,buildings,houses,solar,gates,production};
 }
 /** Larger replacements must fit the existing dry verge and leave real bridges unobstructed. */
-export function placeHouse(h,layout,source){
-  const kind=houseStyle(h,layout.roads);if(kind==='rural')return {kind};
+export function placeHouse(h,layout,source,profile=siteProfile()){
+  const kind=houseStyle(h,layout.roads,profile.roads);if(kind==='rural')return {kind};
   for(const b of source?.bridges||[])if(nearestOnLine(h.x,h.z,b.points).d<18)return {kind:'rural'};
   const hx=kind==='shophouse'?2.9:6,hz=kind==='shophouse'?5.6:7.5;
   const roads=layout.roads.map(r=>({q:nearestOnLine(h.x,h.z,r.points),w:(r.width_m||4)/2+.3}));

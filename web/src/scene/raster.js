@@ -63,6 +63,8 @@ export function drawMask(layout, cx, cz, maskSize = MASK) {
   };
   // canal water drawn slightly narrower than width_m so banks overlap the edge
   stroke(layout.canals, '#f00', (l) => Math.max(1.5, (l.width_m || 4) - 1.6));
+  g.fillStyle='#f00';
+  for(const area of layout.water_areas||[]){g.beginPath();for(const ring of area.rings){ring.forEach(([x,z],i)=>i?g.lineTo(P(x),P(z)):g.moveTo(P(x),P(z)));g.closePath();}g.fill('evenodd');}
   g.fillStyle = '#0f0';
   for (const p of layout.parcels) {
     g.beginPath();

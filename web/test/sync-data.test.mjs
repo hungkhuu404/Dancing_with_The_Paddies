@@ -15,6 +15,8 @@ function workspace(t) {
   copyFileSync(join(web, 'src/science/pixelMethod.js'), join(root, 'web/src/science/pixelMethod.js'));
   writeFileSync(join(root, 'web/package.json'), '{"type":"module"}');
   for (const name of ['sync-data.mjs', 'public-data-files.json']) copyFileSync(join(web, 'scripts', name), join(root, 'web/scripts', name));
+  for(const file of ['src/data/siteRules.js','src/data/site-profiles.json','src/data/projection.js','src/map/contract.js','scripts/make-site-fixture.mjs','scripts/fixtureRules.mjs']){mkdirSync(dirname(join(root,'web',file)),{recursive:true});copyFileSync(join(web,file),join(root,'web',file));}
+  const profilesPath=join(root,'web/src/data/site-profiles.json'),profiles=JSON.parse(readFileSync(profilesPath,'utf8'));profiles.sites.bang_rakam.scene.fixture_preview=false;writeFileSync(profilesPath,JSON.stringify(profiles));
   return root;
 }
 const run = root => spawnSync(process.execPath, [join(root, 'web/scripts/sync-data.mjs')], {encoding:'utf8'});

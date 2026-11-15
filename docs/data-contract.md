@@ -55,6 +55,7 @@ Hợp đồng giữa nhóm dữ liệu và nhóm giao diện. Bản 2.0.0 thay n
   - P2: độ lệch chuẩn theo thời gian của vùng ổn định không quá 0,5 dB.
   - P3: trên vùng ổn định, ảnh bản P05036 lệch không quá 3 lần độ lệch chuẩn so với trung bình các ảnh P05023 cùng track. Không đạt thì ảnh P05036 dùng ngưỡng Q1 tính riêng.
 - **Quy tắc pixel:** HH và HV phải hợp lệ cùng vị trí, hữu hạn, dương; GCOV `mask` phải từ 1 đến 254 (0 không fully focused, 255 ngoài ảnh). So từng pixel với ngưỡng HH/HV của ảnh, trên công suất tuyến tính. Ô 250 m cần đủ lưới 25×25 vị trí và tối thiểu 438/625 pixel hợp lệ. Tính tỷ lệ pixel cùng dưới hai ngưỡng trên tổng pixel hợp lệ; tỷ lệ ≥75% là `W`, còn lại là `N`. Không đủ điều kiện là `-`. HH/HV trung bình ô vẫn xuất để tham khảo, không dùng trực tiếp để suy ra `W`. Bản Tân Hội v2 20 ảnh trước đây chưa áp GCOV mask; đây là sửa lỗi định nghĩa hợp lệ và cần được review cùng dữ liệu xuất lại.
+- **Cảnh GCOV nguồn 20 m tại Bang Rakam.** Trên lưới đã kiểm thẳng hàng, mỗi pixel được chia thành bốn phần 10 m có cùng HH/HV và trạng thái hợp lệ. Cách này tính phần diện tích giao với ô 250 m ở mép, áp dụng cùng các ngưỡng hợp lệ 70%, nước 75% và ngưỡng lấp 50%. Phép chia không tăng độ chi tiết radar. Vùng tham chiếu dùng số mẫu trên lưới gốc. Mask GCOV hợp lệ trong khoảng 1–254 cho bộ Bang Rakam này.
 - **Lọc hai mức:** xếp các lần chụp hợp lệ theo thời gian, gộp mọi track và lọc singleton trên chuỗi thô 75%. Với `W-N-W`, chỉ đổi `N` thành `W` nếu lần giữa có tỷ lệ pixel nước ≥50%; nếu dưới 50% giữ `N`. Với `N-W-N`, vẫn đổi `W` thành `N`. Lần đầu, cuối và thiếu giữ nguyên.
   - **Luôn so trên chuỗi thô, xét mọi vị trí cùng lúc.** Không sửa tại chỗ rồi dùng giá trị vừa sửa để xét vị trí kế tiếp. Với các `N` có tỷ lệ ≥50%, ví dụ `NNWNWW` thành `NNNWWW`.
 - File xuất có cả chuỗi thô 75% (`s_raw`) và chuỗi đã lọc hai mức (`s`). Chỉ số tính trên chuỗi đã lọc. Phương pháp chọn sau khi đã xem DSWx, vì vậy là **post-hoc**, không phải kiểm chứng độc lập. DSWx không phải ground truth; ảnh thưa không chứng minh ngập liên tục.
@@ -198,8 +199,12 @@ Tọa độ theo EPSG:4326, như mọi file xuất cho web.
 
 | File | Cấu trúc | Thuộc tính |
 | --- | --- | --- |
-| `aoi.geojson` | FeatureCollection có đúng 1 feature, Polygon hoặc MultiPolygon | `site` (`tan_hoi`); `name` (`Tân Hội`); `osm_relation` (số nguyên, 15449921); `area_ha` (diện tích tính trong hệ UTM của site, 1 chữ số thập phân) |
-| `places.geojson` | FeatureCollection, mỗi ấp một Point. Chỉ giữ điểm nằm trong ranh xã | `name` (trùng từng ký tự với `nearest_hamlet`); `osm_id` (chuỗi dạng `node/123456`) |
+| `aoi.geojson` | FeatureCollection có đúng 1 feature, Polygon hoặc MultiPolygon | `site`, `name`, `area_ha` (diện tích trong hệ UTM của site, 1 chữ số thập phân), cùng các trường theo loại AOI bên dưới |
+| `places.geojson` | FeatureCollection, mỗi ấp một Point. Chỉ giữ điểm nằm trong AOI của site | `name` (trùng từng ký tự với `nearest_hamlet`); `osm_id` (chuỗi dạng `node/123456`) |
+
+- **Ranh OSM.** Giữ định dạng hiện có với `osm_relation` là số nguyên dương. Tân Hội dùng relation 15449921.
+- **Khung nghiên cứu.** Đặt `aoi_type` bằng `study_bbox`, ghi `source` là nguồn chọn khung, `epsg` là mã EPSG của hệ UTM gốc và `bbox_utm_m` chứa đúng bốn tọa độ mét theo thứ tự tây, nam, đông, bắc. Trường `osm_relation` chỉ dành cho ranh OSM. Polygon GeoJSON vẫn dùng EPSG:4326 và phải khớp bốn góc của khung gốc sau khi chiếu. Bang Rakam dùng EPSG:32647 và bbox `[613250, 1846250, 625250, 1858250]`.
+- Phần mở rộng AOI tương thích với dữ liệu OSM hiện có và giữ `contract_version` là `2.0.0`.
 
 - Nguồn điểm ấp: các node OSM có `place=village` hoặc `place=quarter`. Lọc theo ranh xã thì Tân Hội còn đúng 24 điểm (dữ liệu OSM tải ngày 10/11/2026).
 

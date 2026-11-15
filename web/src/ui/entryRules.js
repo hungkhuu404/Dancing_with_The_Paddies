@@ -21,3 +21,6 @@ export function entrancePose(t,start,end,out){
   out.roll=.045*Math.sin(2*Math.PI*q)*Math.sin(Math.PI*q);
   return out;
 }
+
+/** A labelled illustration may be entered without being published as observations. */
+export function entryKind(profile,site,meta){return publishedSite(site,meta)?'published':profile?.scene.fixture_preview&&meta?.fixture===true&&meta.site===profile.id?'fixture':'pending';}

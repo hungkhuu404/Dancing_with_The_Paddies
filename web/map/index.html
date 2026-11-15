@@ -4,23 +4,23 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Flood Calendar | Map</title>
-    <meta name="description" content="Explore water arrival, flood duration and water recession across Tân Hội using NISAR observations." />
+    <meta name="description" content="Explore water arrival, flood duration and water recession across the study locations using NISAR observations." />
   </head>
   <body>
     <header class="top">
-      <a class="brand" href="../" id="world-link"><span class="brand-name">Flood Calendar</span><span class="brand-site" id="site-name">Tân Hội</span></a>
+      <a class="brand" href="../" id="world-link"><span class="brand-name">Flood Calendar</span><span class="brand-site" id="site-name"></span></a>
       <nav class="workspace-switch" aria-label="Workspace"><a href="../" id="back-world">Landscape</a><span aria-current="page">Map</span><a href="../calendar/" id="calendar-open" title="Water calendar">Calendar</a></nav>
       <button class="text-button" id="about-open" type="button" aria-label="Method and limits" title="Method and limits"><span class="control-label">Method</span></button>
     </header>
 
     <main class="workspace" id="workspace">
-      <div id="map" class="map" role="region" aria-label="Water observations in Tân Hội. Select a block to inspect its record."></div>
+      <div id="map" class="map" role="region" aria-label="Water observations. Select a block to inspect its record."></div>
       <div class="map-loading" id="map-loading" role="status">Loading water observations</div>
       <p id="errors" class="error-message" role="alert" hidden></p>
 
       <section class="explorer surface" aria-labelledby="explorer-title">
         <p class="eyebrow">Water observations</p>
-        <h1 id="explorer-title">Explore Tân Hội</h1>
+        <h1 id="explorer-title">Explore the water record</h1>
         <p class="intro">Select a 250 m block to read its water record.</p>
         <div class="layer-tabs" id="questions" role="group" aria-label="Map layer">
           <button type="button" data-mode="status" aria-pressed="true">Water status</button>
