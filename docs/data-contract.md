@@ -265,7 +265,7 @@ An AOI is exactly one of two types:
 - **OpenStreetMap boundary.** `osm_relation` is a positive integer. Tân Hội uses relation 15449921 (`area_ha` 14617.8).
 - **Study frame.** `aoi_type` is `study_bbox`. `source` names where the frame comes from, `epsg` is the EPSG code of the source UTM zone, and `bbox_utm_m` holds exactly four coordinates in metres in the order west, south, east, north. `osm_relation` is reserved for OpenStreetMap boundaries and must be absent. The GeoJSON polygon is still in EPSG:4326 and must match the four corners of the source frame after projection. Bang Rakam uses EPSG:32647 and `bbox_utm_m` `[613250, 1846250, 625250, 1858250]` (`area_ha` 14400).
 
-Hamlet points are OpenStreetMap nodes tagged `place=village` or `place=quarter`. Tân Hội has 24 points inside its boundary (OpenStreetMap data downloaded on 10 November 2026). Bang Rakam has 4 points.
+Hamlet points are OpenStreetMap nodes tagged `place=village` or `place=quarter`. Tân Hội has 24 points inside its boundary. Bang Rakam has 4 points.
 
 ### 6.5. `series.json`
 

@@ -19,7 +19,6 @@ The committed assets were produced with these scripts. Regenerating every commit
 - `site-options.mjs`, `site_config.py`: read the shared site profile for Node and Python tools.
 - `recovery_paths.py`: resolves the local build and input directories from environment variables. Nothing writes to `web/public/` automatically.
 - `verify_recovery.py`: static check of the Python sources (see [Verification](#verification)).
-- `RECOVERY.md`: provenance table of the generator scripts.
 - `*.mjs` in this folder: Node tools described in the sections below.
 
 ## Dependencies
