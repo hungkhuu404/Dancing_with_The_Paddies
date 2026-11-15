@@ -14,6 +14,10 @@ Team **Dancing with The Paddies** · Ho Chi Minh City University of Technology (
 >
 > **Where it goes next.** The demo runs in two countries, on the same pipeline and web: Tân Hội in An Giang, Vietnam, and Bang Rakam in Phitsanulok, Thailand. The target is every rice-growing country, 100+ of them: NISAR data are open and cover nearly all of Earth's land every 12 days. Each new site needs a site file and a threshold review ([what the second site took](#from-two-demo-sites-to-100-rice-growing-countries)).
 
+![Flood Calendar map of Tân Hội: blocks where water is present (blue) and where water has receded (orange), over the NISAR radar image](docs/images/flood-calendar-map-tan-hoi.jpg)
+
+*Map view of the web app for Tân Hội, all radar passes from 11 August to 3 November 2026. Blue: water present on the block's latest radar pass. Orange: water receded. Grey background: NISAR radar backscatter. Screenshot of https://floodcalendar.pages.dev/map/ taken on 15 November 2026.*
+
 ## The problem
 
 Every autumn, Tân Hội commune in An Giang, Vietnam, opens the dikes around its rice fields after the Autumn–Winter harvest and lets the Mekong flood in. This is deliberate: the flood brings silt and cleans the fields between crops. Then the water has to be pumped out again before Winter–Spring rice can be sown, and the province's sowing calendar for that crop closes on 31 December 2026. A field that still holds water cannot be sown.
