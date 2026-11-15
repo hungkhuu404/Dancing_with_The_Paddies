@@ -2,13 +2,15 @@
 
 *Day in, days under, day out: NISAR keeps each rice block's flood calendar.*
 
-Team **Dancing with The Paddies** · NASA Space Apps Challenge 2026 · Challenge: *Dancing with the SARs*
+Team **Dancing with The Paddies** · Ho Chi Minh City University of Technology (HCMUT), Vietnam National University Ho Chi Minh City (VNU-HCM) · NASA Space Apps Challenge 2026 · Challenge: *Dancing with the SARs*
 
 **Team members:** Khưu Huỳnh Gia Hưng (team lead, contact and submission); Lê Nguyễn Minh Tân, Lê Viễn Bằng and Lý Anh Quân (backend: radar pipeline and data); Võ Anh Quốc and Lê Quang (frontend: web and video).
 
-**Data status:** The web reads the Tân Hội H7 and Bang Rakam radar exports under contract 2.0.0. The repository includes S1–S5, an offline S6 comparison runner and S7. Reference agreement is post-hoc, not independent accuracy evidence; the interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md), [S6 instructions](docs/s6-comparison.md) and [H7 data status](docs/provenance/h7-data-status.md).
+**Web app:** https://floodcalendar.pages.dev · **Demo video (30 s):** https://drive.google.com/file/d/1Rb9ujhvlkRmKDEZBBRMMePUZH5zd6cvU/view
 
-**Web app:** https://floodcalendar.pages.dev — built and deployed from this repository's `main` after Web CI passes ([deployment setup](docs/plans/dancing-production.md)). On 15 November 2026 it served the same Tân Hội H7 and Bang Rakam exports as `data/` in this repository (matching `generated_utc` in each `meta.json`).
+> **Why this matters now.** After the harvest, communes in An Giang, Vietnam, let the Mekong flood into their diked rice fields on purpose. Then the water has to be pumped out before Winter–Spring rice can be sown, and the sowing calendar closes on **31 December 2026**. Last season the flood receded slowly and sowing bunched together; by April 2026 combine harvesters ran short, lodged rice waited in the fields, and farmers lost 500–700 VND per kilogram ([details](#the-problem)). The commune's plan asks it to track the flood, but gives it no map of the flood, and in the flood season the delta is often under cloud.
+>
+> **What we built.** Flood Calendar reads NASA–ISRO NISAR L-band radar, which sees through cloud, and keeps a flood calendar for every 250 m block of Tân Hội commune: is open water still seen, when did it arrive, how long has it stayed. On the latest radar date for each block (up to 3 November 2026), open water was still seen on **9,825 ha** of the 14,650 ha we mapped, and no longer seen on 1,281 ha.
 
 ## The problem
 
@@ -66,6 +68,12 @@ The local web includes:
 Bang Rakam (Thailand) uses the QUAN-9 export: 2,304 blocks and 11 observations in a 12 × 12 km study frame. Tân Hội H7 uses 22 observations. Both retain their scientific limitations. Data sonification follows observed water area; ambient landscape audio is illustrative. See [two-site integration](docs/plans/two-site-real-data.md).
 
 What it does **not** do: it does not measure methane, and it cannot tell whether a field was sown right after the water left.
+
+## Status and deployment
+
+**Web app:** https://floodcalendar.pages.dev — built and deployed from this repository's `main` after Web CI passes ([deployment setup](docs/plans/dancing-production.md)). On 15 November 2026 it served the same Tân Hội H7 and Bang Rakam exports as `data/` in this repository (matching `generated_utc` in each `meta.json`).
+
+**Data status:** The web reads the Tân Hội H7 and Bang Rakam radar exports under contract 2.0.0. The repository includes S1–S5, an offline S6 comparison runner and S7. Reference agreement is post-hoc, not independent accuracy evidence; the interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md), [S6 instructions](docs/s6-comparison.md) and [H7 data status](docs/provenance/h7-data-status.md).
 
 ## How it works
 
