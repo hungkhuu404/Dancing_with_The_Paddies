@@ -6,7 +6,7 @@ Task WEB-INTERFACE-013. Human owner AIVIETNAM-AIO-QP09; actor Codex. Product bas
 
 Remove the repeated T?n H?i H7 radar data and Bang Rakam radar data badges from all four views. Keep the provenance and post-hoc caveats in Sources/Method. H7 acceptance and Q1 metadata do not change.
 
-Scene help moves into the real action toolbar beside Map and Tools. The actual control is moved, retaining its listener and focus state. Calendar/Method share one reference navigation row on phones and an aligned column on desktop. Both remain directly visible. The map gives Help/Method a reserved toolbar group, with a second navigation row only on standalone phones; embedded maps use one compact row. Existing fonts, icons, transparent materials, legends, motion and reduced-motion support remain. Compact mobile Tour and Map controls retain descriptive accessible names.
+Scene help has an explicit action-toolbar slot beside Map and Tools. The same control retains its listener and focus state; the duplicate Sources entry in Tools is removed because Sources remains in the footer. Calendar/Method share one reference navigation row on phones and an aligned column on desktop. Both remain directly visible. The map gives Help/Method a reserved toolbar group, with a second navigation row only on standalone phones; embedded maps use one compact row. Existing fonts, icons, transparent materials, legends, motion and reduced-motion support remain. Compact mobile Tour and Map controls retain descriptive accessible names.
 
 A non-WebGL direct scene link now explains the problem in plain English and offers Water calendar and Method for the selected site, plus the location chooser. These HTML routes do not depend on WebGL; a MapLibre-only fallback would not solve this case.
 
