@@ -71,6 +71,7 @@ def build_method_definition(cfg, run, rules, quality):
         "min_valid_pixel_fraction": cfg["thresholds"]["min_valid_pixel_fraction"],
         "classification": {"name": "pixel_fraction_75_dual_50", "water_fraction": 0.75,
             "fill_min_fraction": 0.5, "joint_valid_fraction": cfg["thresholds"]["min_valid_pixel_fraction"],
+            "valid_mask": "gcov_fully_focused_1_254",
             "comparison": "HH and HV linear power strictly below their acquisition thresholds"},
         "selection": {"status": "post_hoc", "reference": "DSWx-S1; agreement is not independent validation or ground truth"},
         "single_anomaly_filter": {"enabled": cfg["thresholds"]["filter_single_anomaly"], "comparison": "simultaneous 75% raw valid observations; N-to-W fill requires at least 50% water pixels; missing ignored"},

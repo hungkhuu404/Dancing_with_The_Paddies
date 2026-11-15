@@ -127,6 +127,44 @@ def test_posthoc_attachment_keeps_original_frozen_microseconds(tmp_path):
     assert paths[1].read_bytes() == original_before
 
 
+def test_posthoc_attachment_preserves_prior_snapshot_history(tmp_path):
+    import json
+    import add_posthoc
+    block = dict(n_pairs=1, kappa_median=.5, kappa_min=.5, kappa_max=.5, by_track={}, by_n_tracks={})
+    first = dict(id='PH-01', changed_utc='2026-11-14T07:58:38Z', what='old')
+    before = dict(frozen_utc='2026-11-13T06:23:57Z', filtered=block, posthoc=[first])
+    new = dict(frozen_utc='2026-11-14T00:00:00Z', first_dswx_read_utc='2026-11-13T07:29:02Z',
+               filtered={**block, 'kappa_median': .6}, posthoc=[])
+    entry = dict(id='PH-02', changed_utc='2026-11-14T16:40:00Z')
+    paths = [tmp_path/name for name in ('new.json', 'before.json', 'entry.json')]
+    for path, value in zip(paths, (new, before, entry)):
+        path.write_text(json.dumps(value), encoding='utf-8')
+    add_posthoc.main(*paths)
+    out = json.loads(paths[0].read_text(encoding='utf-8'))
+    assert [x['id'] for x in out['posthoc']] == ['PH-01', 'PH-02']
+    assert out['posthoc'][0] == first
+    assert out['posthoc'][1]['before']['kappa_median'] == .5
+    assert out['posthoc'][1]['after']['kappa_median'] == .6
+
+
+def test_posthoc_rejects_conflicting_history_without_writing(tmp_path):
+    import json
+    import add_posthoc
+    block = dict(n_pairs=1, kappa_median=.5, kappa_min=.5, kappa_max=.5, by_track={}, by_n_tracks={})
+    prior = dict(id='PH-01', changed_utc='2026-11-14T07:58:38Z', what='original')
+    before = dict(frozen_utc='2026-11-13T06:23:57Z', filtered=block, posthoc=[prior])
+    new = dict(frozen_utc='2026-11-14T00:00:00Z', first_dswx_read_utc='2026-11-13T07:29:02Z',
+               filtered=block, posthoc=[{**prior, 'what':'conflict'}])
+    entry = dict(id='PH-02', changed_utc='2026-11-14T16:40:00Z')
+    paths = [tmp_path/name for name in ('new.json', 'before.json', 'entry.json')]
+    for path, value in zip(paths, (new, before, entry)):
+        path.write_text(json.dumps(value), encoding='utf-8')
+    original = paths[0].read_bytes()
+    with pytest.raises(ValueError, match='Conflicting post-hoc history'):
+        add_posthoc.main(*paths)
+    assert paths[0].read_bytes() == original
+
+
 def test_public_limits_omit_agreement_numbers_and_old_freeze_claim():
     import make_limits_text
     text = make_limits_text.render({'filtered': {'kappa_median': 0.559123}})

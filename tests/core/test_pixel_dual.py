@@ -120,4 +120,5 @@ bbox_utm_m = [0, 0, 250, 250]
         assert cube['s'][:, 0].tolist() == [2, 1, 2, 2, 1]
     method = json.loads((output / 'method_freeze.draft.json').read_text(encoding='utf-8'))
     assert method['classification']['name'] == 'pixel_fraction_75_dual_50'
+    assert method['classification']['valid_mask'] == 'gcov_fully_focused_1_254'
     assert method['selection']['status'] == 'post_hoc'

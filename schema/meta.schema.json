@@ -88,6 +88,9 @@
         "selection_status": {
           "const": "post_hoc"
         },
+        "valid_mask": {
+          "const": "gcov_fully_focused_1_254"
+        },
         "frozen_utc": {
           "anyOf": [
             {

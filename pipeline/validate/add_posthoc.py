@@ -19,7 +19,16 @@ def main(new_path, before_path, entry_path):
     entry = json.loads(Path(entry_path).read_text(encoding="utf-8"))
     new["frozen_utc"] = before["frozen_utc"]
     entry.update(before=pick(before["filtered"]), after=pick(new["filtered"]))
-    new["posthoc"] = [p for p in new.get("posthoc", []) if p["id"] != entry["id"]] + [entry]
+    history = []
+    for item in before.get("posthoc", []) + new.get("posthoc", []):
+        if item["id"] == entry["id"]:
+            continue
+        previous = next((p for p in history if p["id"] == item["id"]), None)
+        if previous is not None and previous != item:
+            raise ValueError("Conflicting post-hoc history")
+        if previous is None:
+            history.append(item)
+    new["posthoc"] = history + [entry]
     new = V.normalize_timestamps(new)
     Path(new_path).write_text(json.dumps(new, indent=2, ensure_ascii=False, allow_nan=False), encoding="utf-8")
 

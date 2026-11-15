@@ -25,6 +25,12 @@ def test_same_grid_can_arrive_in_different_order():
     run_s6.validate_inputs(*inputs())
 
 
+def test_water13_is_optional_for_primary_open_water_comparison():
+    cube, dsw = inputs()
+    del dsw['water13']
+    run_s6.validate_inputs(cube, dsw)
+
+
 @pytest.mark.parametrize('bad', ['duplicates', 'different_grid', 'bad_state', 'wrong_shape'])
 def test_reject_incompatible_inputs(bad):
     cube, dsw = inputs()

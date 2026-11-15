@@ -18,7 +18,7 @@ python -I -m pytest -p no:cacheprovider -q tests/core tests/validate
 Chuẩn bị ngoài Git:
 
 - Cube NISAR pixel NPZ và metrics CSV của cùng snapshot.
-- NPZ DSWx có `cell_id`, `TD_utc`, `TD`, `valid`, `water`, `water13`; mã ô phải cùng tập với cube, có thể khác thứ tự. Nếu vẽ hình cần thêm `cell_bounds`.
+- NPZ DSWx có `cell_id`, `TD_utc`, `TD`, `valid`, `water`; `water13` là tùy chọn và chỉ dùng khi có nhãn class 1+3 chính xác. Nếu thiếu thì runner bỏ hẳn phép so sánh phụ class 1+3, không nội suy từ tỷ lệ đã làm tròn. Mã ô phải cùng tập với cube, có thể khác thứ tự. Nếu vẽ hình cần thêm `cell_bounds`.
 - CSV BANG-2 có `cell_id`, `cropland_share`, `builtup_share`.
 - `gate.json` lịch sử ghi mốc H3 và lần đầu đọc DSWx. Đây là bằng chứng lịch sử, không phải xác nhận độc lập cho phương pháp pixel.
 - Entry PH-01 và validation H3 trước hiệu chỉnh nếu cần tái tạo đầy đủ lịch sử post-hoc.
@@ -52,6 +52,7 @@ python -c "import json,pathlib; p=pathlib.Path; assert json.loads(p('runtime/s6-
 ## Công cụ đọc dữ liệu và nội dung
 
 - `dswx.py`: reader OPERA DSWx-S1; `landcover.py`: công cụ BANG-2. Các hàm tính và test được nhập từ code đã dùng local. Chúng nhận TOML reader riêng theo cấu trúc bàn giao Bằng (`site`, `grid`/`worldcover`, `search`, `thresholds`, `output`); không truyền trực tiếp TOML S1–S5 thiếu các trường reader. Trong bản tích hợp, đường dẫn cache, ranh và output của reader tính từ thư mục chứa TOML. Khi chuyển cấu hình cũ của Bằng cần cập nhật các đường dẫn tương đối, giữ nguyên tham số nghiệp vụ.
+- `csv_to_dswx.py --csv <file> --timezone Asia/Ho_Chi_Minh --output <file.npz>`: chuyển bảng per-cell có `valid` và `water` chính xác sang NPZ cho phép đối chiếu class 1. Kiểm từng thời điểm, mã ô và bảng đầy đủ; không phát minh nhãn class 1+3.
 - `add_posthoc.py`: thêm entry và before/after, không cắt mất giây lẻ của mốc H3.
 - `make_limits_text.py validation.json limits.md`: mặc định xuất Limits công khai không có điểm khớp DSWx. `--internal` xuất số cho nhóm; số thiếu hiển thị không có dữ liệu.
 - Launcher zsh `run_bang7.sh` và gate tải cũ không được nhập: chúng gắn với cây thư mục máy riêng và phương pháp H3 cũ. Dùng CLI explicit-input ở trên cho snapshot pixel.

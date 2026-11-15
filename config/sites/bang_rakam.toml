@@ -7,7 +7,7 @@ timezone = "Asia/Bangkok"
 [grid]
 epsg = 32647
 cell_size_m = 250
-bbox_utm_m = [610750, 1845000, 627000, 1861250]
+bbox_utm_m = [613250, 1846250, 625250, 1858250]
 
 [catalog]
 collections = ["NISAR_L2_GCOV_PROVISIONAL_V1", "NISAR_L2_GCOV_V1"]
