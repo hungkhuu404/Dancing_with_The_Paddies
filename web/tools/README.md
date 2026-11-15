@@ -2,7 +2,7 @@
 
 ## Phase 2 infrastructure
 
-`fetch-infrastructure.mjs` saves bounded public Overpass responses into an explicit local cache file, with a generic User-Agent. Use the default query, `--buildings-only` and `--facilities-only` separately; public endpoints can time out, and failed requests never fabricate a snapshot. `build-infrastructure.mjs` combines those snapshots, projects source geometry to the scene frame, retains exact names/IDs/tags, deduplicates nested church sites and copies the 24 existing place names unchanged. It writes a separate static scene overlay, never water contract files. Full commands, attribution and limits: [infrastructure review](https://github.com/hungkhuu404/Nasa_prep/blob/cb6a2031615264b177c460fad19400b3c99557e8/docs/plans/3d-infrastructure_review.md).
+`fetch-infrastructure.mjs` saves bounded public Overpass responses into an explicit local cache file, with a generic User-Agent. Use the default query, `--buildings-only` and `--facilities-only` separately; public endpoints can time out, and failed requests never fabricate a snapshot. `build-infrastructure.mjs` combines those snapshots, projects source geometry to the scene frame, retains exact names/IDs/tags, deduplicates nested church sites and copies the 24 existing place names unchanged. It writes a separate static scene overlay, never water contract files. Full commands, attribution and limits: infrastructure review (internal note, not published).
 
 `web/src/world/infrastructureShapes.js` is the reproducible procedural geometry source for new infrastructure, with metre-scale bounds and memory-budget tests. No Blender binary, downloaded model or generated AI image is needed for these shapes. Its source manifest is `web/public/scene/infrastructure-assets.json`.
 
@@ -141,7 +141,7 @@ An optional schema check uses the data team's schema directory and a Python envi
 python web/test/check-site-export.py --data web/public/data --schemas <schema-directory> --frame-schema web/fixtures/bang_rakam/aoi-frame.schema.json
 ```
 
-The frame override is rejected for non-fixture exports. See [base-scene review](https://github.com/hungkhuu404/Nasa_prep/blob/cb6a2031615264b177c460fad19400b3c99557e8/docs/plans/bang_rakam_base_review.md) for measured performance, scope, provenance and outstanding data questions.
+The frame override is rejected for non-fixture exports. See base-scene review (internal note, not published) for measured performance, scope, provenance and outstanding data questions.
 
 ## Original Thai identity models (BR-IDENTITY-003)
 
@@ -153,7 +153,7 @@ node web/tools/compress-identity.mjs <raw-directory> <review-compressed-director
 <blender> -b --factory-startup -t 2 --python web/tools/blender/render_tree_impostors.py -- --source <absolute-raw-directory> --out <absolute-atlas-review-directory> --names thai_borassus thai_tamarind
 ```
 
-The Blender tool uses only built-in geometry and vertex colours; it exports 13 model presets and a Cycles contact sheet. `--only <model...>` rebuilds a subset; `--skip-contact` omits the contact sheet. Raw output stays outside public/. Inspect the Cycles images and budget report before copying only compressed GLBs to public/models/ and the two PNG atlases plus index to public/impostors/thai/. The compressor refuses in-place raw replacement and checks the 400 KB cap and meshopt extension. Install the pinned CLI in an isolated local tool directory; it is not an application dependency. Regenerate thai-manifest.json hashes after a reviewed model change. Source/cultural limits and measurements: [identity review](https://github.com/hungkhuu404/Nasa_prep/blob/cb6a2031615264b177c460fad19400b3c99557e8/docs/plans/bang_rakam_identity_review.md).
+The Blender tool uses only built-in geometry and vertex colours; it exports 13 model presets and a Cycles contact sheet. `--only <model...>` rebuilds a subset; `--skip-contact` omits the contact sheet. Raw output stays outside public/. Inspect the Cycles images and budget report before copying only compressed GLBs to public/models/ and the two PNG atlases plus index to public/impostors/thai/. The compressor refuses in-place raw replacement and checks the 400 KB cap and meshopt extension. Install the pinned CLI in an isolated local tool directory; it is not an application dependency. Regenerate thai-manifest.json hashes after a reviewed model change. Source/cultural limits and measurements: identity review (internal note, not published).
 
 ## Regional observatory overview (WEB-ATLAS-008)
 
