@@ -40,3 +40,5 @@ Record actual test, browser, capture and timing results here before publishing. 
 The startup difference is small and does not establish a meaningful speedup. The change demonstrably removes 41/47 model HEAD requests and shares decoded models; full shader warm-up still takes time. Do not compare these local readiness values directly to the prior hosted 14?16-second sample. No sampled flight exceeds 100 ms, but this is not a guarantee for all camera/driver/thermal conditions. Large bundle warnings remain: scene 1,347.29 kB (453.86 kB gzip), map 1,094.58 kB (299.66 kB gzip).
 
 Evidence stays local in .cache/interface-polish/: qa/results.json and tour-30s.webm; layout/results.json and responsive screenshots; recovery/results.json and fallback screenshots; performance/results.json and route captures; tests.log/build.log. Own direct-Node Vite servers and Edge instances are closed after checks.
+
+Map Help/Method share one glass surface, like the scene action group, instead of independent nested filtered button surfaces inside an iframe. Their distinct accessible names, reserved positions and pointer behaviour remain unchanged.
