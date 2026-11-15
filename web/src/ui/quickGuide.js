@@ -12,7 +12,7 @@ export function createQuickGuide({view='landscape',trigger,fixture=false}={}){
  function close(){panel.hidden=true;trigger.setAttribute('aria-expanded','false');try{localStorage.setItem(key,'seen');}catch{}}
  trigger.onclick=()=>{panel.hidden=!panel.hidden;trigger.setAttribute('aria-expanded',String(!panel.hidden));};panel.querySelector('button').onclick=()=>{close();trigger.focus({preventScroll:true});};
  if(view==='landscape'&&document.querySelector('#help-dialog')){const all=document.createElement('button');all.type='button';all.className='guide-all';all.textContent='All controls';all.onclick=()=>{close();enterDialog(document.querySelector('#help-dialog'));};panel.append(all);}
- addEventListener('keydown',e=>{if(e.key==='Escape'&&!panel.hidden){e.preventDefault();e.stopPropagation();close();trigger.focus({preventScroll:true});}},true);
+ addEventListener('keydown',e=>{if(e.key==='Escape'&&!panel.hidden&&!panel.inert){e.preventDefault();e.stopPropagation();close();trigger.focus({preventScroll:true});}},true);
  document.addEventListener('visibilitychange',()=>{if(document.hidden)panel.hidden=true;});
  return {showOnce(){if(!seen){panel.hidden=false;trigger.setAttribute('aria-expanded','true');seen=true;try{localStorage.setItem(key,'seen');}catch{}}},close};
 }
