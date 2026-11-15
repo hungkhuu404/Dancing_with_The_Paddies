@@ -1,5 +1,4 @@
 import {releaseContext,radarReference,radarUv} from './data/releaseContext.js';
-import {mountReleaseNotice} from './ui/releaseNotice.js';
 import {createTourInvitation} from './ui/tourInvitation.js';
 import {frameBudget} from './fx/frameBudget.js';
 import {createSeasonSound} from './audio/seasonSound.js';
@@ -10,6 +9,7 @@ import { MapControls } from 'three/examples/jsm/controls/MapControls.js';
 import './style.css';
 import './ui/liquid.css';
 import './ui/surfaces.css';
+import './ui/layout.css';
 import '@fontsource/ibm-plex-sans/latin-400.css';
 import '@fontsource/ibm-plex-sans/vietnamese-400.css';
 import '@fontsource/ibm-plex-sans/latin-600.css';
@@ -70,8 +70,10 @@ async function fallback(err) {
   if(activeProfile?.scene.fallback_image){
     try {const r=await fetch(BASE+activeProfile.scene.fallback_image,{method:'HEAD'});if(r.ok&&(r.headers.get('content-type')||'').includes('image')){const image=document.createElement('img');image.src=BASE+activeProfile.scene.fallback_image;image.alt='Illustrative field landscape';el.append(image);}}catch{/* text fallback */}
   }
-  const message=document.createElement('p');message.textContent=err?.message||'The landscape is unavailable.';
-  const choose=document.createElement('a');choose.href=BASE;choose.textContent='Choose a location';el.append(message,choose);
+  const message=document.createElement('p');message.textContent='The landscape cannot open in this browser. You can still explore the water record.';
+  const links=document.createElement('nav');links.setAttribute('aria-label','Alternative views');
+  for(const [path,label] of [['calendar/','Water calendar'],['method/','Method and limits']]){const a=document.createElement('a');a.href=BASE+path+'?'+new URLSearchParams({site:activeProfile?.id||'tan_hoi'});a.textContent=label;links.append(a);}
+  const choose=document.createElement('a');choose.href=BASE;choose.textContent='Choose a location';el.append(message,links,choose);
 }
 
 /** scene/commune/index.json, else a one-tile index around the 2 km window (scene/layout.json). */
@@ -93,6 +95,7 @@ async function loadIndex(profile) {
 }
 
 async function boot() {
+  const bootStarted=performance.now();
   let invitation=null;
   const profile=siteProfile(requestedSite(location.search));activeProfile=profile;
   document.title='Flood Calendar in '+profile.name;
@@ -119,6 +122,9 @@ async function boot() {
   // the error check reads the link status synchronously, which serialises every shader compile (seconds on ANGLE/D3D)
   renderer.debug.checkShaderErrors = !import.meta.env.PROD || params.has('glcheck');
 
+  // Fetch/decode once in parallel with scene metadata and textures; keep all warm-up gates.
+  const modelNames=[...new Set([...LIFE_MODELS.filter(n=>!profile.identity||!['palm_a','palm_b','bush','house_0','house_1','house_2'].includes(n)),...MODELS.filter(n=>!profile.identity||n!=='longtail'),...(profile.identity?.models||[])])];
+  const pendingModels=modelNames.map(n=>loadModel(n).then(g=>[n,g]));
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 1, 20000);
 
@@ -134,7 +140,6 @@ async function boot() {
   ]);
   const reference=radarReference(profile,index,contract.meta);
   const radarTex=sceneRadarTex||(reference?await loadTexture(reference.path,false):null);
-  mountReleaseNotice(contract.meta);
   if(index.provenance){const content=$('#sources-dialog .dialog-content');content.replaceChildren();const title=document.createElement('h3');title.textContent=profile.name+' landscape sources';const details=document.createElement('p');details.textContent=index.provenance.illustration;const imagery=document.createElement('p');imagery.textContent=index.provenance.imagery;const osm=document.createElement('p');osm.textContent=index.provenance.osm;const observations=document.createElement('p');observations.textContent=contract?.meta.fixture?'Data pending. The water record is a fixture; no fixed radar reference image or reference comparison is supplied. Acquisition times come from the ASF DAAC NISAR catalogue.':'Water observations use the selected site export. Scene objects remain illustrative. '+(releaseContext(contract.meta)?.details||'');content.append(title,observations,details,imagery,osm);if(index.provenance.architecture){const credit=document.createElement('p');credit.textContent=index.provenance.architecture;content.append(credit);}const weather=document.createElement('p');weather.id='weather-source-note';content.append(weather);}
   if (parcelTex) { parcelTex.magFilter = parcelTex.minFilter = THREE.NearestFilter; parcelTex.generateMipmaps = false; }
   let passes = contract?.passes;
@@ -652,8 +657,7 @@ async function boot() {
   // Link final lit/depth variants together once, rather than serially waiting
   // for placeholder shaders and then re-linking the scene after every batch.
   async function loadModels() {
-    const names = [...new Set([...LIFE_MODELS.filter(n=>!profile.identity||!['palm_a','palm_b','bush','house_0','house_1','house_2'].includes(n)), ...MODELS.filter(n=>!profile.identity||n!=='longtail'), ...(profile.identity?.models||[])])];
-    const loads = names.map((n) => loadModel(n).then((g) => [n, g]));
+    const loads = pendingModels;
     const next = () => new Promise((r) => requestAnimationFrame(r));
     const used = [];
     for (let i = 0; i < loads.length; i += 6) {
@@ -721,7 +725,7 @@ async function boot() {
   });
   window.__debug.signature=signature;
   createChrome({canvas,signature});
-  const helpControl=document.querySelector('[data-dialog=help-dialog]');document.body.append(helpControl);helpControl.classList.add('quick-guide-toggle','landscape-guide-toggle');
+  const helpControl=document.querySelector('[data-dialog=help-dialog]');document.querySelector('#menu-btn').before(helpControl);helpControl.classList.add('quick-guide-toggle','landscape-guide-toggle');
   const guide=createQuickGuide({trigger:helpControl,fixture:!!contract.meta.fixture});
   invitation=createTourInvitation({site:profile.id,enabled:profile.tour.enabled,fixture:!!contract.meta.fixture,onStart:()=>{guide.close();signature.startTour();},onExplore:()=>{guide.showOnce();canvas.focus({preventScroll:true});}});
   mapWorkspace=createMapWorkspace({
@@ -782,6 +786,7 @@ async function boot() {
   });
   sky.fitShadow(controls.target,camera.position.distanceTo(controls.target),quality.shadow);
   console.info('final lit/shadow shaders ready in',Math.round(performance.now()-compileStarted),'ms');
+  window.__debug.boot={totalMs:Math.round(performance.now()-bootStarted),warmupMs:Math.round(performance.now()-compileStarted),models:modelNames.length};
   last=performance.now();
   $('#loading').hidden=true;if(intro.done&&!entryState.active&&!invitation.offer())guide.showOnce();
   entryState.ready=true;entryState.onReady?.();

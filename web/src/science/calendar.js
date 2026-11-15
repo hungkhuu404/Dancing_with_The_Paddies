@@ -1,4 +1,3 @@
-import {mountReleaseNotice} from '../ui/releaseNotice.js';
 import {createSeasonSound} from '../audio/seasonSound.js';
 import {referenceData} from './referenceData.js';
 import {pageReady,pageError,openCalendarMap} from './referencePage.js';
@@ -10,7 +9,7 @@ async function start(){
   const {site,data}=await referenceData(['meta.json','cells.geojson','series.json','places.geojson','summary.json']);
   const acq=data['meta.json'].acquisitions,rows=waterCalendar(data['cells.geojson'],data['series.json'],acq,data['places.geojson']);
   document.documentElement.style.setProperty('--calendar-pass-count',String(acq.length));
-  pageReady(site);mountReleaseNotice(data['meta.json'],document.querySelector('.reference-heading>div'));
+  pageReady(site);
 document.querySelector('#calendar-title').textContent=site.name;
   document.querySelector('#calendar-summary').textContent=`${rows.length} hamlet groups, ${acq.length} observations. ${fmtDate(acq[0].date_local)} to ${fmtDate(acq.at(-1).date_local)}. Ordered by first water observation.`;
   if(!new URLSearchParams(location.search).has('preview')){

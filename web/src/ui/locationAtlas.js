@@ -27,12 +27,12 @@ export async function createLocationAtlas({choose,back}){
   root.querySelector('.atlas-resume').onclick=back;
   function message(text){statusText.textContent=text;}
   function startChoice(location){
-    if(flight)return;flight=true;cancelled=false;const revision=++choiceRevision;root.classList.add('is-preparing');root.setAttribute('aria-busy','true');status.hidden=false;message('Preparing '+location.name);
+    if(flight)return;flight=true;cancelled=false;const revision=++choiceRevision;root.classList.add('is-preparing');root.setAttribute('aria-busy','true');status.hidden=false;status.querySelector('.atlas-map-fallback')?.remove();message('Preparing '+location.name);
     const isCancelled=()=>cancelled||revision!==choiceRevision;
     choose(location,{cancelled:isCancelled,fly:()=>isCancelled()?Promise.resolve(false):fly(location),message}).catch(error=>{
       if(isCancelled())return;
-      flight=false;root.classList.remove('is-preparing');root.setAttribute('aria-busy','false');message(error.message);
-      if(!status.querySelector('.atlas-map-fallback')){const a=document.createElement('a');a.href=BASE+'map/?site='+encodeURIComponent(location.id);a.textContent='Open observation map';a.className='atlas-map-fallback';status.append(a);}
+      flight=false;root.classList.remove('is-preparing');root.setAttribute('aria-busy','false');message('The landscape could not open. Try the water calendar instead.');
+      if(!status.querySelector('.atlas-map-fallback')){const a=document.createElement('a');a.href=BASE+'calendar/?site='+encodeURIComponent(location.id);a.textContent='Open water calendar';a.className='atlas-map-fallback';status.append(a);}
     });
   }
   function highlight(location){

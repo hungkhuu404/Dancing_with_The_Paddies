@@ -62,3 +62,13 @@ The exported interface remains defined by [CONTRACT-001](../data-contract.md). E
 [Sources, behavior and verification](../plans/history-bang-tour.md).
 
 The science calendar entrypoint sets its acquisition count for compact tour-preview columns; reference.css scopes this evidence layout to .is-preview while preserving the full calendar.
+
+## Interface and capture refinement (WEB-INTERFACE-013)
+
+- ui/layout.css owns shared toolbar spacing and responsive scene/map reference navigation; map tools reserve Help/Method slots.
+- main.js keeps all shader warm-up gates but preloads model promises; data/load.js shares one decode per model and avoids HEAD/GET pairs. main.js also provides selected-site non-WebGL HTML recovery.
+- audio/recordMix.js taps application playback and owns the recording audio mix; world/recorder.js combines it with canvas video. tourAudio.js, tourScore.js, sound.js and audio/seasonSound.js register post-volume outputs.
+- ui/tourFocus.js preserves toolbar focus/inert state after moving Help into the header. Repeated release badges are no longer mounted; data/releaseContext.js still supplies source/Method caveats.
+- test/recordMix.test.mjs checks late sources, capture-only cleanup, playback survival and unsupported capture.
+
+[Design and verification](../plans/interface-polish.md).

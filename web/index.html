@@ -23,18 +23,20 @@
         <nav id="scene-views" aria-label="Scene view" aria-describedby="view-control-note"><p id="view-control-note" class="control-note">Choose how to view the fields</p></nav>
         <nav class="app-actions" aria-label="Tools">
           <a class="map-action" href="/map/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6Zm6-3v15M15 6v15"/></svg>Map</a>
+          <button type="button" data-dialog="help-dialog" aria-label="Show quick guide" title="Quick guide"></button>
           <button id="menu-btn" type="button" title="Tools" aria-label="Open tools" aria-expanded="false" aria-controls="tools-panel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
         </nav>
       </header>
       <section id="light-control" class="light-control" aria-label="Scene lighting"><div id="tod" class="tod"></div><p id="light-control-note" class="control-note">Adjust the scene lighting</p></section>
+      <nav class="reference-links" aria-label="Water record">
       <a class="calendar-launch" href="/calendar/">Water calendar</a>
       <a class="method-launch" href="/method/">Method and limits</a>
+      </nav>
       <button id="whole-btn" class="reset-view" type="button" aria-label="Show the whole commune"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5M8 12h8M12 8v8"/></svg><span>Reset view</span></button>
       <section id="tools-panel" class="tools-panel" aria-labelledby="tools-title" hidden>
         <div class="drawer-heading"><h2 id="tools-title">Tools</h2><button id="tools-close" class="icon-close" aria-label="Close tools" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
         <section class="tools-section presentation-section"><h3>Presentation</h3><div id="presentation-tools"></div></section>
         <details class="tools-section"><summary>Scene settings</summary><button id="sound-btn" class="setting-toggle" type="button" aria-pressed="false">Ambient sound <span aria-hidden="true">Off</span></button></details>
-        <section class="tools-section tool-links"><button type="button" data-dialog="help-dialog">Navigation help</button><button type="button" data-dialog="sources-dialog">Sources &amp; methods</button></section>
       </section>
       <div id="timeline" class="timeline"></div>
       <aside id="card" class="card"></aside>

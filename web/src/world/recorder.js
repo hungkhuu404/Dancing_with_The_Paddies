@@ -1,8 +1,9 @@
+import {createRecordingMix} from '../audio/recordMix.js';
 import {recordingType,fitFrame} from './signatureRules.js';
 export function createRecorder(source,{subtitle=()=>'',credit=()=> 'Flood Calendar · Tân Hội · illustrative 3D',onState=()=>{}}={}) {
-  let recorder=null,stream=null,frame=0,timer=0,url=null,started=0,chunks=[],copy=null,ctx=null,fit=null;
+  let mix=null,recorder=null,stream=null,frame=0,timer=0,url=null,started=0,chunks=[],copy=null,ctx=null,fit=null;
   const state={active:false,url:null,mime:null,bytes:0,error:null};
-  function finish(){clearTimeout(timer);cancelAnimationFrame(frame);stream?.getTracks().forEach(t=>t.stop());document.body.classList.remove('record-clean');state.active=false;onState(state);}
+  function finish(){mix?.close();mix=null;clearTimeout(timer);cancelAnimationFrame(frame);stream?.getTracks().forEach(t=>t.stop());document.body.classList.remove('record-clean');state.active=false;onState(state);}
   function start({wide=true,hide=true,duration=30}={}){
     if(state.active)return;
     const mime=globalThis.MediaRecorder&&recordingType(t=>MediaRecorder.isTypeSupported(t));
@@ -10,7 +11,7 @@ export function createRecorder(source,{subtitle=()=>'',credit=()=> 'Flood Calend
     if(url)URL.revokeObjectURL(url);chunks=[];state.error=null;state.url=null;state.bytes=0;
     copy=document.createElement('canvas');copy.width=wide?1280:source.width;copy.height=wide?720:source.height;ctx=copy.getContext('2d');fit=fitFrame(source.width,source.height,copy.width,copy.height);
     try {
-      stream=copy.captureStream(30);recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:6000000});
+      stream=copy.captureStream(30);mix=createRecordingMix();if(mix)for(const track of mix.stream.getAudioTracks())stream.addTrack(track);state.audio=stream.getAudioTracks().length>0;recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:6000000});
       recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};
       recorder.onerror=e=>{state.error=e.error?.message||'Recording failed';finish();};
       recorder.onstop=()=>{if(chunks.length){const blob=new Blob(chunks,{type:recorder.mimeType});url=URL.createObjectURL(blob);state.url=url;state.bytes=blob.size;state.mime=recorder.mimeType;}finish();};

@@ -1,3 +1,4 @@
+import {tapForRecording} from '../audio/recordMix.js';
 // Original five-scene score. No samples, services or data sonification.
 // Mid-register harmony survives small laptop/phone speakers.
 const ROOTS=[261.6256,293.6648,329.6276,293.6648,261.6256];
@@ -9,7 +10,7 @@ export function createTourScore({Context=globalThis.AudioContext||globalThis.web
     if(ac||!Context)return;
     ac=new Context();master=ac.createGain();master.gain.value=0;duck=ac.createGain();duck.gain.value=1;
     const filter=ac.createBiquadFilter();filter.type='lowpass';filter.frequency.value=1400;
-    master.connect(duck).connect(filter).connect(ac.destination);
+    master.connect(duck).connect(filter).connect(ac.destination);tapForRecording(ac,filter);
   }
   function tone(frequency,at,duration,gain,pan=0,type='sine'){
     const oscillator=ac.createOscillator(),envelope=ac.createGain(),stereo=ac.createStereoPanner();

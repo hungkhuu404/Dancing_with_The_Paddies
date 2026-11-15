@@ -37,3 +37,7 @@ The product package scripts and lockfile are retained. No deploy script, Cloudfl
 Both sites have static Open-Meteo/ERA5 weather for every published acquisition: Tân Hội 22/22 and Bang Rakam 11/11. Weather is an approximately 25 km reanalysis estimate at the acquisition UTC, not a measurement per field. Missing values are never converted to dry/clear conditions in the archive.
 
 Bang Rakam now has a site-specific 60-second route, invitation, captions and Jon narration, with the existing scene score and focused-tour controls. Its calendar shows the actual four mapped groups and eleven visits. Tân Hội retains its original script/audio. [Sources, reproduction and review](../docs/plans/history-bang-tour.md).
+
+## Interface and video capture
+
+Help shares the scene/map toolbar; Calendar and Method remain separate, directly available views. Repeated radar-release badges are removed while Sources/Method retain the scientific caveats. On browsers without WebGL, the selected site can still open its HTML calendar and Method. Canvas recording includes application narration, score, data tones and enabled ambient playback, respecting mute; it does not capture a microphone or system audio. [Design and checks](../docs/plans/interface-polish.md).

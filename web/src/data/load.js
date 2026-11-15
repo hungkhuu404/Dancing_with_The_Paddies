@@ -71,17 +71,15 @@ export function loadTexture(path, srgb = true) {
 }
 
 let gltf;
-/** Loads public/models/<name>.glb, or null if missing/broken. */
-export async function loadModel(name) {
-  if (!gltf) { gltf = new GLTFLoader(); gltf.setMeshoptDecoder(MeshoptDecoder); }
-  try {
-    const head = await fetch(BASE + 'models/' + name + '.glb', { method: 'HEAD' });
-    if (!head.ok || (head.headers.get('content-type') || '').includes('html')) return null;
-    return await gltf.loadAsync(BASE + 'models/' + name + '.glb');
-  } catch (e) {
-    console.warn('model', name, e.message);
-    return null;
-  }
+const modelLoads=new Map();
+/** One GET and decode per model, shared by terrain and living-world consumers. */
+export function loadModel(name) {
+ if(!modelLoads.has(name))modelLoads.set(name,(async()=>{
+  if(!gltf){gltf=new GLTFLoader();gltf.setMeshoptDecoder(MeshoptDecoder);}
+  try{const response=await fetch(BASE+'models/'+name+'.glb',{priority:'low'});if(!response.ok||(response.headers.get('content-type')||'').includes('html'))return null;return await gltf.parseAsync(await response.arrayBuffer(),new URL(BASE+'models/',location.href).href);}
+  catch(e){console.warn('model',name,e.message);return null;}
+ })());
+ return modelLoads.get(name);
 }
 
 export async function loadModelsManifest() {

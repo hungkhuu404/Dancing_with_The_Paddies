@@ -9,7 +9,7 @@ export function createChrome({canvas,signature}) {
   viewIndicator($('.signature-views'));
   $('#presentation-tools').append($('.signature-tools'));
   // Move the real control, retaining its listener and tour state. No duplicate action.
-  $('.app-actions').prepend($('#tour-start'));
+  $('.app-actions').prepend($('#tour-start'));$('#tour-start').setAttribute('aria-label','Start the 60-second guided tour');
   const key=document.createElement('aside');key.className='view-key';key.setAttribute('aria-label','View legend');key.append($('.world-view-caption'),$('#calendar-legend'));document.body.append(key);
   $('#science-note').remove();
   $('#places-slot')?.remove();

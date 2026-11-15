@@ -1,3 +1,4 @@
+import {tapForRecording} from './recordMix.js';
 import {seasonCue,cueNotes,DATA_SOUND_GAIN} from './seasonModel.js';
 import {icon} from '../ui/icons.js';
 import './sound.css';
@@ -10,7 +11,7 @@ export function createSeasonSound({passes,totalHa,fixture=false,onActivity=()=>{
  function stop(){activity(false);if(!context)return;const t=context.currentTime;for(const n of nodes){try{n.gain.gain.cancelScheduledValues(t);n.gain.gain.setTargetAtTime(0,t,.012);n.osc.stop(t+.06);}catch{}}nodes.clear();}
  function refresh(){for(const b of buttons){b.disabled=fixture||disabled;b.setAttribute('aria-pressed',String(on&&!fixture&&!disabled));b.setAttribute('aria-label',disabled?'Data sound unavailable':fixture?'Data sound unavailable for illustrative observations':on?'Mute data sound':'Enable data sound');b.title=b.getAttribute('aria-label');b.dataset.enabled=String(on&&!fixture&&!disabled);b.innerHTML=icon('sound')+'<span class="sound-slash" aria-hidden="true"></span>';}}
  function fail(){disabled=true;stop();refresh();}
- function init(){if(context)return true;try{context=contextFactory();master=context.createGain();master.gain.value=DATA_SOUND_GAIN;const limiter=context.createDynamicsCompressor();limiter.threshold.value=-12;limiter.knee.value=6;limiter.ratio.value=8;limiter.attack.value=.003;limiter.release.value=.12;master.connect(limiter).connect(context.destination);return true;}catch{fail();return false;}}
+ function init(){if(context)return true;try{context=contextFactory();master=context.createGain();master.gain.value=DATA_SOUND_GAIN;const limiter=context.createDynamicsCompressor();limiter.threshold.value=-12;limiter.knee.value=6;limiter.ratio.value=8;limiter.attack.value=.003;limiter.release.value=.12;master.connect(limiter).connect(context.destination);tapForRecording(context,limiter);return true;}catch{fail();return false;}}
  function sync(e){if(e?.type==='season-sound-preference'&&typeof e.detail?.enabled==='boolean')on=e.detail.enabled;else if(storage)on=readSoundPreference(storage);if(!on)stop();refresh();}
  const onStorage=e=>{if(e.key===KEY)sync();};addEventListener('storage',onStorage);addEventListener('season-sound-preference',sync);
  const visibility=()=>{if(document.hidden){stop();context?.suspend().catch(()=>{});}};document.addEventListener('visibilitychange',visibility);

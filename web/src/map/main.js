@@ -1,4 +1,3 @@
-import {mountReleaseNotice} from '../ui/releaseNotice.js';
 import {createSeasonSound} from '../audio/seasonSound.js';
 import {createQuickGuide} from '../ui/quickGuide.js';
 import {assertSceneMeta} from '../data/contractPolicy.js';
@@ -15,6 +14,7 @@ import '@fontsource/newsreader/latin-400.css';
 import '@fontsource/newsreader/vietnamese-400.css';
 import './map.css';
 import '../ui/surfaces.css';
+import '../ui/layout.css';
 import {blockCore} from '../ui/blockCore.js';
 import {icon} from '../ui/icons.js';
 import {reveal,dismiss,viewIndicator} from '../ui/motion.js';
@@ -61,9 +61,8 @@ async function start() {
   const [meta,cells,aoi,places,summary]=await Promise.all(['meta.json','cells.geojson','aoi.geojson','places.geojson','summary.json'].map(f=>getJSON(dir+f)));
   if(!meta||!cells||!meta.acquisitions?.length)throw Error('Required water observations could not be loaded.');
   assertSceneMeta(siteProfile(site.id),meta);
-  mountReleaseNotice(meta)?.classList.add('is-map');
   const dataSound=createSeasonSound({passes:summary?.passes,totalHa:summary?.totals.area_ha,fixture:!!meta.fixture});dataSound.mount(document.querySelector('.date-controls'));
-  const guide=createQuickGuide({view:'map',fixture:!!meta.fixture});if(query.has('debug'))window.__dataSound=dataSound;
+  const guide=createQuickGuide({trigger:$('map-help'),view:'map',fixture:!!meta.fixture});if(query.has('debug'))window.__dataSound=dataSound;
   guide.showOnce();
 
   if(meta.fixture){const notice=document.createElement('p');notice.className='fixture-notice';notice.setAttribute('role','status');notice.textContent='Data pending. Water states are illustrative.';document.body.append(notice);document.body.classList.add('is-fixture');
