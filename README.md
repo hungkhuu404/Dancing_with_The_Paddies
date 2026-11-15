@@ -6,7 +6,7 @@ Team **Dancing with The Paddies** · NASA Space Apps Challenge 2026 · Challenge
 
 **Data status:** The web reads the Tân Hội H7 and Bang Rakam radar exports under contract 2.0.0. The repository includes S1–S5, an offline S6 comparison runner and S7. Reference agreement is post-hoc, not independent accuracy evidence; the interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md), [S6 instructions](docs/s6-comparison.md) and [H7 data status](docs/provenance/h7-data-status.md).
 
-**Existing live site:** https://flood-calendar.pages.dev — this migration has not been deployed or verified against that site.
+**Live site:** https://flood-calendar.pages.dev — on 15 November 2026 it served the same Tân Hội H7 and Bang Rakam exports as `data/` in this repository (matching `generated_utc` in each `meta.json`).
 
 ## What it does
 
@@ -96,7 +96,28 @@ Keep the token in a file outside the repository and point to it:
 export EARTHDATA_TOKEN_FILE=/path/to/token.txt        # PowerShell: $env:EARTHDATA_TOKEN_FILE="C:\path\to\token.txt"
 ```
 
-<!-- TODO: lệnh chạy pipeline cho một site — điền khi code S0–S7 đã vào repo. Không ghi lệnh chưa chạy thử. -->
+**Check a published export (offline, no token).** This re-checks schemas, cell IDs, series lengths, area totals, per-pass summaries, backdrop files and file-size limits against `data/`:
+
+```bash
+python pipeline/export/verify.py --data data --site tan_hoi
+python pipeline/export/verify.py --data data --site bang_rakam
+```
+
+On Windows, set `PYTHONUTF8=1` first (`$env:PYTHONUTF8=1` in PowerShell) so the Vietnamese hamlet names print correctly. Both sites pass on this revision; the three web checks it lists as pending (OSM overlay, opening without manual edits, initial transfer size) are browser checks outside this script.
+
+**Rebuild a site from NISAR (network and Earthdata token required).** The stages are separate commands, shown here for Tân Hội; replace the config with `config/sites/bang_rakam.toml` for Bang Rakam. Paths inside a site TOML are relative to that TOML.
+
+```bash
+python pipeline/catalog/s0.py --config config/sites/tan_hoi.toml           # S0: CMR catalogue
+cd pipeline/core
+python run_pipeline.py --config ../../config/sites/tan_hoi.toml --output <s1-s5-dir>   # S1–S5
+cd ../..
+python pipeline/export/s7.py --input-dir <s1-s5-dir> --config config/sites/tan_hoi.toml \
+  --landcover <landcover.csv> --output <new-export-dir>                   # S7: web files
+python pipeline/export/verify.py --data <new-export-dir> --site tan_hoi   # check the new export
+```
+
+S6 (comparison with OPERA DSWx-S1) runs offline on supplied snapshots; see [docs/s6-comparison.md](docs/s6-comparison.md). Run any stage with `--help` for its options. The published `data/` was produced by these stages; this README's full rebuild sequence was not re-run end to end when it was written.
 
 Never commit the token, the image cache or files with signed links.
 
@@ -104,23 +125,32 @@ Never commit the token, the image cache or files with signed links.
 
 | Data | Provider | Use | Terms |
 | --- | --- | --- | --- |
-| NISAR L2 GCOV | NASA / ISRO, via ASF DAAC | Water detection (S1–S5) | NASA open data |
-| OPERA DSWx-S1 | NASA JPL (OPERA project) | H5 comparison and post-hoc pixel-method selection; S6 code remains separate | NASA open data |
-| ESA WorldCover 2021 | European Space Agency | Cropland mask | CC BY 4.0. © ESA WorldCover project 2021 / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium |
-| OpenStreetMap | OpenStreetMap contributors | Commune boundary, hamlet names, roads, bridges and places in the 3D scene | ODbL, © OpenStreetMap contributors |
+| NISAR L2 GCOV, Provisional and Validated V1 ([10.5067/NIL2GCOV-P1](https://doi.org/10.5067/NIL2GCOV-P1), [10.5067/NIL2GCOV-V1](https://doi.org/10.5067/NIL2GCOV-V1)) | NASA / ISRO, via ASF DAAC | Water detection (S1–S5) | NASA open data |
+| OPERA DSWx-S1 V1 ([10.5067/OPDSWS1-L3V1](https://doi.org/10.5067/OPDSWS1-L3V1)) | NASA JPL (OPERA project) | Post-hoc comparison (S6) and post-hoc pixel-method selection | NASA open data |
+| ESA WorldCover 10 m 2021 v200 ([10.5281/zenodo.7254221](https://doi.org/10.5281/zenodo.7254221)) | European Space Agency | Cropland mask | CC BY 4.0. © ESA WorldCover project 2021 / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium |
+| OpenStreetMap (via Overpass API; base map tiles from OpenFreeMap) | OpenStreetMap contributors | Commune boundary, hamlet names, roads, bridges and places in the 3D scene; base map | ODbL, © OpenStreetMap contributors |
+| EOxCloudless 2016 | EOX IT Services GmbH (contains modified Copernicus Sentinel data 2016) | Regional imagery in the location entrance | CC BY 4.0 |
+| Sentinel-2 scene metadata, via Element 84 Earth Search | Copernicus / ESA | Tile cloud cover shown in the web (not a commune measurement) | Copernicus open data terms |
+| ERA5 reanalysis, via Open-Meteo | ECMWF / Copernicus Climate Change Service | Weather context (cloud cover) in the web | CC BY 4.0 |
+| Natural Earth 1:10m physical layers | Natural Earth | Regional atlas labels and land | Public domain |
 
 <!-- TODO: thêm nguồn ảnh quang học dùng trong video nếu có -->
 
 ## Limits
 
-<!-- TODO: thay bằng bản cuối "Validation and limits" khi khóa số liệu -->
+Final data (H7, 15 November 2026):
 
-- The 75% pixel method and 50% temporal guard were selected after examining DSWx-S1; agreement is not an independent test and DSWx-S1 is not ground truth.
-- The local web does not report agreement scores; the supplied comparison is post-hoc.
-- Both sites use real radar exports in the web. Bang Rakam is a study frame, not an administrative boundary. The repository's S6 runner currently supports the Tân Hội comparison.
-- One track revisits every 12 days, so water arrival and water leaving are date ranges.
-- Track 148 D does not cover about 13.5% of the commune's cells; the map uses each cell's latest valid image.
-- Water arrival may be dated early on dry, flat fields.
+- **Tân Hội:** 22 NISAR acquisitions from tracks 047 D, 083 A and 148 D, 11 August–3 November 2026; 2,344 cells (14,650 ha). Nine acquisitions use per-image (Q1) thresholds instead of the default −14 dB HH / −20 dB HV.
+- **Bang Rakam:** 11 acquisitions from tracks 011 A and 105 D, 14 August–31 October 2026; 2,304 cells (14,400 ha) in a 12 × 12 km study frame, not an administrative boundary. Track 112 A images had no valid samples after the GCOV mask and are excluded. The 31 October 105 D image failed the stable-area check (P3) and uses Q1 thresholds.
+
+Limits:
+
+- The 75% pixel method and 50% temporal guard were selected after examining OPERA DSWx-S1. Agreement with DSWx-S1 is post-hoc, not an independent test, and DSWx-S1 is not ground truth. The web does not report agreement scores; `validation.json` keeps them for inspection.
+- Sparse observations do not prove continuous flooding. One track revisits every 12 days, so water arrival, days under water and water leaving are ranges between two images.
+- The ">30 days" layer flags cells, not verified continuous flooding. In Tân Hội it marks 8,093.75 ha as "yes"; in a post-hoc check on 13 November the same rule applied to DSWx-S1 gave about 2,731 ha, so treat the layer as an upper bound.
+- Trees and buildings can hide water from the radar; dry, flat fields can look like water, so water arrival may be dated early.
+- Track 148 D misses about 14% of Tân Hội's cells; the map uses each cell's latest valid image.
+- The repository's S6 runner currently supports the Tân Hội comparison; the Bang Rakam comparison (8 NISAR–DSWx-S1 pairs) was replayed from supplied inputs.
 - The 3D scene is an illustration: houses, people and vegetation are generated by rules, and roads, bridges and churches follow OpenStreetMap. It is not a surveyed model of the commune.
 
 ## Use of AI
@@ -129,15 +159,19 @@ Never commit the token, the image cache or files with signed links.
 
 ## References
 
-<!-- TODO: bổ sung tên bài và tác giả đầy đủ -->
+Literature and plans:
 
 - IPCC (2019). *2019 Refinement to the 2006 IPCC Guidelines for National Greenhouse Gas Inventories*, Vol. 4, Ch. 5, Table 5.13.
-- Arai, H. et al. (2018). *Remote Sensing* 10:1438.
-- *Remote Sensing* 18(13):2190 (2026), An Giang.
-- GISTDA (2026). *Remote Sensing* 18(13):2194.
-- CH4Rice.
+- Arai, H., Takeuchi, W., Oyoshi, K., Nguyen, L. D., Inubushi, K. (2018). Estimation of Methane Emissions from Rice Paddies in the Mekong Delta Based on Land Surface Dynamics Characterization with Remote Sensing. *Remote Sensing* 10(9), 1438. https://doi.org/10.3390/rs10091438
+- Hoang-Phi, P., Lam-Dao, N., Dang-Pham-Bao, N., Le Toan, T., Truong-Nhat-Kieu, T., Sobue, S. (2026). Inundation Monitoring in Rice Fields Using ALOS-2 PALSAR-2: A Case Study of An Giang, the Mekong Delta in Vietnam. *Remote Sensing* 18(13), 2190. https://doi.org/10.3390/rs18132190
+- Kitratporn, N., Koedkurang, K., Nueangjamnong, P., Simachokchai, K., Chayawat, C., Sobue, S., Le Toan, T. (2026). A Multi-Frequency SAR Framework for Methane Emission Estimation in Thai Rice Paddies. *Remote Sensing* 18(13), 2194. https://doi.org/10.3390/rs18132194
+- CH4Rice project, Space Applications for Environment (SAFE) initiative led by the Vietnam National Space Center. https://www.eorc.jaxa.jp/SAFE/project/ch4rice
 - Tân Hội Commune People's Committee, Plan 122/KH-UBND (12 May 2026).
 - An Giang Department of Agriculture and Environment, Official Letter 3767/SNNMT-KH (16 April 2026).
+
+Data: see [Data sources](#data-sources) for every dataset, provider, DOI and licence.
+
+Software: Python (NumPy, h5py, pyproj, Shapely, Pillow, jsonschema, aiohttp, pytest); web built with Vite and three.js, MapLibre GL JS, postprocessing, n8ao and SunCalc; fonts IBM Plex Sans and Newsreader via Fontsource. Licences are listed under [License](#license).
 
 ## License
 
