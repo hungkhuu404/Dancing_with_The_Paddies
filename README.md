@@ -6,11 +6,45 @@ Team **Dancing with The Paddies** · NASA Space Apps Challenge 2026 · Challenge
 
 **Data status:** The web reads the Tân Hội H7 and Bang Rakam radar exports under contract 2.0.0. The repository includes S1–S5, an offline S6 comparison runner and S7. Reference agreement is post-hoc, not independent accuracy evidence; the interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md), [S6 instructions](docs/s6-comparison.md) and [H7 data status](docs/provenance/h7-data-status.md).
 
-**Live site:** https://flood-calendar.pages.dev — on 15 November 2026 it served the same Tân Hội H7 and Bang Rakam exports as `data/` in this repository (matching `generated_utc` in each `meta.json`).
+**Web app:** https://flood-calendar.pages.dev — on 15 November 2026 it served the same Tân Hội H7 and Bang Rakam exports as `data/` in this repository (matching `generated_utc` in each `meta.json`).
+
+## The problem
+
+Every autumn, Tân Hội commune in An Giang, Vietnam, opens the dikes around its rice fields after the Autumn–Winter harvest and lets the Mekong flood in. This is deliberate: the flood brings silt and cleans the fields between crops. Then the water has to be pumped out again before Winter–Spring rice can be sown, and the province's sowing calendar for that crop closes on 31 December 2026. A field that still holds water cannot be sown.
+
+The commune's own plan sets out who has to make this work (Plan 122/KH-UBND, 12 May 2026, following provincial Letter 3767/SNNMT-KH). It covers 24 hamlets and 9,622 ha of diked fields:
+
+- The **Commune People's Committee** sets the sowing window and the flood-release timing, and must update the flood level to adjust the sowing calendar.
+- The **flood-release zones** pump the water out so they can sow within the calendar.
+- The **cooperatives** track the water and announce the flood-release schedule to farmers.
+
+Each of these duties needs the same answer: where is open water still standing, hamlet by hamlet, and since when? The plan asks the commune to track the flood; it does not give it a map of the flood. The season when the answer matters most is also the season when the delta is often under cloud, which limits optical satellites. Radar is not limited by cloud.
+
+Reports give totals, not places. In the 2025 season, a provincial sowing report listed 25,053 of 505,712 ha (4.95%) of An Giang's planned Winter–Spring rice as sown (Official Letter 5395/SNNMT-CCTTBVTV). A number like that says how far the season has gone, not which fields still hold water.
+
+## Who it is for
+
+| User (from Plan 122) | Decision | What Flood Calendar gives them |
+| --- | --- | --- |
+| Commune People's Committee, Tân Hội | Sowing window and flood-release timing for 24 hamlets; when to adjust the calendar | For each 250 m block: is open water still seen, when it arrived, how long it has stayed. Summarised by nearest hamlet (hamlet names from OpenStreetMap) |
+| Agricultural cooperatives | Which areas to check first before announcing the schedule to farmers | Blocks where open water is no longer seen, and blocks where it is still seen, on the latest radar date. This does not mean a field is ready to sow |
+| Later: provincial department | Progress across communes | The same view for other communes, after site set-up and a threshold review |
+
+Flood Calendar does not replace a field visit. It shows where to send one.
+
+NISAR data reaches us about two weeks after acquisition, so the map shows recent weeks, not today. Every date is a range between two radar passes.
+
+These users and decisions come from the commune's published plan. We have not yet put the tool in front of commune staff; that is the next step.
+
+## Why NISAR
+
+Flat open water reflects NISAR's L-band radar away from the satellite, so it shows dark in both HH and HV, with or without cloud, day or night. Tân Hội is covered by three NISAR tracks, so each block gets a new look every 3–5 days, from free NASA data.
+
+On the latest radar date for each block (up to 3 November 2026), open water was still seen on 9,825 ha and no longer seen on 1,281 ha. These areas are within our 14,650 ha grid of 2,344 blocks, not the 9,622 ha diked area of the plan. The 1,281 ha show where a cooperative could check first.
+
+We also ran the method on Bang Rakam, a rice plain in Phitsanulok, Thailand (2,304 blocks, 11 radar passes). It needed its own site settings, per-image thresholds and handling for mixed 10 m and 20 m pixels.
 
 ## What it does
-
-In An Giang, Vietnam, communes open their diked rice fields to the river flood after the Autumn–Winter crop, then pump the water out before sowing the Winter–Spring crop. The flood is wanted: it cleans the fields, flushes acidity, brings silt, and breaks the cycle of brown planthoppers and weeds. The hard part is timing. Commune plans set a sowing window, and cooperatives have to know which fields still hold water.
 
 Flood Calendar uses NISAR L-band radar to answer three questions for every 250 m cell of Tân Hội commune (2,344 cells, 14,650 ha):
 
@@ -155,7 +189,10 @@ Limits:
 
 ## Use of AI
 
-<!-- TODO: điền theo khai báo của từng thành viên (hạn 12:00 15/11) -->
+The backend team used AI coding agents (OpenAI Codex and Claude Code) to write code. Every line was reviewed manually by a team member before it was merged.
+
+<!-- TODO: phần video đang hỏi lại -->
+
 
 ## References
 
