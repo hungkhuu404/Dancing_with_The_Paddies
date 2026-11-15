@@ -4,7 +4,7 @@
 
 Team **Dancing with The Paddies** · NASA Space Apps Challenge 2026 · Challenge: *Dancing with the SARs*
 
-**Data status:** The web reads the Tân Hội pixel-method export under contract 2.0.0. The repository includes S1–S5, an offline S6 comparison runner and S7. Both Tân Hội and Bang Rakam candidate observations are integrated into the web; H7 and scientific acceptance remain separate work. The interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md), [S6 instructions](docs/s6-comparison.md) and [data provenance](docs/provenance/tan-hoi-quan8-mask.md).
+**Data status:** The web reads the Tân Hội H7 and Bang Rakam radar exports under contract 2.0.0. The repository includes S1–S5, an offline S6 comparison runner and S7. Reference agreement is post-hoc, not independent accuracy evidence; the interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md), [S6 instructions](docs/s6-comparison.md) and [H7 data status](docs/provenance/h7-data-status.md).
 
 **Existing live site:** https://flood-calendar.pages.dev — this migration has not been deployed or verified against that site.
 
@@ -25,7 +25,7 @@ The local web includes:
 - A map that can be replayed image by image, and a chart for any single cell.
 - A layer for fields flooded more than 30 days before the season, relevant *if the IPCC emission factor is applied* (IPCC 2019, Table 5.13).
 
-Bang Rakam (Thailand) uses the real QUAN-9 candidate: 2,304 blocks and 11 observations in a 12 × 12 km study frame. Tân Hội uses 22 observations. Both releases retain their scientific review caveats. Data sonification follows observed water area; ambient landscape audio is illustrative. See [two-site integration](docs/plans/two-site-real-data.md).
+Bang Rakam (Thailand) uses the QUAN-9 export: 2,304 blocks and 11 observations in a 12 × 12 km study frame. Tân Hội H7 uses 22 observations. Both retain their scientific limitations. Data sonification follows observed water area; ambient landscape audio is illustrative. See [two-site integration](docs/plans/two-site-real-data.md).
 
 What it does **not** do: it does not measure methane, and it cannot tell whether a field was sown right after the water left.
 
@@ -117,7 +117,7 @@ Never commit the token, the image cache or files with signed links.
 
 - The 75% pixel method and 50% temporal guard were selected after examining DSWx-S1; agreement is not an independent test and DSWx-S1 is not ground truth.
 - The local web does not report agreement scores; the supplied comparison is post-hoc.
-- Bang Rakam candidate observations are not yet connected to the web; its landscape uses an explicit fixture illustration. H7/final data are not supplied. The repository's S6 runner currently supports the Tân Hội comparison.
+- Both sites use real radar exports in the web. Bang Rakam is a study frame, not an administrative boundary. The repository's S6 runner currently supports the Tân Hội comparison.
 - One track revisits every 12 days, so water arrival and water leaving are date ranges.
 - Track 148 D does not cover about 13.5% of the commune's cells; the map uses each cell's latest valid image.
 - Water arrival may be dated early on dry, flat fields.

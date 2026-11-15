@@ -15,7 +15,7 @@
 | --- | --- |
 | `pipeline/{catalog,core,export,validate}/` | S0, S1–S5 pixel processing, offline Tân Hội S6 comparison and S7 export |
 | `config/sites/`, `schema/`, `tests/` | Site configuration and JSON Schema are present; frontend tests are in web/test/ |
-| `data/` | Tân Hội v2 pixel export with 22 acquisitions and Bang Rakam 48×48 candidate; post-hoc S6 comparisons, no final H7 export |
+| `data/` | Tân Hội H7 pixel export with 22 acquisitions and Bang Rakam 48×48 export with 11 acquisitions; S6 comparisons are post-hoc |
 | `docs/data-contract.md` | Contract 2.0.0 for the pixel export |
 | `docs/plans/`, `docs/provenance/` | Bổ sung trong đợt 1 |
 | `web/` | Vite, Three.js và MapLibre; 3D và map tích hợp cùng tab, có route `/map/` độc lập; test trong `web/test/` |
@@ -36,7 +36,7 @@ Các tài liệu đợt migration là snapshot lịch sử. Web cài từ lockfi
 
 ## Current two-site frontend
 
-[MIG-WEB-TWO-SITES-005](plans/pixel-v2-two-sites.md) records the frontend migration, its historical 20-image export, explicit Bang Rakam illustration, verification and scientific limits. [Pinned source and file hashes](provenance/pixel-v2-two-sites.md) distinguish source imports from product adaptations. The later 22-image candidate is documented in [its provenance](provenance/tan-hoi-quan8-mask.md); real Bang Rakam data are not yet integrated into the web.
+[MIG-WEB-TWO-SITES-005](plans/pixel-v2-two-sites.md) records the earlier frontend migration and its historical 20-image export. The later [two-site integration](plans/two-site-real-data.md) uses real observations from both sites. [H7 data status](provenance/h7-data-status.md) records the catalogue confirmation and remaining limits.
 
 ## Playback and first-visit assistance
 

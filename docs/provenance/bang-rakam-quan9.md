@@ -9,4 +9,4 @@ The metadata clarification applied after BANG-10 changes only `pairing` in `data
 - BANG-10 replay and original validation SHA-256: `d01dd99b97cf4a8e37b1515af72786ceaf3dab995bc31fe5bf2a035418819f79`
 - Validation with clarified pairing SHA-256: `29c82565920670fde5636c4a7475d50b8e39952d6aad1903c544a8844b3a1993`
 
-Tân's review of P3/Q1 for acquisition 105D on 31 October and Quốc's web verification remain pending.
+Tân approved the Q1 fallback for acquisition 105D on 31 October after P3 failed. The decision is recorded in the [PR #15 merge commit](https://github.com/hungkhuu404/Dancing_with_The_Paddies/commit/07edb7e4c70c7eb4cbec1e06ffd3c16de57a1ca7). This approval does not change the post-hoc comparison or establish historical freeze times. See [H7 data status](h7-data-status.md) for the later handoff and remaining web acceptance.

@@ -25,7 +25,13 @@ test('reference dates describe the displayed fixed image, not a synthetic or sel
  assert.equal(r.date,'2026-10-31');assert.equal(r.path,'data/bang_rakam/'+meta.acquisitions.at(-1).backdrop);assert.equal(radarReference(p,{}, {...meta,fixture:true}),null);
  assert.deepEqual(radarReference(p,{textures:{radar:'fixed.webp'},radar_date:'2026-08-14'},meta),{path:p.scene.base+'fixed.webp',date:'2026-08-14'});
 });
-test('candidate status and square study limits remain explicit after fixture replacement',()=>{
- const meta=read('data/bang_rakam/meta.json'),note=releaseContext(meta);assert.match(note.details,/pending/);assert.equal(releaseContext({...meta,fixture:true}),null);
+test('approved H7 and Q1 labels retain post-hoc limitations and do not apply to other exports',()=>{
+ const tan=read('data/tan_hoi/meta.json'),bang=read('data/bang_rakam/meta.json');
+ assert.match(releaseContext(tan).label,/H7/);assert.match(releaseContext(tan).details,/post-hoc/i);assert.doesNotMatch(releaseContext(tan).details,/interim|not the final/i);
+ assert.match(releaseContext(bang).details,/Q1.*approved/i);assert.match(releaseContext(bang).details,/not independent/i);assert.doesNotMatch(releaseContext(bang).details,/review.*pending/i);
+ for(const meta of [tan,bang]){assert.equal(releaseContext({...meta,fixture:true}),null);const other=releaseContext({...meta,generated_utc:'2026-01-01T00:00:00Z'});assert.doesNotMatch(other.label,/H7/i);assert.doesNotMatch(other.details,/Q1.*approved/i);}
+});
+test('Bang Rakam square study limits remain explicit',()=>{
+ const meta=read('data/bang_rakam/meta.json');
  const text=siteLimitText(meta,read('data/bang_rakam/aoi.geojson').features[0].properties);assert.match(text,/12 × 12 km/);assert.match(text,/not an administrative boundary/);assert.match(text,/20 m/);assert.match(text,/112A/);assert.doesNotMatch(text,/kappa|precision|recall/i);
 });

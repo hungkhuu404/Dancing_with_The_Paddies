@@ -1,5 +1,7 @@
 # Two-site pixel frontend integration
 
+> Historical migration snapshot. Both real site exports are now integrated, and the Tân Hội H7 catalogue is confirmed; see [H7 data status](../provenance/h7-data-status.md).
+
 Task MIG-WEB-TWO-SITES-005; human owner Quoc, actor Codex. Consumers: published Tân Hội landscape/map/calendar/Method and the separately labelled Bang Rakam illustration. Source cb6a2031615264b177c460fad19400b3c99557e8; product baseline 43359f0; branch migration/pixel-v2-two-sites. User authorization covers commit, push, PR and merge after successful review/checks. This document records technical scope, not submission acceptance.
 
 ## Scope and conditions
