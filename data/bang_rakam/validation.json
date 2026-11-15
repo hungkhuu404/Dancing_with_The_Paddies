@@ -8,7 +8,7 @@
   "first_dswx_read_scope": "current Codex actor/run only; historical Bang first read unconfirmed",
   "n_dswx_passes": 12,
   "n_nisar_acquisitions": 11,
-  "pairing": "each NISAR acquisition to nearest DSWx pass by UTC time, within 3 days (inclusive)",
+  "pairing": "For each NISAR acquisition, select the nearest DSWx-S1 pass by UTC time within 3 days (inclusive), after excluding passes with no valid cells in the study AOI. Of 27 DSWx-S1 passes, 12 were eligible and yielded 8 comparison pairs.",
   "dswx_rules": "cell valid if >=70% px code<250; water if >=50% of valid px code 1; DSWx series not filtered",
   "filtered": {
     "n_pairs": 8,
