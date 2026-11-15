@@ -20,7 +20,7 @@ Team **Dancing with The Paddies** · Ho Chi Minh City University of Technology (
 | **NASA data** | NISAR L2 GCOV, 33 acquisitions in 2026 (22 Vietnam, 11 Thailand); OPERA DSWx-S1 for comparison; NASA CMR for search |
 | **Result** | Tân Hội: open water grew from 1,206 ha (16 Aug) to 9,850 ha (3 Nov 2026); 1,281 ha where water is no longer seen. Bang Rakam: 331 ha (14 Aug) to 1,756 ha (31 Oct 2026) |
 | **Reach** | Vietnam and Thailand are the demonstration: two countries, one codebase. The design target is flooded rice anywhere NISAR passes, in the 100+ countries that grow rice. A new site takes three steps: a site file, a threshold review and a comparison with a reference water product |
-| **Agreement with NASA OPERA DSWx-S1** | Median Cohen's kappa 0.56 in Tân Hội (19 pass pairs) and 0.57 in Bang Rakam (8 pairs); post-hoc, not independent validation |
+| **Agreement with NASA OPERA DSWx-S1** | Median Cohen's kappa 0.56 in Tân Hội (19 pass pairs) and 0.57 in Bang Rakam (8 pairs), post-hoc comparison |
 | **Limits** | Not yet tested with commune staff. The pumping-out phase is still ahead of the record |
 | **Try it** | https://floodcalendar.pages.dev · 30 s video (link above) · verify the published data offline with [Quick start](#quick-start) |
 
