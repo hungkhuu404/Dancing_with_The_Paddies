@@ -119,13 +119,57 @@
               "area_ha": {
                 "type": "number",
                 "minimum": 0
+              },
+              "aoi_type": {
+                "const": "study_bbox"
+              },
+              "source": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "epsg": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "bbox_utm_m": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4
               }
             },
             "required": [
               "site",
               "name",
-              "osm_relation",
               "area_ha"
+            ],
+            "oneOf": [
+              {
+                "required": [
+                  "osm_relation"
+                ],
+                "not": {
+                  "required": [
+                    "aoi_type"
+                  ]
+                }
+              },
+              {
+                "required": [
+                  "aoi_type",
+                  "source",
+                  "epsg",
+                  "bbox_utm_m"
+                ],
+                "not": {
+                  "required": [
+                    "osm_relation"
+                  ]
+                }
+              }
             ]
           }
         },
