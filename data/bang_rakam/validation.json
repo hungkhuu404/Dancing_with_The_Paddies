@@ -1,0 +1,412 @@
+{
+  "reference": "OPERA DSWx-S1, WTR class 1 (open water)",
+  "frozen_utc": "2026-11-15T01:12:17.714113Z",
+  "first_dswx_read_utc": "2026-11-14T19:17:27.722851Z",
+  "site": "bang_rakam",
+  "timezone": "Asia/Bangkok",
+  "comparison_is_independent": false,
+  "first_dswx_read_scope": "current Codex actor/run only; historical Bang first read unconfirmed",
+  "n_dswx_passes": 12,
+  "n_nisar_acquisitions": 11,
+  "pairing": "each NISAR acquisition to nearest DSWx pass by UTC time, within 3 days (inclusive)",
+  "dswx_rules": "cell valid if >=70% px code<250; water if >=50% of valid px code 1; DSWx series not filtered",
+  "filtered": {
+    "n_pairs": 8,
+    "n_nisar_acquisitions": 11,
+    "n_pairs_with_kappa": 8,
+    "kappa_median": 0.5699,
+    "kappa_min": 0.4601,
+    "kappa_max": 0.6769,
+    "by_track": {
+      "011A": {
+        "n_pairs": 4,
+        "kappa_median": 0.5776,
+        "kappa_min": 0.4601,
+        "kappa_max": 0.6596
+      },
+      "105D": {
+        "n_pairs": 4,
+        "kappa_median": 0.5547,
+        "kappa_min": 0.4652,
+        "kappa_max": 0.6769
+      }
+    },
+    "by_n_tracks": {
+      "3": {
+        "n_cells_in_group": 0,
+        "n_pairs": 8,
+        "kappa_median": null,
+        "kappa_min": null,
+        "kappa_max": null
+      },
+      "2": {
+        "n_cells_in_group": 2304,
+        "n_pairs": 8,
+        "kappa_median": 0.5699,
+        "kappa_min": 0.4601,
+        "kappa_max": 0.6769
+      }
+    },
+    "onset": {
+      "n_cells": 206,
+      "overlap_share": 0.3155,
+      "median_diff_days": -7.5
+    },
+    "gt30": {
+      "n_cells": 211,
+      "precision": 0.381,
+      "recall": 0.8511,
+      "table_rows_nisar_cols_dswx": {
+        "yes": {
+          "yes": 40,
+          "possible": 19,
+          "no": 46
+        },
+        "possible": {
+          "yes": 6,
+          "possible": 18,
+          "no": 66
+        },
+        "no": {
+          "yes": 1,
+          "possible": 5,
+          "no": 10
+        }
+      },
+      "n_cells_excluded_na_on_either_side": 2093,
+      "n_nisar_yes": 119,
+      "n_dswx_yes": 48
+    },
+    "cropland_share_of_flagged": 1.0,
+    "cropland_share_of_flagged_n_cells": 119,
+    "water_share_on_builtup": 0.0,
+    "water_share_on_builtup_n_obs": 220,
+    "water_share_on_builtup_n_cells": 20,
+    "water_share_on_stable_reference_cell": 0.0,
+    "water_share_on_stable_reference_cell_n_obs": 11,
+    "n_cells_total": 2304
+  },
+  "unfiltered": {
+    "n_pairs": 8,
+    "n_nisar_acquisitions": 11,
+    "n_pairs_with_kappa": 8,
+    "kappa_median": 0.5753,
+    "kappa_min": 0.4488,
+    "kappa_max": 0.6677,
+    "by_track": {
+      "011A": {
+        "n_pairs": 4,
+        "kappa_median": 0.5801,
+        "kappa_min": 0.4488,
+        "kappa_max": 0.6677
+      },
+      "105D": {
+        "n_pairs": 4,
+        "kappa_median": 0.5634,
+        "kappa_min": 0.4652,
+        "kappa_max": 0.6359
+      }
+    },
+    "by_n_tracks": {
+      "3": {
+        "n_cells_in_group": 0,
+        "n_pairs": 8,
+        "kappa_median": null,
+        "kappa_min": null,
+        "kappa_max": null
+      },
+      "2": {
+        "n_cells_in_group": 2304,
+        "n_pairs": 8,
+        "kappa_median": 0.5753,
+        "kappa_min": 0.4488,
+        "kappa_max": 0.6677
+      }
+    },
+    "onset": {
+      "n_cells": 225,
+      "overlap_share": 0.3333,
+      "median_diff_days": -4.5
+    },
+    "gt30": {
+      "n_cells": 232,
+      "precision": 0.3861,
+      "recall": 0.8298,
+      "table_rows_nisar_cols_dswx": {
+        "yes": {
+          "yes": 39,
+          "possible": 19,
+          "no": 43
+        },
+        "possible": {
+          "yes": 7,
+          "possible": 14,
+          "no": 68
+        },
+        "no": {
+          "yes": 1,
+          "possible": 15,
+          "no": 26
+        }
+      },
+      "n_cells_excluded_na_on_either_side": 2072,
+      "n_nisar_yes": 115,
+      "n_dswx_yes": 48
+    },
+    "cropland_share_of_flagged": 1.0,
+    "cropland_share_of_flagged_n_cells": 115,
+    "water_share_on_builtup": 0.0,
+    "water_share_on_builtup_n_obs": 220,
+    "water_share_on_builtup_n_cells": 20,
+    "water_share_on_stable_reference_cell": 0.0,
+    "water_share_on_stable_reference_cell_n_obs": 11,
+    "n_cells_total": 2304
+  },
+  "pairs": [
+    {
+      "i": 1,
+      "track": "105D",
+      "nisar_date_local": "2026-08-20",
+      "dswx_date_local": "2026-08-21",
+      "dswx_time_local": "06:07",
+      "gap_days": 0.5,
+      "n_cells": 2304,
+      "kappa": 0.5892,
+      "precision": 0.9545,
+      "recall": 0.4375
+    },
+    {
+      "i": 4,
+      "track": "105D",
+      "nisar_date_local": "2026-09-13",
+      "dswx_date_local": "2026-09-15",
+      "dswx_time_local": "18:29",
+      "gap_days": 2.0,
+      "n_cells": 2304,
+      "kappa": 0.5202,
+      "precision": 0.8413,
+      "recall": 0.3955
+    },
+    {
+      "i": 5,
+      "track": "011A",
+      "nisar_date_local": "2026-09-19",
+      "dswx_date_local": "2026-09-20",
+      "dswx_time_local": "06:07",
+      "gap_days": 1.0,
+      "n_cells": 2304,
+      "kappa": 0.4601,
+      "precision": 0.4385,
+      "recall": 0.5481
+    },
+    {
+      "i": 6,
+      "track": "011A",
+      "nisar_date_local": "2026-10-01",
+      "dswx_date_local": "2026-10-02",
+      "dswx_time_local": "06:07",
+      "gap_days": 1.0,
+      "n_cells": 2304,
+      "kappa": 0.6046,
+      "precision": 0.5777,
+      "recall": 0.7083
+    },
+    {
+      "i": 7,
+      "track": "105D",
+      "nisar_date_local": "2026-10-07",
+      "dswx_date_local": "2026-10-09",
+      "dswx_time_local": "18:29",
+      "gap_days": 2.0,
+      "n_cells": 2304,
+      "kappa": 0.6769,
+      "precision": 0.6696,
+      "recall": 0.7488
+    },
+    {
+      "i": 8,
+      "track": "011A",
+      "nisar_date_local": "2026-10-13",
+      "dswx_date_local": "2026-10-14",
+      "dswx_time_local": "06:07",
+      "gap_days": 1.0,
+      "n_cells": 2304,
+      "kappa": 0.6596,
+      "precision": 0.7331,
+      "recall": 0.6628
+    },
+    {
+      "i": 9,
+      "track": "011A",
+      "nisar_date_local": "2026-10-25",
+      "dswx_date_local": "2026-10-26",
+      "dswx_time_local": "06:07",
+      "gap_days": 1.0,
+      "n_cells": 2304,
+      "kappa": 0.5506,
+      "precision": 0.5404,
+      "recall": 0.6546
+    },
+    {
+      "i": 10,
+      "track": "105D",
+      "nisar_date_local": "2026-10-31",
+      "dswx_date_local": "2026-11-01",
+      "dswx_time_local": "06:07",
+      "gap_days": 0.5,
+      "n_cells": 2304,
+      "kappa": 0.4652,
+      "precision": 0.4128,
+      "recall": 0.6824
+    }
+  ],
+  "pairs_unfiltered": [
+    {
+      "i": 1,
+      "track": "105D",
+      "nisar_date_local": "2026-08-20",
+      "dswx_date_local": "2026-08-21",
+      "dswx_time_local": "06:07",
+      "gap_days": 0.5,
+      "n_cells": 2304,
+      "kappa": 0.597,
+      "precision": 0.8364,
+      "recall": 0.4792
+    },
+    {
+      "i": 4,
+      "track": "105D",
+      "nisar_date_local": "2026-09-13",
+      "dswx_date_local": "2026-09-15",
+      "dswx_time_local": "18:29",
+      "gap_days": 2.0,
+      "n_cells": 2304,
+      "kappa": 0.5298,
+      "precision": 0.7532,
+      "recall": 0.4328
+    },
+    {
+      "i": 5,
+      "track": "011A",
+      "nisar_date_local": "2026-09-19",
+      "dswx_date_local": "2026-09-20",
+      "dswx_time_local": "06:07",
+      "gap_days": 1.0,
+      "n_cells": 2304,
+      "kappa": 0.4488,
+      "precision": 0.4331,
+      "recall": 0.5288
+    },
+    {
+      "i": 6,
+      "track": "011A",
+      "nisar_date_local": "2026-10-01",
+      "dswx_date_local": "2026-10-02",
+      "dswx_time_local": "06:07",
+      "gap_days": 1.0,
+      "n_cells": 2304,
+      "kappa": 0.6067,
+      "precision": 0.5575,
+      "recall": 0.75
+    },
+    {
+      "i": 7,
+      "track": "105D",
+      "nisar_date_local": "2026-10-07",
+      "dswx_date_local": "2026-10-09",
+      "dswx_time_local": "18:29",
+      "gap_days": 2.0,
+      "n_cells": 2304,
+      "kappa": 0.6359,
+      "precision": 0.6344,
+      "recall": 0.7094
+    },
+    {
+      "i": 8,
+      "track": "011A",
+      "nisar_date_local": "2026-10-13",
+      "dswx_date_local": "2026-10-14",
+      "dswx_time_local": "06:07",
+      "gap_days": 1.0,
+      "n_cells": 2304,
+      "kappa": 0.6677,
+      "precision": 0.72,
+      "recall": 0.6897
+    },
+    {
+      "i": 9,
+      "track": "011A",
+      "nisar_date_local": "2026-10-25",
+      "dswx_date_local": "2026-10-26",
+      "dswx_time_local": "06:07",
+      "gap_days": 1.0,
+      "n_cells": 2304,
+      "kappa": 0.5536,
+      "precision": 0.5478,
+      "recall": 0.6495
+    },
+    {
+      "i": 10,
+      "track": "105D",
+      "nisar_date_local": "2026-10-31",
+      "dswx_date_local": "2026-11-01",
+      "dswx_time_local": "06:07",
+      "gap_days": 0.5,
+      "n_cells": 2304,
+      "kappa": 0.4652,
+      "precision": 0.4128,
+      "recall": 0.6824
+    }
+  ],
+  "dswx_class_1_3": {
+    "filtered": {
+      "n_pairs": 8,
+      "kappa_median": 0.5691,
+      "kappa_min": 0.4554,
+      "kappa_max": 0.6731
+    },
+    "unfiltered": {
+      "n_pairs": 8,
+      "kappa_median": 0.5745,
+      "kappa_min": 0.4442,
+      "kappa_max": 0.6628
+    }
+  },
+  "side_note_dswx_single_flip_filtered": {
+    "n_pairs": 8,
+    "kappa_median": 0.6137,
+    "kappa_min": 0.4452,
+    "kappa_max": 0.6906,
+    "onset": {
+      "n_cells": 148,
+      "overlap_share": 0.3851,
+      "median_diff_days": -4.5
+    },
+    "gt30": {
+      "n_cells": 152,
+      "precision": 0.4468,
+      "recall": 0.8571,
+      "table_rows_nisar_cols_dswx": {
+        "yes": {
+          "yes": 42,
+          "possible": 24,
+          "no": 28
+        },
+        "possible": {
+          "yes": 6,
+          "possible": 19,
+          "no": 25
+        },
+        "no": {
+          "yes": 1,
+          "possible": 5,
+          "no": 2
+        }
+      },
+      "n_cells_excluded_na_on_either_side": 2152,
+      "n_nisar_yes": 119,
+      "n_dswx_yes": 53
+    }
+  },
+  "posthoc": []
+}
