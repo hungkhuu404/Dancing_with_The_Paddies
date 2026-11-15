@@ -157,7 +157,7 @@ The Blender tool uses only built-in geometry and vertex colours; it exports 13 m
 
 ## Regional observatory overview (WEB-ATLAS-008)
 
-`node web/tools/build-atlas.mjs --cache .cache/atlas-source --python <python-with-shapely>` downloads pinned public-domain Natural Earth physical layers and invokes build-atlas.py (Shapely 2.2.0). Use `--out <review-directory>` to generate a review copy. This is optional offline asset generation, not part of npm build or the frontend runtime. No national or maritime boundary layer is generated. Source hashes and label semantics are in public/atlas/manifest.json; [design and verification](../../docs/plans/observatory-landing.md).
+`node web/tools/build-atlas.mjs --cache .cache/atlas-source --python <python-with-shapely>` downloads pinned public-domain Natural Earth physical layers and invokes build-atlas.py (Shapely 2.2.0). Use `--out <review-directory>` to generate a review copy. This is optional offline asset generation, not part of npm build or the frontend runtime. No national or maritime boundary layer is generated. Source hashes and label semantics are in public/atlas/manifest.json.
 
 
 ## Historical weather and site narration (WEB-EXPERIENCE-011)
