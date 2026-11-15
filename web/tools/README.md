@@ -103,7 +103,7 @@ The fetch commands access public services only during offline preparation. Inspe
 
 Python generators keep `FLOOD_BUILD_DIR`, `FLOOD_SOURCE_DIR` and, for Tan Hoi's existing reference rasters, `FLOOD_H0_DIR` explicit as described in [RECOVERY.md](RECOVERY.md). All inputs belong to the selected site's source directory; changing `--site` does not acquire missing input files. Generated files remain in the local build directory until reviewed and copied. `bang_rakam` uses a full rectangular frame rather than an invented administrative boundary. Its missing radar references produce no radar texture, and no existing Tan Hoi raster is substituted.
 
-The Bang Rakam field/ecology profile is a preliminary illustrative recipe for the base-scene phase. Thai architecture, species refinement, real scene acquisition and water fixtures are later phases; the atlas keeps the site pending until both a matching scene index and published observations exist. The Tan Hoi tour is disabled for other profiles until an appropriate script is provided.
+The Bang Rakam field/ecology profile is a preliminary illustrative recipe for the base-scene phase. Thai architecture, species refinement, real scene acquisition and water fixtures are later phases; the atlas keeps the site pending until both a matching scene index and published observations exist. Tour scripts and camera routes are selected by site; the published Bang Rakam tour now has its own script, route and narration.
 
 Offline smoke checks create and remove their own temporary fixtures and do not access private source data:
 
@@ -158,3 +158,16 @@ The Blender tool uses only built-in geometry and vertex colours; it exports 13 m
 ## Regional observatory overview (WEB-ATLAS-008)
 
 `node web/tools/build-atlas.mjs --cache .cache/atlas-source --python <python-with-shapely>` downloads pinned public-domain Natural Earth physical layers and invokes build-atlas.py (Shapely 2.2.0). Use `--out <review-directory>` to generate a review copy. This is optional offline asset generation, not part of npm build or the frontend runtime. No national or maritime boundary layer is generated. Source hashes and label semantics are in public/atlas/manifest.json; [design and verification](../../docs/plans/observatory-landing.md).
+
+
+## Historical weather and site narration (WEB-EXPERIENCE-011)
+
+```text
+node web/tools/fetch-history.mjs --site tan_hoi --out <review-json>
+node web/tools/fetch-history.mjs --site bang_rakam --out <review-json>
+node web/tools/build-tour-voice.mjs --site bang_rakam --generate --key-file <private-file-outside-checkout> --out <empty-staging-directory> --reuse web/public/audio/tour
+```
+
+Weather bounds are derived from each real meta.json in UTC and include the following interpolation hour. The fetcher refuses incomplete acquisition coverage, non-UTC axes and wrong units before writing; failed requests preserve the existing archive. Review the resulting source/grid/coverage metadata before publishing. Existing optical cloud metadata is retained with its original provenance; this command does not acquire new Sentinel-2 observations.
+
+Voice generation is an explicit paid offline operation, never part of npm build or browser use. It uses the existing reviewed Jon voice; --reuse copies matching, hash-checked speech instead of spending credits again. This Bang Rakam build reused scenes 3 and 4 and generated only 1, 2 and 5. Inspect duration, cues and decoded playback before publishing the five MP3s and manifest to the selected profile audio path. No credentials belong in the checkout.

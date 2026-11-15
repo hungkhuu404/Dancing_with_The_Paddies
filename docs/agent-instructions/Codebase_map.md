@@ -48,3 +48,17 @@ The exported interface remains defined by [CONTRACT-001](../data-contract.md). E
 - web/test/twoSiteData.test.mjs checks both real snapshots, local times, scene/raster footprint alignment and release semantics.
 
 [Integration design and acceptance limits](../plans/two-site-real-data.md).
+
+## Historical weather and site tours (WEB-EXPERIENCE-011)
+
+- web/tools/fetch-history.mjs and history-rules.mjs: offline ERA5 acquisition from real pass times; UTC, units, continuity and coverage checks before writing.
+- web/public/scene/history.json and scene/bang_rakam/history.json: credited static hourly archives, coverage and retained optical provenance.
+- web/src/world/tourScript.js: per-site narration/caption scripts; default Tân Hội script remains compatible.
+- web/src/data/site-profiles.json and world/signatureRules.js: five-view Bang Rakam camera configuration and bounded continuous route interpolation.
+- web/src/world/signature.js and ui/tourInvitation.js: correct site invitation/script/route, real weather context and existing focused-tour lifecycle.
+- web/tools/build-tour-voice.mjs and public/audio/tour-bang-rakam/: explicit offline voice generation, matching-clip reuse, timestamps and provenance.
+- web/test/historyTour.test.mjs: UTC/archive coverage, narration binaries/cues, record preference and site route invariants.
+
+[Sources, behavior and verification](../plans/history-bang-tour.md).
+
+The science calendar entrypoint sets its acquisition count for compact tour-preview columns; reference.css scopes this evidence layout to .is-preview while preserving the full calendar.

@@ -39,8 +39,13 @@ export function sideLookingPosition(x,z,dir,height=1800,side=1,incidence=40,out=
   const offset=height*Math.tan(incidence*Math.PI/180)*side;
   out.x=x-dir[1]*offset;out.y=height;out.z=z+dir[0]*offset;return out;
 }
-export function tourPose(seconds,anchor,out={}) {
+export function tourPose(seconds,anchor,out={},route=null) {
   const t=Math.max(0,Math.min(60,seconds)), i=Math.min(4,Math.floor(t/12)), u=ease((t-i*12-6)/6);
+  if(route){
+    if(route.length!==5)throw Error('A tour route needs five scenes');
+    const from=route[i],to=route[Math.min(4,i+1)],a=from.target==='record'?anchor:from.target,b=to.target==='record'?anchor:to.target;
+    out.scene=i;out.r=from.r+(to.r-from.r)*u;out.polar=from.polar+(to.polar-from.polar)*u;out.az=from.az+(to.az-from.az)*u;out.x=a[0]+(b[0]-a[0])*u;out.z=a[1]+(b[1]-a[1])*u;return out;
+  }
   const r=[1400,850,600,38,16000], p=[.65,.9,.9,1.1,.28], a=[-.5,.3,1,1.5,1.8];
   out.scene=i;out.r=r[i]+(r[Math.min(4,i+1)]-r[i])*u;
   out.polar=p[i]+(p[Math.min(4,i+1)]-p[i])*u;out.az=a[i]+(a[Math.min(4,i+1)]-a[i])*u;
