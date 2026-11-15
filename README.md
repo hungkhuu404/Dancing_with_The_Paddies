@@ -6,7 +6,7 @@ Team **Dancing with The Paddies** · NASA Space Apps Challenge 2026 · Challenge
 
 **Data status:** The web reads the Tân Hội H7 and Bang Rakam radar exports under contract 2.0.0. The repository includes S1–S5, an offline S6 comparison runner and S7. Reference agreement is post-hoc, not independent accuracy evidence; the interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md), [S6 instructions](docs/s6-comparison.md) and [H7 data status](docs/provenance/h7-data-status.md).
 
-**Web app:** https://flood-calendar.pages.dev — on 15 November 2026 it served the same Tân Hội H7 and Bang Rakam exports as `data/` in this repository (matching `generated_utc` in each `meta.json`).
+**Production target:** https://floodcalendar.pages.dev ? the product main branch deploys after Web CI passes. Initial activation requires the Actions credential and a successful production run; see [deployment setup](docs/plans/dancing-production.md). The existing integration site remains at https://flood-calendar.pages.dev.
 
 ## The problem
 
