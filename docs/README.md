@@ -43,3 +43,5 @@ Các tài liệu đợt migration là snapshot lịch sử. Web cài từ lockfi
 [WEB-EXPERIENCE-006](plans/season-sound-guidance.md) documents procedural data sound, compact guidance and measured low-tier rendering changes. The [product module map](agent-instructions/Codebase_map.md) identifies the shared audio, assistance and rendering-budget modules.
 
 [Focused tour refinement](plans/tour-refinement.md) records compact playback, stronger data audio and the session-scoped arrival invitation with reversible tour focus.
+
+[Observatory landing](plans/observatory-landing.md) documents the redesigned geographic entrance, physical island sources, lighter rendering and both-site entry verification.
