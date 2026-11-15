@@ -15,6 +15,7 @@ export const U = {
   uCalendarN: { value: new THREE.Vector2(1,1) }, uHasCalendar: { value: 0 },
   uNight: { value: 0 }, // 0 day .. 1 night (windows, fireflies)
   uRadarTex: { value: null },
+  uRadarUv: { value: new THREE.Vector4(0,0,1,1) },
   uHasRadar: { value: 0 },
   uRain: { value: new THREE.Vector4(0, 0, 1, 0) }, // rain cell: centre x, z, radius (m), intensity 0..1
   uWet: { value: 0 }, // lingering wetness everywhere after rain 0..1
@@ -30,7 +31,7 @@ float fbm(vec2 p){ float a=.5, s=0.; for(int i=0;i<4;i++){ s+=a*vnoise(p); p=p*2
 
 export const COMMON = /* glsl */ `
 uniform float uTime; uniform vec2 uWind; uniform float uCloudAmt; uniform float uRadarMode; uniform float uNight;
-uniform sampler2D uRadarTex; uniform float uHasRadar; uniform vec4 uRain; uniform float uWet; uniform vec4 uFrame;
+uniform sampler2D uRadarTex; uniform vec4 uRadarUv; uniform float uHasRadar; uniform vec4 uRain; uniform float uWet; uniform vec4 uFrame;
 uniform float uCalendarMode; uniform float uAgeHaze; uniform sampler2D uCalendarTex; uniform sampler2D uParcelAtlas; uniform vec2 uCalendarN; uniform float uHasCalendar;
 ${NOISE}
 float rainAt(vec2 xz){ return uRain.w * (1. - smoothstep(uRain.z * .55, uRain.z, distance(xz, uRain.xy) + (vnoise(xz / 90.) - .5) * uRain.z * .3)); }
@@ -44,7 +45,9 @@ vec2 uvWin(vec2 xz){ return vec2((xz.x + 1000.) / 2000., 1. - (xz.y + 1000.) / 2
 vec2 uvFrame(vec2 xz){ return vec2((xz.x - uFrame.x) / uFrame.z, (-xz.y - uFrame.y) / uFrame.w); }
 float radarAt(vec2 xz){ vec2 uv = uvFrame(xz);
   if (uHasRadar < .5 || any(lessThan(uv, vec2(0))) || any(greaterThan(uv, vec2(1)))) return .32 + .25 * fbm(xz / 40.);
-  float v = texture2D(uRadarTex, uv).r; return v * v * .6; } // stored as display grey: square ~ to linear
+  vec4 sampleRadar = texture2D(uRadarTex, uRadarUv.xy + uv * uRadarUv.zw);
+  if(sampleRadar.a<.5)return .32 + .25 * fbm(xz / 40.);
+  float v = sampleRadar.r; return v * v * .6; } // stored as display grey: square ~ to linear
 vec4 calendarAt(vec2 xz){
   vec2 uv=uvFrame(xz); if(uHasCalendar<.5 || any(lessThan(uv,vec2(0))) || any(greaterThan(uv,vec2(1))))return vec4(0.);
   vec4 parcel=texture2D(uParcelAtlas,uv);if(parcel.b<.5)return vec4(0.);

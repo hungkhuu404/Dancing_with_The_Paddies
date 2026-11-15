@@ -52,7 +52,7 @@ export async function createSignature(ctx) {
   const residual=document.createElement('span');residual.className='legend-note';
   for(const [label,color] of [['No water observed',COLORS.silt],['Water in every image',COLORS.water],['Insufficient data',COLORS.missing]]){const row=document.createElement('span'),chip=document.createElement('i');chip.style.background=color;row.append(chip,document.createTextNode(label));residual.append(row);}legend.append(residual);
   function setMode(i){mode=Math.max(0,Math.min(2,+i));document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.view===mode)));legend.hidden=mode!==2;
-    note.textContent=mode===0?'Illustrated landscape. Water states use the selected image.':mode===1?(profile.scene.reference_radar_date?'Fixed HH image from '+fmtDate(profile.scene.reference_radar_date)+'. Objects are illustrated.':'Radar image unavailable. Objects are illustrated.'):'Season summary. Lighter fields indicate earlier water arrival.';
+    note.textContent=mode===0?'Illustrated landscape. Water states use the selected image.':mode===1?(ctx.radarReferenceDate?'Fixed HH image from '+fmtDate(ctx.radarReferenceDate)+'. Objects are illustrated.':'Radar image unavailable. Objects are illustrated.'):'Season summary. Lighter fields indicate earlier water arrival.';
     viewCaption.hidden=mode===0;viewCaption.textContent=note.textContent;
   }
   setMode(0);panel.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>setMode(b.dataset.view));

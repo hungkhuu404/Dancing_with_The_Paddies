@@ -4,7 +4,7 @@
 
 Team **Dancing with The Paddies** · NASA Space Apps Challenge 2026 · Challenge: *Dancing with the SARs*
 
-**Data status:** The web reads the Tân Hội pixel-method export under contract 2.0.0. The repository includes S1–S5, an offline S6 comparison runner and S7. Bang Rakam candidate observations are in the repository but not yet integrated into the web; H7 remains separate work. The interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md), [S6 instructions](docs/s6-comparison.md) and [data provenance](docs/provenance/tan-hoi-quan8-mask.md).
+**Data status:** The web reads the Tân Hội pixel-method export under contract 2.0.0. The repository includes S1–S5, an offline S6 comparison runner and S7. Both Tân Hội and Bang Rakam candidate observations are integrated into the web; H7 and scientific acceptance remain separate work. The interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md), [S6 instructions](docs/s6-comparison.md) and [data provenance](docs/provenance/tan-hoi-quan8-mask.md).
 
 **Existing live site:** https://flood-calendar.pages.dev — this migration has not been deployed or verified against that site.
 
@@ -25,7 +25,7 @@ The local web includes:
 - A map that can be replayed image by image, and a chart for any single cell.
 - A layer for fields flooded more than 30 days before the season, relevant *if the IPCC emission factor is applied* (IPCC 2019, Table 5.13).
 
-Bang Rakam (Thailand) is available as a clearly labelled illustrative landscape with water data pending. Its frontend frame is 12 x 12 km; the backend processing configuration remains separate. Data sonification remains planned; ambient landscape audio is illustrative.
+Bang Rakam (Thailand) uses the real QUAN-9 candidate: 2,304 blocks and 11 observations in a 12 × 12 km study frame. Tân Hội uses 22 observations. Both releases retain their scientific review caveats. Data sonification follows observed water area; ambient landscape audio is illustrative. See [two-site integration](docs/plans/two-site-real-data.md).
 
 What it does **not** do: it does not measure methane, and it cannot tell whether a field was sown right after the water left.
 

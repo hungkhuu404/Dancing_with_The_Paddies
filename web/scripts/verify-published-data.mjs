@@ -1,4 +1,4 @@
-﻿// Verify committed real inputs and exact generated output, including explicitly labelled illustrations.
+// Verify committed real inputs and exact generated output, including explicitly labelled illustrations.
 import {readFileSync,writeFileSync,readdirSync,lstatSync,mkdirSync,mkdtempSync,rmSync} from 'node:fs';
 import {resolve,join,dirname,basename} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -29,7 +29,7 @@ try{
   const actual=files(join(web,dir));if(actual.length!==expected.size)throw Error('Unexpected public output file count: '+dir);
   for(const [name,file]of actual)if(expected.get(name)!==hash(readFileSync(file)))throw Error('Unexpected public output bytes: '+dir+'/'+name);
  }
- console.log('Verified '+names.length+' committed real inputs; both outputs exactly match real data plus explicit illustrations.');
+ console.log('Verified '+names.length+' committed real inputs; both outputs exactly match the registry and separately configured illustrations, if any.');
 }finally{
  if(dirname(resolve(temp))!==resolve(cache)||!basename(temp).startsWith('public-verify-'))throw Error('Unsafe verifier cleanup');
  rmSync(temp,{recursive:true,force:true});
