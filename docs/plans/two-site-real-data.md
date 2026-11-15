@@ -1,5 +1,7 @@
 # Two-site real-data integration (WEB-DATA-009)
 
+> Historical integration snapshot. The catalogue and Q1 decisions recorded as pending below were later confirmed; see [H7 data status](../provenance/h7-data-status.md).
+
 Human owner: AIVIETNAM-AIO-QP09; actor: Codex. Product baseline: Dancing_with_The_Paddies@0415f2b, containing data PRs #12 and #15 and the merged observatory entrance. Consumer: landscape, map, water calendar, method and data sound. Secondary baseline: Nasa_prep@fb8277c. Implement in the product first, then mirror selected committed frontend/public-data/schema files for preview. No automatic merge or scientific acceptance is included.
 
 ## Input and publication
