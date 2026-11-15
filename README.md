@@ -8,9 +8,11 @@ Team **Dancing with The Paddies** · Ho Chi Minh City University of Technology (
 
 **Web app:** https://floodcalendar.pages.dev · **Demo video (30 s):** https://drive.google.com/file/d/1Rb9ujhvlkRmKDEZBBRMMePUZH5zd6cvU/view
 
-> **Why this matters now.** After the harvest, communes in An Giang, Vietnam, let the Mekong flood into their diked rice fields on purpose. Then the water has to be pumped out before Winter–Spring rice can be sown, and the sowing calendar closes on **31 December 2026**. Last season the flood receded slowly and sowing bunched together; by April 2026 combine harvesters ran short, lodged rice waited in the fields, and farmers lost 500–700 VND per kilogram ([details](#the-problem)). The commune's plan asks it to track the flood, but gives it no map of the flood, and in the flood season the delta is often under cloud.
+> **Why this matters now.** After the harvest, communes in An Giang, Vietnam, let the Mekong flood into their diked rice fields on purpose. Then the water has to be pumped out before Winter–Spring rice can be sown, and the sowing calendar closes on **31 December 2026**. Last season the flood receded slowly and sowing bunched together, the provincial agriculture department said. In April 2026 reporters found combine harvesters short in other An Giang communes, lodged rice waiting in the fields, and some farmers losing 500–700 VND per kilogram ([details](#the-problem)). The commune's plan asks it to track the flood, but gives it no map of the flood, and in the flood season the delta is often under cloud.
 >
-> **What we built.** Flood Calendar reads NASA–ISRO NISAR L-band radar, which sees through cloud, and keeps a flood calendar for every 250 m block of Tân Hội commune: is open water still seen, when did it arrive, how long has it stayed. On the latest radar date for each block (up to 3 November 2026), open water was still seen on **9,825 ha** of the 14,650 ha we mapped, and no longer seen on 1,281 ha.
+> **What we built.** Flood Calendar reads NASA–ISRO NISAR L-band radar, which sees through cloud, and keeps a flood calendar for every 250 m block of Tân Hội commune: is open water still seen, when did it arrive, how long has it stayed. In our record, open water grew from 1,206 ha on 16 August to **9,850 ha** by 3 November 2026: two-thirds of the 14,650 ha we mapped, and the widest extent of the season so far, two days after the sowing calendar opened.
+>
+> **Where it goes next.** The demo runs in two countries, on the same pipeline and web: Tân Hội in An Giang, Vietnam, and Bang Rakam in Phitsanulok, Thailand. The target is every rice-growing country, 100+ of them: NISAR data are open and cover nearly all of Earth's land every 12 days. Each new site needs a site file and a threshold review ([what the second site took](#from-two-demo-sites-to-100-rice-growing-countries)).
 
 ## The problem
 
@@ -46,34 +48,42 @@ These users and decisions come from the commune's published plan. We have not ye
 
 Flat open water reflects NISAR's L-band radar away from the satellite, so it shows dark in both HH and HV, with or without cloud, day or night. Tân Hội is covered by three NISAR tracks, so each block gets a new look every 3–5 days, from free NASA data.
 
-On the latest radar date for each block (up to 3 November 2026), open water was still seen on 9,825 ha and no longer seen on 1,281 ha. These areas are within our 14,650 ha grid of 2,344 blocks, not the 9,622 ha diked area of the plan. The 1,281 ha show where a cooperative could check first.
+In our record, open water in Tân Hội grew from 1,206 ha on 16 August to 9,850 ha by 3 November 2026, the widest extent of the season so far, two days after the sowing calendar opened. On the latest radar pass for each block, open water was still seen on 9,825 ha, had been there on every pass on 25 ha, and was no longer seen on 1,281 ha. These areas are within our 14,650 ha grid of 2,344 blocks, which is larger than the plan's 9,622 ha of diked fields. The 1,281 ha show where a cooperative could check first. The pumping-out phase is still ahead and is not in the data yet.
 
-We also ran the method on Bang Rakam, a rice plain in Phitsanulok, Thailand (2,304 blocks, 11 radar passes). It needed its own site settings, per-image thresholds and handling for mixed 10 m and 20 m pixels.
+Radar mapping of flooded rice is established work: ALOS-2 PALSAR-2 inundation monitoring in An Giang (Hoang-Phi et al., 2026), multi-frequency SAR in Thai paddies (Kitratporn et al., 2026), the CH4Rice project, Arai et al. (2018) in the Mekong Delta, and NASA's OPERA DSWx-S1 surface-water product from C-band radar. What Flood Calendar adds is a calendar for each block (arrival range, days under water, current status) from NISAR's L-band, organised around the decisions in a commune's own plan, and told with a replayable map, sound and a 3D scene.
+
+## From two demo sites to 100+ rice-growing countries
+
+The demo runs on two rice plains in two countries: Tân Hội in An Giang, Vietnam (2,344 blocks, 22 radar passes), and Bang Rakam in Phitsanulok, Thailand (2,304 blocks, 11 radar passes). Both use the same pipeline and the same web. Bang Rakam is a rice plain that Thailand's Royal Irrigation Department manages as a flood-retention area: its 2026 plan has farmers sow from 1 April and finish the harvest by mid-August so that the fields can take floodwater.
+
+The target is global. Rice is grown in 100+ countries (117 rice-producing countries in the IRRI Rice Almanac, 4th edition), and NISAR images nearly all of Earth's land every 12 days, with open data. Wherever rice fields are flooded and NISAR passes over, the same three questions can be asked: is open water still seen, when did it arrive, how long has it stayed.
+
+Adding a site takes three steps. Bang Rakam showed that each one is needed:
+
+1. A site file: study area, NISAR tracks, grid and reference areas (`config/sites/`).
+2. A threshold review for that site's images. Bang Rakam needed per-image thresholds and handling for mixed 10 m and 20 m pixels.
+3. A comparison with a reference surface-water product where one exists. We used NASA OPERA DSWx-S1.
 
 ## What it does
 
-Flood Calendar uses NISAR L-band radar to answer three questions for every 250 m cell of Tân Hội commune (2,344 cells, 14,650 ha):
+Flood Calendar uses NISAR L-band radar to answer three questions for every 250 m block of Tân Hội commune (2,344 blocks, 14,650 ha):
 
 1. **Is open water still there?**
 2. **How long has the field been under water?** Given as a minimum and a maximum number of days.
 3. **When did the water arrive?** Given as a date range. On dry, flat fields the radar can mark the start earlier than it happened on the ground.
 
-Each NISAR track revisits every 12 days, so every date is a range between two images, never a single day.
+Each NISAR track revisits every 12 days, so every date is a range between two radar passes, never a single day.
 
-The local web includes:
+The web app includes:
 
-- A map that can be replayed image by image, and a chart for any single cell.
+- A map that can be replayed radar pass by radar pass, and a chart for any single block.
+- Data sound: tones follow the water area of each radar pass. The ambient landscape sound is illustrative.
+- A 3D scene of each site with a narrated guided tour. The scene is an illustration (see [Limits](#limits)).
 - A layer for fields flooded more than 30 days before the season, relevant *if the IPCC emission factor is applied* (IPCC 2019, Table 5.13).
 
-Bang Rakam (Thailand) uses the QUAN-9 export: 2,304 blocks and 11 observations in a 12 × 12 km study frame. Tân Hội H7 uses 22 observations. Both retain their scientific limitations. Data sonification follows observed water area; ambient landscape audio is illustrative. See [two-site integration](docs/plans/two-site-real-data.md).
+Bang Rakam (Thailand) has 2,304 blocks and 11 radar passes in a 12 × 12 km study frame, in the same web app. See [two-site integration](docs/plans/two-site-real-data.md).
 
 What it does **not** do: it does not measure methane, and it cannot tell whether a field was sown right after the water left.
-
-## Status and deployment
-
-**Web app:** https://floodcalendar.pages.dev — built and deployed from this repository's `main` after Web CI passes ([deployment setup](docs/plans/dancing-production.md)). On 15 November 2026 it served the same Tân Hội H7 and Bang Rakam exports as `data/` in this repository (matching `generated_utc` in each `meta.json`).
-
-**Data status:** The web reads the Tân Hội H7 and Bang Rakam radar exports under contract 2.0.0. The repository includes S1–S5, an offline S6 comparison runner and S7. Reference agreement is post-hoc, not independent accuracy evidence; the interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md), [S6 instructions](docs/s6-comparison.md) and [H7 data status](docs/provenance/h7-data-status.md).
 
 ## How it works
 
@@ -81,18 +91,68 @@ The web reads the published pixel export rather than running the pipeline. S6 ru
 
 | Stage | What it does | Folder |
 | --- | --- | --- |
-| S0 Catalogue | Query NASA CMR for NISAR L2 GCOV scenes over the site; keep the latest CRID of each acquisition | `pipeline/catalog/` |
+| S0 Catalogue | Query NASA CMR for NISAR L2 GCOV scenes over the site; keep the latest processing version of each acquisition | `pipeline/catalog/` |
 | S1 Read | Read the HH and HV windows over HTTPS into a local cache | `pipeline/core/` |
-| S2 Grid | Prepare 250 m cells and diagnostic HH/HV means | `pipeline/core/` |
-| S3 Reference | Measure a river reference and a stable area for each track; run checks P1–P3 | `pipeline/core/` |
+| S2 Grid | Prepare 250 m blocks and diagnostic HH/HV means | `pipeline/core/` |
+| S3 Reference | Measure a river reference and a stable area for each track; run three consistency checks | `pipeline/core/` |
 | S4 Classify | Apply HH/HV thresholds to pixels, require 75% water pixels, and filter single-image flips using a 50% fill guard | `pipeline/core/` |
 | S5 Indicators | Water arrival, days under water, current status, >30-day flag | `pipeline/core/` |
 | S6 Compare | Compare with OPERA DSWx-S1 | `pipeline/validate/` |
 | S7 Export | Write static files for the web | `pipeline/export/` |
 
-The v2 export records Q0 defaults of HH < −14 dB and HV < −20 dB, with per-acquisition Q1 overrides. It marks a cell as water when at least 75% of jointly valid pixels meet both acquisition thresholds. A 50% threshold controls whether a dry singleton between water observations is filled. The pixel method was selected after examining OPERA DSWx-S1 agreement; that agreement is post-hoc, not independent validation or field accuracy. The comparison file also retains its clearly marked historical H3 baseline; the web reads the v2 pixel states.
+The export records default thresholds of HH < −14 dB and HV < −20 dB, with per-image overrides. It marks a block as water when at least 75% of jointly valid pixels meet both thresholds. A 50% threshold controls whether a single dry pass between two water passes is filled. The pixel method was selected after examining OPERA DSWx-S1 agreement; that agreement is post-hoc, not independent validation or field accuracy.
 
 The file format between the pipeline and the web is defined in [docs/data-contract.md](docs/data-contract.md).
+
+## Data sources
+
+| Data | Provider | Use | Terms |
+| --- | --- | --- | --- |
+| NISAR L2 GCOV, Provisional and Validated V1 ([10.5067/NIL2GCOV-P1](https://doi.org/10.5067/NIL2GCOV-P1), [10.5067/NIL2GCOV-V1](https://doi.org/10.5067/NIL2GCOV-V1)) | NASA / ISRO, via ASF DAAC | Water detection (S1–S5) | NASA open data |
+| OPERA DSWx-S1 V1 ([10.5067/OPDSWS1-L3V1](https://doi.org/10.5067/OPDSWS1-L3V1)) | NASA JPL (OPERA project) | Post-hoc comparison (S6) and post-hoc pixel-method selection | NASA open data |
+| ESA WorldCover 10 m 2021 v200 ([10.5281/zenodo.7254221](https://doi.org/10.5281/zenodo.7254221)) | European Space Agency | Cropland mask | CC BY 4.0. © ESA WorldCover project 2021 / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium |
+| OpenStreetMap (via Overpass API; base map tiles from OpenFreeMap) | OpenStreetMap contributors | Commune boundary, hamlet names, roads, bridges and places in the 3D scene; base map | ODbL, © OpenStreetMap contributors |
+| EOxCloudless 2016 (Sentinel-2 cloudless mosaic, 2016–2017 acquisitions; https://cloudless.eox.at/) | EOX IT Services GmbH (contains modified Copernicus Sentinel data 2016 & 2017) | Regional imagery in the location entrance; reprojected and resampled as the backdrop of the 3D illustration in the video. A multi-date mosaic, not an image of the 2026 flood | CC BY 4.0 |
+| Sentinel-2 scene metadata, via Element 84 Earth Search | Copernicus / ESA | Tile cloud cover shown in the web (not a commune measurement) | Copernicus open data terms |
+| ERA5 reanalysis, via Open-Meteo | ECMWF / Copernicus Climate Change Service | Weather context (cloud cover) in the web | CC BY 4.0 |
+| Natural Earth 1:10m physical layers | Natural Earth | Regional atlas labels and land | Public domain |
+
+Optical imagery credit: EOxCloudless by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2016 & 2017), CC BY 4.0. https://cloudless.eox.at/
+
+## Limits
+
+Final data (frozen 15 November 2026):
+
+- **Tân Hội:** 22 NISAR acquisitions (radar passes) from tracks 047 D, 083 A and 148 D, 11 August–3 November 2026; 2,344 blocks (14,650 ha). Nine acquisitions use per-image thresholds instead of the default −14 dB HH / −20 dB HV.
+- **Bang Rakam:** 11 acquisitions from tracks 011 A and 105 D, 14 August–31 October 2026; 2,304 blocks (14,400 ha) in a 12 × 12 km study frame, not an administrative boundary. Track 112 A images had no valid samples after the GCOV mask and are excluded. The 31 October 105 D image failed the stable-area check and uses per-image thresholds.
+
+Limits:
+
+- The 75% pixel method and 50% temporal guard were selected after examining OPERA DSWx-S1. Agreement with DSWx-S1 is post-hoc, not an independent test, and DSWx-S1 is not ground truth. The web does not report agreement scores; `validation.json` keeps them for inspection.
+- On the latest radar passes the flooded area was still at its largest. The record does not yet include the pumping-out phase that the tool is meant to follow; the next passes will show it.
+- Sparse observations do not prove continuous flooding. One track revisits every 12 days, so water arrival, days under water and water leaving are ranges between two radar passes.
+- The ">30 days" layer flags blocks, not verified continuous flooding. In Tân Hội it marks 8,093.75 ha as "yes"; in a post-hoc check on 13 November the same rule applied to DSWx-S1 gave about 2,731 ha, so treat the layer as an upper bound.
+- Trees and buildings can hide water from the radar; dry, flat fields can look like water, so water arrival may be dated early.
+- Track 148 D misses about 14% of Tân Hội's blocks; the map uses each block's latest valid image.
+- The repository's comparison runner (S6) currently supports the Tân Hội comparison; the Bang Rakam comparison (8 NISAR–DSWx-S1 pairs) was replayed from supplied inputs.
+- The 3D scene is an illustration: houses, people and vegetation are generated by rules, and roads, bridges and churches follow OpenStreetMap. It is not a surveyed model of the commune.
+
+## Use of AI
+
+The backend team used AI coding agents (OpenAI Codex and Claude Code) to write code. Every line was reviewed manually by a team member before it was merged.
+
+Video:
+
+- **AI-generated audio:** the English narration in the video is an AI voice made with ElevenLabs Text to Speech (voice "Lyan").
+- **Script, animation and editing:** OpenAI Codex and ChatGPT helped with the script, the Three.js and Remotion animation code, video assembly, subtitle timing, audio mixing and checks.
+- **Subtitle check:** Microsoft Speech Recognition (offline) was used to compare the narration with the subtitles.
+- Three.js, Remotion and FFmpeg are rendering and editing tools, not generative models. The video contains no AI-generated images or video.
+
+## Status and deployment
+
+**Web app:** https://floodcalendar.pages.dev — built and deployed from this repository's `main` after the automated tests pass ([deployment setup](docs/plans/dancing-production.md)). On 15 November 2026 it served the same Tân Hội and Bang Rakam data as `data/` in this repository (matching `generated_utc` in each `meta.json`).
+
+**Data status:** The web reads the final Tân Hội and Bang Rakam radar exports (data contract 2.0.0, frozen 15 November 2026). The repository includes pipeline stages S1–S5, an offline comparison runner (S6) and the exporter (S7). Agreement with the reference product is post-hoc, not independent accuracy evidence; the interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md), [comparison instructions](docs/s6-comparison.md) and [final data status](docs/provenance/h7-data-status.md).
 
 ## Repository layout
 
@@ -105,8 +165,8 @@ The file format between the pipeline and the web is defined in [docs/data-contra
 | `schema/` | JSON Schema for exported files |
 | `tests/` | Pipeline tests. Web tests are in `web/test/` |
 | `data/` | Exported data read by the web (`data/sites.json`, `data/{site}/`) |
-| `web/` | Local static website (Vite, MapLibre GL JS, Three.js); original asset-generator sources are included in web/tools/ |
-| `web/src/sound/` | Not present; data sonification is not migrated |
+| `web/` | Static web app (Vite, MapLibre GL JS, Three.js); original asset-generator sources are included in web/tools/ |
+| `web/src/audio/` | Data sound: tones that follow the water area of each radar pass |
 | `docs/` | Data contract and method notes |
 
 ## Quick start
@@ -142,7 +202,7 @@ Keep the token in a file outside the repository and point to it:
 export EARTHDATA_TOKEN_FILE=/path/to/token.txt        # PowerShell: $env:EARTHDATA_TOKEN_FILE="C:\path\to\token.txt"
 ```
 
-**Check a published export (offline, no token).** This re-checks schemas, cell IDs, series lengths, area totals, per-pass summaries, backdrop files and file-size limits against `data/`:
+**Check a published export (offline, no token).** This re-checks schemas, block IDs, series lengths, area totals, per-pass summaries, backdrop files and file-size limits against `data/`:
 
 ```bash
 python pipeline/export/verify.py --data data --site tan_hoi
@@ -167,50 +227,6 @@ S6 (comparison with OPERA DSWx-S1) runs offline on supplied snapshots; see [docs
 
 Never commit the token, the image cache or files with signed links.
 
-## Data sources
-
-| Data | Provider | Use | Terms |
-| --- | --- | --- | --- |
-| NISAR L2 GCOV, Provisional and Validated V1 ([10.5067/NIL2GCOV-P1](https://doi.org/10.5067/NIL2GCOV-P1), [10.5067/NIL2GCOV-V1](https://doi.org/10.5067/NIL2GCOV-V1)) | NASA / ISRO, via ASF DAAC | Water detection (S1–S5) | NASA open data |
-| OPERA DSWx-S1 V1 ([10.5067/OPDSWS1-L3V1](https://doi.org/10.5067/OPDSWS1-L3V1)) | NASA JPL (OPERA project) | Post-hoc comparison (S6) and post-hoc pixel-method selection | NASA open data |
-| ESA WorldCover 10 m 2021 v200 ([10.5281/zenodo.7254221](https://doi.org/10.5281/zenodo.7254221)) | European Space Agency | Cropland mask | CC BY 4.0. © ESA WorldCover project 2021 / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium |
-| OpenStreetMap (via Overpass API; base map tiles from OpenFreeMap) | OpenStreetMap contributors | Commune boundary, hamlet names, roads, bridges and places in the 3D scene; base map | ODbL, © OpenStreetMap contributors |
-| EOxCloudless 2016 (Sentinel-2 cloudless mosaic, 2016–2017 acquisitions; https://cloudless.eox.at/) | EOX IT Services GmbH (contains modified Copernicus Sentinel data 2016 & 2017) | Regional imagery in the location entrance; reprojected and resampled as the backdrop of the 3D illustration in the video. A multi-date mosaic, not an image of the 2026 flood | CC BY 4.0 |
-| Sentinel-2 scene metadata, via Element 84 Earth Search | Copernicus / ESA | Tile cloud cover shown in the web (not a commune measurement) | Copernicus open data terms |
-| ERA5 reanalysis, via Open-Meteo | ECMWF / Copernicus Climate Change Service | Weather context (cloud cover) in the web | CC BY 4.0 |
-| Natural Earth 1:10m physical layers | Natural Earth | Regional atlas labels and land | Public domain |
-
-Optical imagery credit: EOxCloudless by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2016 & 2017), CC BY 4.0. https://cloudless.eox.at/
-
-## Limits
-
-Final data (H7, 15 November 2026):
-
-- **Tân Hội:** 22 NISAR acquisitions from tracks 047 D, 083 A and 148 D, 11 August–3 November 2026; 2,344 cells (14,650 ha). Nine acquisitions use per-image (Q1) thresholds instead of the default −14 dB HH / −20 dB HV.
-- **Bang Rakam:** 11 acquisitions from tracks 011 A and 105 D, 14 August–31 October 2026; 2,304 cells (14,400 ha) in a 12 × 12 km study frame, not an administrative boundary. Track 112 A images had no valid samples after the GCOV mask and are excluded. The 31 October 105 D image failed the stable-area check (P3) and uses Q1 thresholds.
-
-Limits:
-
-- The 75% pixel method and 50% temporal guard were selected after examining OPERA DSWx-S1. Agreement with DSWx-S1 is post-hoc, not an independent test, and DSWx-S1 is not ground truth. The web does not report agreement scores; `validation.json` keeps them for inspection.
-- Sparse observations do not prove continuous flooding. One track revisits every 12 days, so water arrival, days under water and water leaving are ranges between two images.
-- The ">30 days" layer flags cells, not verified continuous flooding. In Tân Hội it marks 8,093.75 ha as "yes"; in a post-hoc check on 13 November the same rule applied to DSWx-S1 gave about 2,731 ha, so treat the layer as an upper bound.
-- Trees and buildings can hide water from the radar; dry, flat fields can look like water, so water arrival may be dated early.
-- Track 148 D misses about 14% of Tân Hội's cells; the map uses each cell's latest valid image.
-- The repository's S6 runner currently supports the Tân Hội comparison; the Bang Rakam comparison (8 NISAR–DSWx-S1 pairs) was replayed from supplied inputs.
-- The 3D scene is an illustration: houses, people and vegetation are generated by rules, and roads, bridges and churches follow OpenStreetMap. It is not a surveyed model of the commune.
-
-## Use of AI
-
-The backend team used AI coding agents (OpenAI Codex and Claude Code) to write code. Every line was reviewed manually by a team member before it was merged.
-
-Video:
-
-- **AI-generated audio:** the English narration in the video is an AI voice made with ElevenLabs Text to Speech (voice "Lyan").
-- **Script, animation and editing:** OpenAI Codex and ChatGPT helped with the script, the Three.js and Remotion animation code, video assembly, subtitle timing, audio mixing and checks.
-- **Subtitle check:** Microsoft Speech Recognition (offline) was used to compare the narration with the subtitles.
-- Three.js, Remotion and FFmpeg are rendering and editing tools, not generative models. The video contains no AI-generated images or video.
-
-
 ## References
 
 Literature and plans:
@@ -219,7 +235,10 @@ Literature and plans:
 - Arai, H., Takeuchi, W., Oyoshi, K., Nguyen, L. D., Inubushi, K. (2018). Estimation of Methane Emissions from Rice Paddies in the Mekong Delta Based on Land Surface Dynamics Characterization with Remote Sensing. *Remote Sensing* 10(9), 1438. https://doi.org/10.3390/rs10091438
 - Hoang-Phi, P., Lam-Dao, N., Dang-Pham-Bao, N., Le Toan, T., Truong-Nhat-Kieu, T., Sobue, S. (2026). Inundation Monitoring in Rice Fields Using ALOS-2 PALSAR-2: A Case Study of An Giang, the Mekong Delta in Vietnam. *Remote Sensing* 18(13), 2190. https://doi.org/10.3390/rs18132190
 - Kitratporn, N., Koedkurang, K., Nueangjamnong, P., Simachokchai, K., Chayawat, C., Sobue, S., Le Toan, T. (2026). A Multi-Frequency SAR Framework for Methane Emission Estimation in Thai Rice Paddies. *Remote Sensing* 18(13), 2194. https://doi.org/10.3390/rs18132194
+- Global Rice Science Partnership (2013). *Rice Almanac*, 4th edition. International Rice Research Institute, Los Baños, Philippines.
+- NASA Jet Propulsion Laboratory. NISAR mission. https://nisar.jpl.nasa.gov/
 - CH4Rice project, Space Applications for Environment (SAFE) initiative led by the Vietnam National Space Center. https://www.eorc.jaxa.jp/SAFE/project/ch4rice
+- Royal Irrigation Department, Thailand (24 May 2026). Brief water situation summary, section 11 (Bang Rakam cropping plan). https://water.rid.go.th/flood/news/%E0%B8%AA%E0%B8%A3%E0%B8%B8%E0%B8%9B%E0%B8%AA%E0%B8%B1%E0%B9%89%E0%B8%99%E0%B8%AA%E0%B8%96%E0%B8%B2%E0%B8%99%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%93%E0%B9%8C%E0%B8%99%E0%B9%89%E0%B8%B3%20%2824%20%E0%B8%9E.%E0%B8%84.%2069%29.pdf
 - Tân Hội Commune People's Committee, Plan 122/KH-UBND (12 May 2026).
 - An Giang Department of Agriculture and Environment, Official Letter 3767/SNNMT-KH (16 April 2026).
 - Báo Tin tức (Vietnam News Agency) (9 April 2026). Thiếu máy cắt, lúa đổ sập nằm khô ngoài đồng. https://baotintuc.vn/kinh-te/thieu-may-cat-lua-do-sap-nam-kho-ngoai-dong-20260409170938328.htm
