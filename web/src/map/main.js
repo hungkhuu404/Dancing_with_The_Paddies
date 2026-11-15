@@ -79,7 +79,7 @@ async function start() {
   const features=cells.features, props=features.map(f=>f.properties), bins=onsetBins(props);
   const byCell=new Map(features.map((f,i)=>[f.properties.cell_id,i]));
   const initial=readView(location.search,acq.length);
-  const state={...initial,sel:-1,hover:-1,radarOnly:false,gt30:false};
+  const state={...initial,sel:-1,hover:-1,radarOnly:false,gt30:false};dataSound.select(state.pass);
   let series=null,seriesPromise=null,revision=0,playTimer=0,backdropTimer=0,backdropAt=0;
   const loadSeries=()=>seriesPromise||=getJSON(dir+'series.json').then(s=>{
     series=s;

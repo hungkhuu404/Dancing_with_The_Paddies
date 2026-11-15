@@ -1,3 +1,4 @@
+import {createTourInvitation} from './ui/tourInvitation.js';
 import {frameBudget} from './fx/frameBudget.js';
 import {createSeasonSound} from './audio/seasonSound.js';
 import {createQuickGuide} from './ui/quickGuide.js';
@@ -90,6 +91,7 @@ async function loadIndex(profile) {
 }
 
 async function boot() {
+  let invitation=null;
   const profile=siteProfile(requestedSite(location.search));activeProfile=profile;
   document.title='Flood Calendar in '+profile.name;
   if(profile.boundary.mode==='frame'){$('#loading h1').textContent='Preparing the landscape';$('#whole-btn').setAttribute('aria-label','Show the study area');}
@@ -296,12 +298,12 @@ async function boot() {
     else if (user && !reduced) momentTimer = setTimeout(() => world.nisar.play(i, {keepTime:true}), 280); // compare dates without changing scene lighting or the camera
     else wctx.setPassAll(i, reduced);
     card.markPass(i);
-  }, { start: () => world.timelapse.start(), stop: () => {world.timelapse.stop();dataSound.stop();} });
+  }, { start: () => {const before=curPass,cinematic=world.timelapse.start();if(curPass===before&&(cinematic||curPass<nPasses-1))dataSound.play(curPass);return cinematic;}, stop: () => {world.timelapse.stop();dataSound.stop();} });
   $('#lens-label').textContent = radarTex?`NISAR HH · ${fmtDate(index.radar_date || profile.scene.reference_radar_date)}`:'Radar image unavailable';
   const tod = createTimeOfDay($('#tod'), tod0, reduced);
   wctx.setPassAll(pass0, true);
   timeline.set(pass0);
-  soundReady=true;dataSound.mount($('#timeline'));
+  soundReady=true;dataSound.select(pass0);dataSound.mount($('#timeline'));
   $('#data-src').textContent = (!contract ? 'Water states: scene layout (contract data not loaded).' : contract.meta.fixture ? 'Fixture data, not results.' : '') + (index.fixture ? ' Commune tiles: development stand-in.' : '');
 
   // world controls: weather, NISAR pass, boat ride, sound, whole commune
@@ -331,6 +333,7 @@ async function boot() {
     document.body.classList.add('ready');
     title.classList.remove('is-in');
     title.classList.add('is-out');
+    invitation?.offer();
   }
   function skipIntro() { if (!intro.done) intro.speed = 7; }
   controls.enabled = false;
@@ -443,13 +446,13 @@ async function boot() {
   }
   canvas.addEventListener('pointermove', (e) => {
     if (e.pointerType === 'mouse') { lens.state.x = e.clientX; lens.state.y = e.clientY; }
-    if (!intro.done || e.buttons || world.ride.on) return;
+    if (!intro.done || e.buttons || world.ride.on || signature?.tourActive) return;
     setHover(pickAt(e.clientX, e.clientY));
   });
   addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') { lens.state.x = e.clientX; lens.state.y = e.clientY; } });
   canvas.addEventListener('pointerdown', (e) => (downAt = [e.clientX, e.clientY, performance.now()]));
   canvas.addEventListener('pointerup', (e) => {
-    if (!downAt || !intro.done || world.ride.on) return;
+    if (!downAt || !intro.done || world.ride.on || signature?.tourActive) return;
     const moved = Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]);
     if (moved < 6 && performance.now() - downAt[2] < 400) {
       groundHit(e.clientX,e.clientY);
@@ -458,12 +461,12 @@ async function boot() {
     }
     downAt = null;
   });
-  canvas.addEventListener('dblclick', (e) => { if (intro.done && !world.ride.on && groundHit(e.clientX, e.clientY)) flyTo(hit); });
+  canvas.addEventListener('dblclick', (e) => { if (intro.done && !world.ride.on && !signature?.tourActive && groundHit(e.clientX, e.clientY)) flyTo(hit); });
 
   // ---------------------------------------------------------------- keyboard
   const held = new Set();
   addEventListener('keydown', (e) => {
-    if(entryState.active||document.querySelector('dialog[open]')||e.target.closest?.('#tools-panel'))return;
+    if(entryState.active||signature?.tourActive||document.querySelector('dialog[open]')||e.target.closest?.('#tools-panel'))return;
     const tag = e.target.tagName;
     const typing = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
     if (e.key === 'Escape') { if (selected) select(null); else if (lens.state.on) setLens(false); return; }
@@ -547,9 +550,9 @@ async function boot() {
     if (!intro.done) updateIntro(dt);
     else if (fly.on) updateFly(dt);
     if (tilt.on && !riding) updateTilt(dt);
-    if (!riding) keyMove(dt);
-    if (intro.done && !riding && !fly.on) controls.update(dt);
-    controls.enabled = intro.done && !riding;
+    if (!riding&&!signature?.tourActive) keyMove(dt);
+    if (intro.done && !riding && !fly.on&&!signature?.tourActive) controls.update(dt);
+    controls.enabled = intro.done && !riding&&!signature?.tourActive;
     if (riding) world.update(simdt, U.uTime.value, camera, world.ride.boat.position, sky); // positions the camera first
 
     const view = riding ? world.ride.boat.position : controls.target;
@@ -706,7 +709,7 @@ async function boot() {
     pass:()=>curPass,tod:()=>tod.value,target:()=>controls.target,groundHit,
     saveView:wctx.saveView,restoreView:wctx.restoreView,
     openCalendarMap:query=>mapWorkspace.open(import.meta.env.BASE_URL+'map/?'+new URLSearchParams(query)),
-    pose:p=>{tourTarget.set(p.x,0,p.z);pose({target:tourTarget,r:p.r,polar:p.polar,az:p.az});},
+    pose:(p,entry,weight=1)=>{tourTarget.set(p.x,0,p.z);pose({target:tourTarget,r:p.r,polar:p.polar,az:p.az});if(entry){camera.position.lerpVectors(entry.pos,camera.position,weight);controls.target.lerpVectors(entry.target,controls.target,weight);camera.lookAt(controls.target);}},
     selectAt:(x,z)=>{const field=tiles.pick(x,z);if(field)select(field);},
     stopActivities:()=>{dataSound.stop();clearTimeout(momentTimer);world.ride.exit();world.timelapse.stop();world.nisar.stop();timeline.stop();fly.on=false;tilt.on=false;},
   });
@@ -714,6 +717,7 @@ async function boot() {
   createChrome({canvas,signature});
   const helpControl=document.querySelector('[data-dialog=help-dialog]');document.body.append(helpControl);helpControl.classList.add('quick-guide-toggle','landscape-guide-toggle');
   const guide=createQuickGuide({trigger:helpControl,fixture:!!contract.meta.fixture});
+  invitation=createTourInvitation({site:profile.id,enabled:profile.tour.enabled,fixture:!!contract.meta.fixture,onStart:()=>{guide.close();signature.startTour();},onExplore:()=>{guide.showOnce();canvas.focus({preventScroll:true});}});
   mapWorkspace=createMapWorkspace({
     current:()=>({pass:curPass,site:contract?.meta.site?.id||contract?.meta.site||profile.id,cell:selected?.props?.cell_id||selected?.t?.layout.parcels[selected.i]?.cell?.cell_id}),
     beforeOpen:()=>{signature.stopTour();timeline.stop();world.timelapse.stop();world.nisar.stop();world.ride.exit();held.clear();clearTimeout(momentTimer);fly.on=false;tilt.on=false;world.sound.setPaused(true);dataSound.setPaused(true);guide.close();},
@@ -773,7 +777,7 @@ async function boot() {
   sky.fitShadow(controls.target,camera.position.distanceTo(controls.target),quality.shadow);
   console.info('final lit/shadow shaders ready in',Math.round(performance.now()-compileStarted),'ms');
   last=performance.now();
-  $('#loading').hidden=true;guide.showOnce();
+  $('#loading').hidden=true;if(intro.done&&!entryState.active&&!invitation.offer())guide.showOnce();
   entryState.ready=true;entryState.onReady?.();
   requestAnimationFrame(tick);
   mapWorkspace.openDeepLink();

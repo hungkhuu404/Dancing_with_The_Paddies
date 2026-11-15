@@ -18,3 +18,11 @@ The exported interface remains defined by [CONTRACT-001](../data-contract.md). E
 | web/test/seasonSound.test.mjs | Musical mapping, real-summary bounds and rendering-budget invariants |
 
 [Current experience review](../plans/season-sound-guidance.md). [Earlier two-site integration](../plans/pixel-v2-two-sites.md) documents asset provenance and remaining scientific acceptance limits.
+
+## Arrival and focused tour (WEB-TOUR-007)
+
+- web/src/ui/tourInvitation.js and tourRules.js: session-scoped arrival choice, shared-link/fixture exclusion, bounded progress and entry/record eligibility.
+- web/src/ui/tourFocus.js and tourExperience.css: reversible inert/aria state, fading exploration chrome and retained evidence/exit/audio controls.
+- world/signature.js and main.js coordinate smooth camera entry, scientific evidence and normal/early-exit restoration; input is suspended only while the tour is active.
+- audio/seasonModel.js and seasonSound.js retain the data mapping with a stronger limited output bus and selected-observation feedback on unmute.
+- web/test/tourExperience.test.mjs covers the pure rules. [Refinement review](../plans/tour-refinement.md).

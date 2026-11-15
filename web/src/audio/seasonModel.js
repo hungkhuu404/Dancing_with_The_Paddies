@@ -1,3 +1,4 @@
+export const DATA_SOUND_GAIN=.42;
 // Area ratios are per acquisition, among observed blocks. Missing coverage stays explicit.
 export function seasonCue(pass,totalHa){
  if(!pass||!Number.isFinite(totalHa)||totalHa<=0)return null;

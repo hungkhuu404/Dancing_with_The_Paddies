@@ -41,3 +41,5 @@ Các tài liệu đợt migration là snapshot lịch sử. Web cài từ lockfi
 ## Playback and first-visit assistance
 
 [WEB-EXPERIENCE-006](plans/season-sound-guidance.md) documents procedural data sound, compact guidance and measured low-tier rendering changes. The [product module map](agent-instructions/Codebase_map.md) identifies the shared audio, assistance and rendering-budget modules.
+
+[Focused tour refinement](plans/tour-refinement.md) records compact playback, stronger data audio and the session-scoped arrival invitation with reversible tour focus.
