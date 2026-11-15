@@ -15,6 +15,10 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
+  backend-contracts:
+    name: Backend and published contracts
+    uses: ./.github/workflows/backend-checks.yml
+
   test-build:
     name: Test and build (Node 24)
     runs-on: ubuntu-latest
@@ -54,7 +58,7 @@ jobs:
 
   deploy-production:
     name: Deploy floodcalendar production
-    needs: test-build
+    needs: [test-build, backend-contracts]
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     timeout-minutes: 15

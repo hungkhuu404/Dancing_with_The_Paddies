@@ -29,7 +29,7 @@ The regional entrance opens a selected landscape. Map opens inside the same page
 
 The high-tier Tân Hội profile uses four detailed streamed tiles and limited distant simulation/mirrors; farfield retains coverage. Intel low still has occasional streaming stalls. The large map/scene chunks remain a known build warning. Generator source is in tools/ with explicit local input/output options; source recovery does not prove every historic asset is fully reproducible. No raw imagery, tokens, source cache or heldout are included. Some generators require Blender and separate Python/model-compression dependencies; npm ci alone does not install these.
 
-The product package scripts and lockfile are retained. Product production targets Cloudflare Pages project floodcalendar through its own gated Web CI workflow; the Nasa-hosted site remains independent. The new project is not live until credentials, a main run and hosted checks are complete. [Deployment setup and recovery](../docs/plans/dancing-production.md).
+The product package scripts and lockfile are retained. Product production targets Cloudflare Pages project floodcalendar through its own gated Web CI workflow; the Nasa-hosted site remains independent. Production is available at https://floodcalendar.pages.dev/. Its main deployment requires both web and backend contract checks. [Deployment setup and recovery](../docs/plans/dancing-production.md).
 
 
 ## Historical weather and narrated tours

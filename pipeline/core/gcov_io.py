@@ -54,10 +54,14 @@ def remote_source(url):
         fs.close_session(fs.loop, fs._session)
 
 
-def _window(group, xs, ys, bbox, layers):
+def _window(group, xs, ys, bbox, layers, include_overlap=False):
     x0, y0, x1, y1 = bbox
-    cols = np.flatnonzero((xs >= x0) & (xs < x1))
-    rows = np.flatnonzero((ys >= y0) & (ys < y1))
+    pad_x = pad_y = 0
+    if include_overlap and len(xs) > 1 and len(ys) > 1:
+        pad_x = 10 if np.isclose(abs(xs[1] - xs[0]), 20) else 0
+        pad_y = 10 if np.isclose(abs(ys[1] - ys[0]), 20) else 0
+    cols = np.flatnonzero((xs >= x0 - pad_x) & (xs < x1 + pad_x))
+    rows = np.flatnonzero((ys >= y0 - pad_y) & (ys < y1 + pad_y))
     if not len(cols) or not len(rows):
         raise ValueError("ReferenceOutsideGrid")
     index = (slice(rows[0], rows[-1] + 1), slice(cols[0], cols[-1] + 1))
@@ -72,7 +76,7 @@ def _window(group, xs, ys, bbox, layers):
 
 def cache_identity(row, cfg):
     identity = {"grid": cfg["grid"], "references": {label: {k: ref[k] for k in ("epsg", "bbox_utm_m")} for label, ref in cfg["references"].items()},
-        "group": cfg["read"].get("gcov_group"), "layers": cfg["read"].get("layers"), "granule": row["granule"], "version": 3}
+        "group": cfg["read"].get("gcov_group"), "layers": cfg["read"].get("layers"), "granule": row["granule"], "version": 4}
     return hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()[:16]
 
 
@@ -112,7 +116,7 @@ def read_acquisition(row, cfg, base, force=False, open_source=None):
         if epsg != cfg["grid"]["epsg"]:
             raise ValueError("UnexpectedRasterCRS")
         xs, ys = group["xCoordinates"][()], group["yCoordinates"][()]
-        main = _window(group, xs, ys, cfg["grid"]["bbox_utm_m"], layers)
+        main = _window(group, xs, ys, cfg["grid"]["bbox_utm_m"], layers, include_overlap=True)
         data = {**main, "epsg": epsg, "utc": row["acq_utc"], "crid": row["crid"], "cache_key": digest}
         for label in ("water", "stable"):
             ref = cfg["references"][label]
@@ -124,7 +128,12 @@ def read_acquisition(row, cfg, base, force=False, open_source=None):
     valid = np.isfinite(data["hh"]) & np.isfinite(data["hv"]) & (data["hh"] > 0) & (data["hv"] > 0)
     x0, y0, x1, y1 = cfg["grid"]["bbox_utm_m"]
     pixel_area = abs(float(xs[1] - xs[0]) * float(ys[1] - ys[0]))
-    fraction = float(valid.sum() / ((x1 - x0) * (y1 - y0) / pixel_area))
+    if np.isclose(pixel_area, 400):
+        wx = np.maximum(0, np.minimum(main["xs"] + 10, x1) - np.maximum(main["xs"] - 10, x0))
+        wy = np.maximum(0, np.minimum(main["ys"] + 10, y1) - np.maximum(main["ys"] - 10, y0))
+        fraction = float(np.sum(valid * wy[:, None] * wx[None, :]) / ((x1 - x0) * (y1 - y0)))
+    else:
+        fraction = float(valid.sum() / ((x1 - x0) * (y1 - y0) / pixel_area))
     data["valid_pixel_fraction"] = fraction
     fd, temporary_name = tempfile.mkstemp(dir=cache, prefix=path.stem + "_", suffix=".npz.tmp")
     os.close(fd)

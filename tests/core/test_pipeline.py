@@ -45,7 +45,8 @@ def test_existing_freeze_blocks_before_any_processing(tmp_path):
     assert sorted(p.name for p in out.iterdir()) == ["method_freeze.json"]
 
 
-def test_offline_pipeline_preserves_skips_and_repeats_data_bytes(tmp_path):
+@pytest.mark.parametrize("native_pixel_m", [10, 20])
+def test_offline_pipeline_preserves_skips_and_repeats_data_bytes(tmp_path, native_pixel_m):
     import csv
     import tomllib
     from gcov_io import cache_identity
@@ -91,7 +92,9 @@ bbox_utm_m = [0, 0, 100, 100]
             continue
         digest = cache_identity(row, cfg)
         path = tmp_path / f"cache{i}.npz"
-        np.savez_compressed(path, hh=np.full((10, 10), .01), hv=np.full((10, 10), .001), xs=np.arange(5, 100, 10), ys=np.arange(95, 0, -10),
+        side = 100 // native_pixel_m
+        half = native_pixel_m / 2
+        np.savez_compressed(path, hh=np.full((side, side), .01), hv=np.full((side, side), .001), xs=np.arange(half, 100, native_pixel_m), ys=np.arange(100-half, 0, -native_pixel_m),
             ref_water_hh=np.array([[.01]]), ref_water_hv=np.array([[.001]]), ref_stable_hh=np.array([[1.]]), ref_stable_hv=np.array([[1.]]), cache_key=digest, utc=row["acq_utc"], crid=row["crid"])
         records.append({**row, "path": str(path), "cache_key": digest, "valid_pixel_fraction": 1., "duration_s": 0.})
     manifest = {"acquisitions": records, "skipped": [{**rows[2], "reason": "read_error", "detail": "TimeoutError"}]}
