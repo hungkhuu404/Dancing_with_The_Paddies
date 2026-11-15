@@ -3,9 +3,9 @@ import {utm} from './projection.js';
 export function releaseContext(meta){
   if(meta?.fixture||meta?.method?.selection_status!=='post_hoc')return null;
   if(meta.site==='tan_hoi'&&meta.generated_utc==='2026-11-14T16:51:26.073876Z')
-    return {label:'Tân Hội H7 radar data',details:'The 22-acquisition Tân Hội H7 catalogue uses the GCOV mask correction. Reference agreement is post-hoc, not independent evidence of accuracy.'};
+    return {label:'Tân Hội radar data',details:'The 22-acquisition Tân Hội catalogue uses the GCOV mask correction. Reference agreement is post-hoc, not independent evidence of accuracy.'};
   if(meta.site==='bang_rakam'&&meta.generated_utc==='2026-11-15T01:13:19.089598Z')
-    return {label:'Bang Rakam radar data',details:'The 31 October 105D scene uses Q1, approved after P3 failed. Reference agreement is post-hoc, not independent evidence of accuracy.'};
+    return {label:'Bang Rakam radar data',details:'The 31 October 105D image failed the stable-area check and uses per-image thresholds. Reference agreement is post-hoc, not independent evidence of accuracy.'};
   return {label:'Candidate radar release',details:'Reference agreement is post-hoc, not independent evidence of accuracy.'};
 }
 /** Prefer the scene reference where supplied; otherwise use the last actual backdrop. */

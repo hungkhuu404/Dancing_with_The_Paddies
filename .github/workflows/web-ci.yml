@@ -2,7 +2,7 @@ name: Web CI
 
 on:
   pull_request:
-    branches: [main, migration/web-local]
+    branches: [main]
   push:
     branches: [main]
   workflow_dispatch:

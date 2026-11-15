@@ -1,4 +1,4 @@
-"""Create an explicit local handoff package; never upload or claim receipt."""
+"""Create a local, hash-checked package of one pipeline run; it never uploads anything."""
 import argparse
 import hashlib
 import json
@@ -124,7 +124,7 @@ def package(output, name, destination, config_path=None, selection_path=None, ba
                 raise ValueError("SuitePathEscape")
             if hashlib.sha256(source.read_bytes()).hexdigest() != expected:
                 raise ValueError("ReceivedBang1FileChanged")
-            destination_file = target / "BANG-1" / filename
+            destination_file = target / "protocol_suite" / filename
             destination_file.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, destination_file)
         evidence = target / "evidence"
@@ -136,26 +136,26 @@ def package(output, name, destination, config_path=None, selection_path=None, ba
                 raise ValueError("AcceptanceTestEvidenceMissing")
             shutil.copy2(matches[0], evidence / ("bang1." + extension))
     note = "# " + name + "\n\n"
-    note += "Bản chuẩn bị local của Tân, actor OpenCode. Chưa upload, chưa có xác nhận đã nhận.\n"
-    note += "Cube theo task board mục 6, trục t × n, mã 0/1/2 = thiếu/không nước/nước. CSV null là ô trống, boolean true/false.\n"
-    note += "manifest.json trỏ cache tương đối từ thư mục gói. Mỗi cache có hh/hv công suất tuyến tính, xs/ys UTM, epsg, utc, crid và hai cửa sổ tham chiếu.\n"
+    note += "Local package. Not uploaded.\n"
+    note += "Cube axes are t × n; codes 0/1/2 = missing/no water/water. CSV nulls are empty cells; booleans are true/false.\n"
+    note += "manifest.json points to caches relative to the package folder. Each cache holds linear-power hh/hv, UTM xs/ys, epsg, utc, crid and two reference windows.\n"
     if acceptance:
-        note = note.replace("manifest.json trỏ cache tương đối từ thư mục gói.", "manifest.json giữ nguyên bản đã nghiệm thu để kiểm hash; manifest.portable.json trỏ cache tương đối từ thư mục gói.")
+        note = note.replace("manifest.json points to caches relative to the package folder.", "manifest.json is kept as accepted for hash checks; manifest.portable.json points to caches relative to the package folder.")
     if acceptance:
-        note += "BANG-1 cũ đạt 62 test, không skip; chỉ kiểm các hàm phương pháp cũ, không xác nhận phân loại pixel. method_freeze.json là snapshot phương pháp pixel hậu kiểm, chưa gửi hoặc được xác nhận nhận.\n"
-        note += "acceptance.json ghi kiểm tra mới nhất. run_manifest.json và method_freeze.draft.json giữ nguyên lịch sử xử lý trước nghiệm thu; trạng thái nhận bộ test không đồng nghĩa bộ test đã đạt ở thời điểm xử lý.\n"
-        note += "CONTRACT-001 2.0.0 đề xuất; cần hai nhóm xác nhận. Phương pháp pixel được chọn sau khi đã xem DSWx, không phải kiểm chứng độc lập.\n"
-        note += "Chạy lại BANG-1 từ thư mục gói: python -I -m pytest -p no:cacheprovider -q BANG-1/tests --bang1-adapter pipeline/core/bang1_adapter.py --bang1-require-adapter.\n"
+        note += "The protocol regression suite passed with none skipped; it checks the earlier cell-mean functions and does not validate the pixel classification. method_freeze.json is a post-hoc snapshot of the pixel method.\n"
+        note += "acceptance.json records the latest check. run_manifest.json and method_freeze.draft.json keep the processing record from before acceptance.\n"
+        note += "Data contract 2.0.0. The pixel method was selected after looking at DSWx-S1; this is not independent validation.\n"
+        note += "Re-run the protocol suite from the package folder: python -I -m pytest -p no:cacheprovider -q protocol_suite/tests --bang1-adapter pipeline/core/bang1_adapter.py --bang1-require-adapter.\n"
     else:
-        note += "BANG-2 đã dùng. Gói chưa có nghiệm thu BANG-1. method_freeze.draft.json KHÔNG phải H3, frozen_utc vẫn null.\n"
+        note += "Land-cover table used. No protocol-suite acceptance in this package. method_freeze.draft.json is a draft; frozen_utc is null.\n"
     reference = json.loads((output / "reference.json").read_text(encoding="utf-8"))
-    note += "\n## P1–P3 và phương án theo spec\n\n"
+    note += "\n## Reference checks P1–P3\n\n"
     for track, report in reference["tracks"].items():
         note += f"- {track}: P1 {report['p1']}, P2 {report['p2']}, P3 {report['p3']}.\n"
-    note += "P1 không đạt dùng Q1 theo track; P3 không đạt dùng Q1 của chính ảnh P05036. Ngưỡng cụ thể ở cube và reference.json. Quy tắc pixel 75% và ngưỡng lấp 50% được chọn hậu kiểm sau khi xem DSWx.\n"
-    note += "Nguồn code nằm pipeline/core; các script dùng import cùng thư mục. processing_config.toml giữ nguyên cấu hình đã tính và hash trong run_manifest. portable_config.toml chỉ đổi đường dẫn sang source-data/ và cache/ của gói.\n"
-    note += "Để đọc lại cache: gọi read_cache.py --config portable_config.toml --output rerun, thêm --track 047D cho gói H2A. Khi chạy run_pipeline.py, cache hợp lệ không tải mạng. Bộ test nội bộ cần PYTHONPATH trỏ pipeline/core.\n"
-    note += "Code và tests có trợ giúp AI; số liệu chỉ từ GCOV thật, không có dữ liệu giả và không có payload DSWx Tân Hội.\n"
+    note += "A track that fails P1 uses per-track Q1 thresholds; an image that fails P3 uses Q1 thresholds from that same image. Exact thresholds are in the cube and reference.json. The 75% pixel rule and the 50% fill guard were selected post-hoc after looking at DSWx-S1.\n"
+    note += "Source code is in pipeline/core; scripts import from the same folder. processing_config.toml is the configuration that was run, with its hash in run_manifest. portable_config.toml only changes paths to the package folders source-data/ and cache/.\n"
+    note += "To re-read the cache: read_cache.py --config portable_config.toml --output rerun (add --track 047D for a single-track package). With a valid cache, run_pipeline.py does not use the network. The bundled tests need PYTHONPATH set to pipeline/core.\n"
+    note += "Code and tests were written with AI assistance; all numbers come from real GCOV data, with no synthetic data.\n"
     (target / "DOC_BAN_GIAO.md").write_text(note, encoding="utf-8")
     members = safe_members(target)
     hashes = {p.relative_to(target).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in members}

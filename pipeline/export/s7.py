@@ -128,7 +128,7 @@ def read_inputs(args):
     metrics, landcover = csv_rows(args.metrics),csv_rows(args.landcover)
     ids = set(cube["cell_id"].tolist())
     require(set(metrics)==ids,"metrics/cube cell_id differ")
-    require(ids<=set(landcover),"BANG-2 missing cube cell_id")
+    require(ids<=set(landcover),"Land-cover table missing cube cell_id")
     reference, manifest = reader.read_json(args.reference),reader.read_json(args.manifest)
     run, freeze = reader.read_json(args.run_manifest),reader.read_json(args.freeze)
     require(run["site"]==config["site"]==freeze["site"],"Input site mismatch")
@@ -203,9 +203,9 @@ def build_cells(config,cube,metrics,landcover,places,writer):
         p["cropland"] = boolean(landcover[cid]["cropland"])
         share = float(landcover[cid]["cropland_share"])
         require(math.isfinite(share) and 0<=share<=1,"Invalid cropland_share")
-        # Published BANG-2 shares are rounded to 4 decimals. Boolean is authoritative
+        # Published land-cover shares are rounded to 4 decimals. Boolean is authoritative
         # within one rounding unit of the boundary.
-        require(abs(share-0.5)<=0.00005 or p["cropland"]==(share>=0.5),"BANG-2 boolean/share mismatch")
+        require(abs(share-0.5)<=0.00005 or p["cropland"]==(share>=0.5),"Land-cover boolean/share mismatch")
         p["nearest_hamlet"] = points[int(np.argmin((px-x-size/2)**2+(py-y-size/2)**2))]["properties"]["name"]
         p["flag_gt30"] = validated_gt30(p)
         ring = writer.rounded([to_ll.transform(a,b) for a,b in [(x,y),(x+size,y),(x+size,y+size),(x,y+size),(x,y)]])

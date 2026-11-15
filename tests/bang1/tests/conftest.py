@@ -14,7 +14,7 @@ def pytest_addoption(parser):
 
 def pytest_configure(config):
     if config.getoption('--bang1-require-adapter') and not config.getoption('--bang1-adapter'):
-        raise pytest.UsageError('BANG-1: supply --bang1-adapter; S4/S5 have NOT been verified')
+        raise pytest.UsageError('Protocol suite: supply --bang1-adapter; S4/S5 have NOT been verified')
 
 
 @pytest.fixture(scope='session')

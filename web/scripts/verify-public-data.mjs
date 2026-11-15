@@ -34,7 +34,7 @@ const registry=JSON.parse(readFileSync(join(ROOT,'data/sites.json'),'utf8'));
 for(const site of registry.sites){
  if(!['tan_hoi','bang_rakam'].includes(site.id)||!names.includes(site.id+'/meta.json'))throw Error('Unsupported or unlisted real site');
  const meta=JSON.parse(readFileSync(join(ROOT,'data',site.id,'meta.json'),'utf8'));
- if(meta.site!==site.id||!isPixelV2(meta))throw Error('Expected real CONTRACT-001 2.0.0 pixel input for '+site.id);
+ if(meta.site!==site.id||!isPixelV2(meta))throw Error('Expected real data-contract 2.0.0 pixel input for '+site.id);
 }
 console.log(`Verified ${names.length} committed public inputs at ${git('rev-parse', 'HEAD')}; no synthetic data.`);
 

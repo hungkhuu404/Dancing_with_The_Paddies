@@ -182,6 +182,6 @@ def test_internal_limits_handle_undefined_statistics():
          kappa_max=None, gt30=dict(n_cells=0, precision=None, recall=None),
          onset=dict(n_cells=0, overlap_share=None, median_diff_days=None))}
     text = make_limits_text.render(v, internal=True)
-    assert 'internal only' in text
+    assert 'post-hoc, for review' in text
     assert 'not available' in text
     assert 'the method was frozen before' not in text.lower()

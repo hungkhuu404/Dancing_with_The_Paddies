@@ -1,4 +1,4 @@
-"""Verify the received BANG-1 suite and real outputs, then freeze one local snapshot."""
+"""Verify the protocol regression suite and real outputs, then freeze one local snapshot."""
 import argparse
 from collections import Counter
 import csv
@@ -185,7 +185,7 @@ def finalize(config_path, output, bang_tests=None, check_only=False, bang_receip
     verify_suite(suite, receipt)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     # Verify and publish a fresh owned snapshot, never a directory with active pipeline writers.
-    snapshot = output.parent / ("H4A-SNAPSHOT-" + stamp)
+    snapshot = output.parent / ("SNAPSHOT-" + stamp)
     snapshot.mkdir()
     artifact_names = ["tan_hoi_cube.npz", "tan_hoi_metrics.csv", "reference.json", "run_manifest.json", "manifest.json", "method_freeze.draft.json"]
     for name in artifact_names:

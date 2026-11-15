@@ -8,7 +8,7 @@ export function dateRange(a,b) {
   return `${fmtDate(a)} to ${fmtDate(b)}`;
 }
 
-/** Presentation only: retain bounds, ongoing status and uncertainty from CONTRACT-001. */
+/** Presentation only: retain bounds, ongoing status and uncertainty from the data contract. */
 export function blockSummary(p) {
   const names={flooded:'Water present',water_gone:'Water receded',never_water:'No water observed',always_water:'Water throughout',no_data:'Insufficient observations'};
   const rows=[];

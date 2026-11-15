@@ -65,7 +65,7 @@ def test_zip_root_keeps_handoff_name_not_last_source_filename(tmp_path, monkeypa
     (out / "manifest.json").write_text('{"acquisitions":[],"skipped":[]}')
     (out / "run_manifest.json").write_text(json.dumps({"config_sha256": hashlib.sha256((run / "config/tan_hoi.toml").read_bytes()).hexdigest(), "code_sha256": {"science.py": hashlib.sha256(b"# fixture").hexdigest()}}))
     monkeypatch.setattr(package_handoff, "__file__", str(run / "package_handoff.py"))
-    package_handoff.package(out, "H2A", tmp_path / "delivery")
-    with zipfile.ZipFile(tmp_path / "delivery/H2A.zip") as archive:
-        assert "H2A/SHA256.json" in archive.namelist()
-        assert all(name.startswith("H2A/") for name in archive.namelist())
+    package_handoff.package(out, "SAMPLE", tmp_path / "delivery")
+    with zipfile.ZipFile(tmp_path / "delivery/SAMPLE.zip") as archive:
+        assert "SAMPLE/SHA256.json" in archive.namelist()
+        assert all(name.startswith("SAMPLE/") for name in archive.namelist())

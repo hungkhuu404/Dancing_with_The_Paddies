@@ -41,7 +41,7 @@ export function createCard(root, passes, onClose, fixture=false) {
     root.querySelector('.card-x').addEventListener('click', close);
     root.querySelector('.card-x').focus({ preventScroll: true });
   }
-  // Contract data: the same answers as the map's block panel (spec_uiux §6.4), for the 250 m block under the field.
+  // Contract data: the same answers as the map's block panel, for the 250 m block under the field.
   function openCell(parcel, idx, pass) {
     const p = parcel.cell, s = parcel.s;
     const notes=cellSentences(p).slice(['flooded','water_gone'].includes(p.status)?3:1);

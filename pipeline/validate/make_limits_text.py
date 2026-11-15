@@ -1,7 +1,7 @@
-"""Render public limits by default; --internal emits DSWx agreement for team use.
+"""Render the public limits text by default; --internal adds DSWx-S1 agreement figures.
 
-DEC-PLAN-015: public web/video/slides/Project must not present agreement after
-DSWx tuning as independent validation. No public agreement numbers are emitted.
+Agreement after tuning against DSWx-S1 is not independent validation, so the
+public limits text carries no agreement numbers.
 """
 import argparse
 import json
@@ -28,14 +28,14 @@ def _number(value, digits=2):
 
 def render(v, *, internal=False):
     if not internal:
-        return '# Limits (draft, BANG-8)\n\n' + PUBLIC_LIMITS + '\n'
+        return '# Limits\n\n' + PUBLIC_LIMITS + '\n'
     f = v['filtered']
     gt = f['gt30']
     on = f['onset']
     text = (
-        '# DSWx agreement (internal only)\n\n'
-        'These are agreement figures for team review, not independent validation or ground accuracy. '
-        'Do not copy these numbers into the public web, video, slides or Project page (DEC-PLAN-015).\n\n'
+        '# DSWx-S1 agreement (post-hoc, for review)\n\n'
+        'These are agreement figures for review, not independent validation or ground accuracy. '
+        'They are post-hoc and must not be presented as accuracy.\n\n'
         f"Pairs: {f['n_pairs']}. Cohen's kappa, median: {_number(f['kappa_median'])}; "
         f"range: {_number(f['kappa_min'])} to {_number(f['kappa_max'])}. "
         f"The >30-day flag has precision {_number(gt['precision'])} and recall {_number(gt['recall'])} "

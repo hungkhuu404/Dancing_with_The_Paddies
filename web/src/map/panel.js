@@ -1,4 +1,4 @@
-// Block panel pieces (spec_uiux §6.4–6.5): pass strip and HH/HV chart as plain SVG strings.
+// Block panel pieces: pass strip and HH/HV chart as plain SVG strings.
 import { COLORS, fmtDate } from './contract.js';
 
 const SYMBOLS = ['circle', 'square', 'triangle']; // one per track, so tracks differ by shape, not only colour

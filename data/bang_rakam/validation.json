@@ -5,7 +5,7 @@
   "site": "bang_rakam",
   "timezone": "Asia/Bangkok",
   "comparison_is_independent": false,
-  "first_dswx_read_scope": "current Codex actor/run only; historical Bang first read unconfirmed",
+  "first_dswx_read_scope": "this comparison run only; an earlier first read is not recorded",
   "n_dswx_passes": 12,
   "n_nisar_acquisitions": 11,
   "pairing": "For each NISAR acquisition, select the nearest DSWx-S1 pass by UTC time within 3 days (inclusive), after excluding passes with no valid cells in the study AOI. Of 27 DSWx-S1 passes, 12 were eligible and yielded 8 comparison pairs.",
