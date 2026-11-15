@@ -1,4 +1,4 @@
-"""Adapter belongs to Tân; this suite does not implement S4/S5."""
+"""The adapter is supplied by the pipeline; this suite does not implement S4/S5."""
 import importlib.util
 import sys
 from pathlib import Path
@@ -21,7 +21,7 @@ def pytest_configure(config):
 def tan_adapter(pytestconfig):
     path = pytestconfig.getoption('--bang1-adapter')
     if not path:
-        pytest.skip('Chưa có adapter code Tân; chưa kiểm S4/S5. Use --bang1-adapter PATH')
+        pytest.skip('No adapter supplied; S4/S5 not checked. Use --bang1-adapter PATH')
     path = Path(path).expanduser().resolve()
     if not path.is_file():
         pytest.fail(f'Adapter does not exist: {path}')

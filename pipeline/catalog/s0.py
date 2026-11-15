@@ -301,24 +301,24 @@ def csv_text(rows):
 
 
 def comparison_markdown(manifest, rows, baseline, changes, h0_audit):
-    lines = ["# S0 — đối chiếu danh mục", "", f'- Nguồn chạy: `{manifest["source"]}`.',
-             f'- Trạng thái: `{manifest["status"]}`; metadata UTC: `{manifest["started_utc"]}`.',
-             "- Chỉ kiểm metadata và URL; không tải hoặc xác nhận nội dung HDF5.", "",
-             "| Track/hướng/frame | baseline sau lọc | Kết quả |", "| --- | ---: | ---: |"]
+    lines = ["# S0 — catalogue comparison", "", f'- Run source: `{manifest["source"]}`.',
+             f'- Status: `{manifest["status"]}`; metadata UTC: `{manifest["started_utc"]}`.',
+             "- Checks metadata and URLs only; does not download or validate HDF5 content.", "",
+             "| Track/direction/frame | Baseline after filtering | Result |", "| --- | ---: | ---: |"]
     old_counts, new_counts = counts(baseline), counts(rows)
     for track in sorted(old_counts.keys() | new_counts.keys()):
         lines.append(f"| {track} | {old_counts.get(track, 0)} | {new_counts.get(track, 0)} |")
-    lines += ["", f"Tổng: {len(baseline)} baseline hợp lệ; {len(rows)} dòng kết quả.", "", "## Chênh lệch", ""]
+    lines += ["", f"Total: {len(baseline)} valid baseline rows; {len(rows)} result rows.", "", "## Differences", ""]
     if not changes:
-        lines.append("Không có chênh lệch granule hoặc URL so với baseline sau lọc.")
+        lines.append("No granule or URL differences from the filtered baseline.")
     for change in changes:
         lines += [f'- **{change["kind"]}** `{change["granule"]}`: {change["reason"]}']
         if "previous" in change:
-            lines.append(f'  - Bản baseline: `{change["previous"]}`.')
-    lines += ["", "## Các granule baseline bị loại theo cấu hình", ""]
+            lines.append(f'  - Baseline version: `{change["previous"]}`.')
+    lines += ["", "## Baseline granules excluded by the configuration", ""]
     lines += [f'- `{a["granule"]}`: {a["reason"]}.' for a in h0_audit]
     if manifest["source"] != "CMR_LIVE":
-        lines += ["", "**Đây chỉ là kiểm lại baseline. Chưa xác nhận metadata hiện tại, phân trang mạng hoặc phủ khung UTM mới.**"]
+        lines += ["", "**This is a baseline re-check only. Current metadata, network paging and coverage of the new UTM frame are not confirmed.**"]
     return "\n".join(lines) + "\n"
 
 
