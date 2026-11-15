@@ -1,49 +1,25 @@
-# Tài liệu dự án
+# Project documentation
 
-## Nguồn hiện hành
+Start with the [product README](../README.md): the problem, intended users, method, data sources, limits and how to run.
 
-- [README sản phẩm](../README.md): mục đích, thiết kế và hướng dẫn dự kiến của Flood Calendar.
-- [CONTRACT-001 2.0.0](data-contract.md): nguồn chuẩn về file, khóa và ý nghĩa dữ liệu trong repo này.
-- [Hướng dẫn làm việc](../AGENTS.md): phạm vi sửa đổi và bảo toàn dữ liệu.
-- [Kế hoạch migration](plans/migration-plan.md), [kết quả đợt 1](plans/migration-batch-01.md).
-- [Manifest kế thừa](provenance/migration-manifest.md), [hash tài liệu đợt 1](provenance/batch-01-sha256.md).
-- [Bản đồ tích hợp MAP-UX-001](plans/integrated-map.md): thiết kế, module hiện hành, phạm vi dữ liệu và kết quả kiểm tra UI sau migration. [Chạy web local](../web/README.md).
+## Method and data
 
-## Cấu trúc hiện hành
+- [Data contract 2.0.0](data-contract.md): the files, keys and meaning of the exported data that the web app reads.
+- [Pixel method](pixel-dual-method.md): how a 250 m block is marked as water from NISAR HH and HV pixels.
+- [Comparison with OPERA DSWx-S1](s6-comparison.md): how to run the offline comparison and what it does and does not show.
+- [Web app instructions](../web/README.md): running, testing and building the web app.
 
-| Đường dẫn | Hiện trạng |
-| --- | --- |
-| `pipeline/{catalog,core,export,validate}/` | S0, S1–S5 pixel processing, offline Tân Hội S6 comparison and S7 export |
-| `config/sites/`, `schema/`, `tests/` | Site configuration and JSON Schema are present; frontend tests are in web/test/ |
-| `data/` | Tân Hội H7 pixel export with 22 acquisitions and Bang Rakam 48×48 export with 11 acquisitions; S6 comparisons are post-hoc |
-| `docs/data-contract.md` | Contract 2.0.0 for the pixel export |
-| `docs/plans/`, `docs/provenance/` | Bổ sung trong đợt 1 |
-| `web/` | Vite, Three.js và MapLibre; 3D và map tích hợp cùng tab, có route `/map/` độc lập; test trong `web/test/` |
+## Feature notes (`plans/`)
 
-Các tài liệu đợt migration là snapshot lịch sử. Web cài từ lockfile và chạy local. Code S6 được tích hợp ở task BANG-6; [hướng dẫn chạy](s6-comparison.md) và [nguồn/bằng chứng](provenance/bang6-s6.md) ghi phạm vi của task này. Liên kết live site trong README có trước migration, không phải bằng chứng deploy từ checkout này. Kết quả kiểm tra local được tách khỏi trạng thái CI và production.
+Design notes, checks and limits for each part of the web app:
 
-## Local location-entrance migration
+- [Integrated map](plans/integrated-map.md), [calendar and method views](plans/calendar-method.md)
+- [Two-site data integration](plans/two-site-real-data.md), [two-site frontend](plans/pixel-v2-two-sites.md)
+- [Location entrance](plans/location-entrance.md), [observatory landing](plans/observatory-landing.md), [landing-map radar sweep](plans/atlas-sweep.md)
+- [Guided-tour audio](plans/tour-audio.md), [tour refinement](plans/tour-refinement.md), [acquisition weather and Bang Rakam tour](plans/history-bang-tour.md)
+- [Season playback, sound and guidance](plans/season-sound-guidance.md), [interface polish](plans/interface-polish.md)
+- [Deployment](plans/dancing-production.md)
 
-[MIG-WEB-ENTRANCE-003](plans/location-entrance.md) records the regional entry, compact controls, module map, local checks and open-PR integration limits. [Source and per-file hashes](provenance/location-entrance.md) distinguish the pinned import from the one product adaptation. The integration branch now includes current main data tools; PR checks and merge state are tracked on GitHub. No deploy is configured by this migration.
+## Provenance (`provenance/`)
 
-## Scientific views
-
-[SCIENCE-UI-001](plans/calendar-method.md) documents the hamlet water calendar, Method and limits, calculation rules, module map and verification. The views are available as /calendar/ and /method/ and open inside landscape/map exploration.
-
-## Guided-tour audio migration
-
-[MIG-TOUR-AUDIO-004](plans/tour-audio.md) records the narrated tour, audible scene score, compact captions and independent Calendar/Method entries. [Pinned source and file hashes](provenance/tour-audio.md) cover the selected import from Nasa_prep main. No source hosting workflow or data files are migrated.
-
-## Current two-site frontend
-
-[MIG-WEB-TWO-SITES-005](plans/pixel-v2-two-sites.md) records the earlier frontend migration and its historical 20-image export. The later [two-site integration](plans/two-site-real-data.md) uses real observations from both sites. [H7 data status](provenance/h7-data-status.md) records the catalogue confirmation and remaining limits.
-
-## Playback and first-visit assistance
-
-[WEB-EXPERIENCE-006](plans/season-sound-guidance.md) documents procedural data sound, compact guidance and measured low-tier rendering changes. The [product module map](agent-instructions/Codebase_map.md) identifies the shared audio, assistance and rendering-budget modules.
-
-[Focused tour refinement](plans/tour-refinement.md) records compact playback, stronger data audio and the session-scoped arrival invitation with reversible tour focus.
-
-[Observatory landing](plans/observatory-landing.md) documents the redesigned geographic entrance, physical island sources, lighter rendering and both-site entry verification.
-
-[Landing-map radar illumination](plans/atlas-sweep.md) records the geography-following scan, motion preferences, selected-file provenance and pre-release checks. Product PR/commit history records its current release state.
+Where imported files and published data came from, with per-file hashes and the final data status. These files are historical records and are kept as written.

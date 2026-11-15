@@ -10,9 +10,9 @@ Team **Dancing with The Paddies** · Ho Chi Minh City University of Technology (
 
 > **Why this matters now.** After the harvest, communes in An Giang, Vietnam, let the Mekong flood into their diked rice fields on purpose. Then the water has to be pumped out before Winter–Spring rice can be sown, and the sowing calendar closes on **31 December 2026**. Last season the flood receded slowly and sowing bunched together, the provincial agriculture department said. In April 2026 reporters found combine harvesters short in other An Giang communes, lodged rice waiting in the fields, and some farmers losing 500–700 VND per kilogram ([details](#the-problem)). The commune's plan asks it to track the flood, but gives it no map of the flood, and in the flood season the delta is often under cloud.
 >
-> **What we built.** Flood Calendar reads NASA–ISRO NISAR L-band radar, which sees through cloud, and keeps a flood calendar for every 250 m block of Tân Hội commune: is open water still seen, when did it arrive, how long has it stayed. In our record, open water grew from 1,206 ha on 16 August to **9,850 ha** by 3 November 2026: two-thirds of the 14,650 ha we mapped, and the widest extent of the season so far, two days after the sowing calendar opened.
+> **What we built.** Flood Calendar reads NASA–ISRO NISAR L-band radar, which sees through cloud, and keeps a flood calendar for every 250 m block of Tân Hội commune: is open water still seen, when did it arrive, how long has it stayed. Across 22 radar passes, open water grew from 1,206 ha on 16 August to **9,850 ha** by 3 November 2026, two days after the sowing calendar opened on 1 November. That is two-thirds of the 14,650 ha we mapped, a grid larger than the plan's 9,622 ha of diked fields. The flood is still at its widest, so the pumping-out phase is not in the record yet. So far the map marks 1,281 ha where open water is no longer seen, the first places a cooperative could check.
 >
-> **Where it goes next.** The demo runs in two countries, on the same pipeline and web: Tân Hội in An Giang, Vietnam, and Bang Rakam in Phitsanulok, Thailand. The target is every rice-growing country, 100+ of them: NISAR data are open and cover nearly all of Earth's land every 12 days. Each new site needs a site file and a threshold review ([what the second site took](#from-two-demo-sites-to-100-rice-growing-countries)).
+> **Where it goes next.** The demo runs in two countries, on the same pipeline and web app: Tân Hội in An Giang, Vietnam, and Bang Rakam in Phitsanulok, Thailand. The second site needed its own site file, a threshold review and handling for mixed 10 m and 20 m pixels, and one of its three NISAR tracks gave no usable data. The target is every rice-growing country, 100+ of them: NISAR data are open and cover nearly all of Earth's land every 12 days, so the same steps can be repeated wherever flooded rice is grown ([what a new site takes](#from-two-demo-sites-to-100-rice-growing-countries)).
 
 ![Flood Calendar map of Tân Hội: blocks where water is present (blue) and where water has receded (orange), over the NISAR radar image](docs/images/flood-calendar-map-tan-hoi.jpg)
 
@@ -50,9 +50,9 @@ These users and decisions come from the commune's published plan. We have not ye
 
 ## Why NISAR
 
-Flat open water reflects NISAR's L-band radar away from the satellite, so it shows dark in both HH and HV, with or without cloud, day or night. Tân Hội is covered by three NISAR tracks, so each block gets a new look every 3–5 days, from free NASA data.
+Flat open water reflects NISAR's L-band radar away from the satellite, so it shows dark in both HH and HV, with or without cloud, day or night. Tân Hội is covered by three NISAR tracks, so most blocks get a new look every 3–5 days, from free NASA data (one track misses about 14% of the blocks).
 
-In our record, open water in Tân Hội grew from 1,206 ha on 16 August to 9,850 ha by 3 November 2026, the widest extent of the season so far, two days after the sowing calendar opened. On the latest radar pass for each block, open water was still seen on 9,825 ha, had been there on every pass on 25 ha, and was no longer seen on 1,281 ha. These areas are within our 14,650 ha grid of 2,344 blocks, which is larger than the plan's 9,622 ha of diked fields. The 1,281 ha show where a cooperative could check first. The pumping-out phase is still ahead and is not in the data yet.
+In our record, open water in Tân Hội grew from 1,206 ha on 16 August to 9,850 ha by 3 November 2026, the widest extent of the season so far, two days after the sowing calendar opened on 1 November. On the latest radar pass for each block, open water was still seen on 9,825 ha, had been there on every pass on 25 ha, and was no longer seen on 1,281 ha. These areas are within our 14,650 ha grid of 2,344 blocks, which is larger than the plan's 9,622 ha of diked fields. The 1,281 ha show where a cooperative could check first. The pumping-out phase is still ahead and is not in the data yet.
 
 Radar mapping of flooded rice is established work: ALOS-2 PALSAR-2 inundation monitoring in An Giang (Hoang-Phi et al., 2026), multi-frequency SAR in Thai paddies (Kitratporn et al., 2026), the CH4Rice project, Arai et al. (2018) in the Mekong Delta, and NASA's OPERA DSWx-S1 surface-water product from C-band radar. What Flood Calendar adds is a calendar for each block (arrival range, days under water, current status) from NISAR's L-band, organised around the decisions in a commune's own plan, and told with a replayable map, sound and a 3D scene.
 
@@ -83,7 +83,7 @@ The web app includes:
 - A map that can be replayed radar pass by radar pass, and a chart for any single block.
 - Data sound: tones follow the water area of each radar pass. The ambient landscape sound is illustrative.
 - A 3D scene of each site with a narrated guided tour. The scene is an illustration (see [Limits](#limits)).
-- A layer for fields flooded more than 30 days before the season, relevant *if the IPCC emission factor is applied* (IPCC 2019, Table 5.13).
+- A layer for fields flooded more than 30 days before the season. The IPCC 2019 guidelines give such fields a higher methane scaling factor (Table 5.13). The layer only flags blocks, relevant *if the IPCC default factor applies*; it does not estimate emissions.
 
 Bang Rakam (Thailand) has 2,304 blocks and 11 radar passes in a 12 × 12 km study frame, in the same web app. See [two-site integration](docs/plans/two-site-real-data.md).
 
@@ -125,7 +125,7 @@ Optical imagery credit: EOxCloudless by EOX IT Services GmbH (Contains modified 
 
 ## Limits
 
-Final data (frozen 15 November 2026):
+Final data (as published on 15 November 2026):
 
 - **Tân Hội:** 22 NISAR acquisitions (radar passes) from tracks 047 D, 083 A and 148 D, 11 August–3 November 2026; 2,344 blocks (14,650 ha). Nine acquisitions use per-image thresholds instead of the default −14 dB HH / −20 dB HV.
 - **Bang Rakam:** 11 acquisitions from tracks 011 A and 105 D, 14 August–31 October 2026; 2,304 blocks (14,400 ha) in a 12 × 12 km study frame, not an administrative boundary. Track 112 A images had no valid samples after the GCOV mask and are excluded. The 31 October 105 D image failed the stable-area check and uses per-image thresholds.
@@ -143,7 +143,14 @@ Limits:
 
 ## Use of AI
 
-The backend team used AI coding agents (OpenAI Codex and Claude Code) to write code. Every line was reviewed manually by a team member before it was merged.
+Code:
+
+- **Radar pipeline (backend):** written with AI coding agents (OpenAI Codex and Claude Code). Every line was reviewed manually by a team member before it was merged.
+- **Web app (frontend):** also written with AI coding agents. Changes pass the automated tests before they are merged.
+
+Web app audio:
+
+- **AI-generated audio:** the guided-tour narration for both sites is an AI voice made with ElevenLabs Text to Speech (voice "Jon"). Details are in `web/public/audio/tour/manifest.json`.
 
 Video:
 
@@ -156,7 +163,7 @@ Video:
 
 **Web app:** https://floodcalendar.pages.dev — built and deployed from this repository's `main` after the automated tests pass ([deployment setup](docs/plans/dancing-production.md)). On 15 November 2026 it served the same Tân Hội and Bang Rakam data as `data/` in this repository (matching `generated_utc` in each `meta.json`).
 
-**Data status:** The web reads the final Tân Hội and Bang Rakam radar exports (data contract 2.0.0, frozen 15 November 2026). The repository includes pipeline stages S1–S5, an offline comparison runner (S6) and the exporter (S7). Agreement with the reference product is post-hoc, not independent accuracy evidence; the interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md), [comparison instructions](docs/s6-comparison.md) and [final data status](docs/provenance/h7-data-status.md).
+**Data status:** The web reads the final Tân Hội and Bang Rakam radar exports (data contract 2.0.0, published 15 November 2026). The repository includes pipeline stages S1–S5, an offline comparison runner (S6) and the exporter (S7). Agreement with the reference product is post-hoc, not independent accuracy evidence; the interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md), [comparison instructions](docs/s6-comparison.md) and [final data status](docs/provenance/h7-data-status.md).
 
 ## Repository layout
 

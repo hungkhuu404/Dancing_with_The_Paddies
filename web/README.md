@@ -1,6 +1,6 @@
 # Flood Calendar web
 
-The original two-site frontend was imported from Nasa_prep@cb6a2031615264b177c460fad19400b3c99557e8. See [migration review](../docs/plans/pixel-v2-two-sites.md) and [per-file provenance](../docs/provenance/pixel-v2-two-sites.md). The original source PR is [Nasa_prep #24](https://github.com/hungkhuu404/Nasa_prep/pull/24); this product migration records its reviewed head directly.
+The original two-site frontend was imported from the team's private preparation repository (Nasa_prep@cb6a2031615264b177c460fad19400b3c99557e8). See [migration review](../docs/plans/pixel-v2-two-sites.md) and [per-file provenance](../docs/provenance/pixel-v2-two-sites.md). The source pull request there is not public; this repository records its reviewed head commit.
 
 ## Run locally
 
@@ -18,9 +18,9 @@ The regional entrance opens a selected landscape. Map opens inside the same page
 
 ## Data and illustrations
 
-- The registry and its 48 allowlisted public files contain both real site exports. Tân Hội H7 uses CONTRACT-001 2.0.0: 2,344 cells and 22 acquisitions from 11 August to 3 November 2026, with the GCOV mask applied. The web reads these exports and does not execute S1–S7. It rejects incompatible metadata instead of supplying replacement observations.
-- Bang Rakam reads the QUAN-9 export: 2,304 cells, 11 acquisitions (14 August–31 October 2026), EPSG:32647, in the confirmed 12 × 12 km study frame. Its data-driven cards, map and calendar are not fixtures. Landscape objects remain illustrative.
-- Tân Hội's catalogue is H7. Tân approved the Bang Rakam Q1 fallback for 31 October. Both sites retain the post-hoc reference limitation. See [H7 data status](../docs/provenance/h7-data-status.md).
+- The registry and its 48 approved public files contain both real site exports. The final Tân Hội export uses data contract 2.0.0: 2,344 blocks and 22 acquisitions from 11 August to 3 November 2026, with the GCOV mask applied. The web reads these exports and does not execute S1–S7. It rejects incompatible metadata instead of supplying replacement observations.
+- Bang Rakam has 2,304 blocks, 11 acquisitions (14 August–31 October 2026), EPSG:32647, in the confirmed 12 × 12 km study frame. Its data-driven cards, map and calendar are not fixtures. Landscape objects remain illustrative.
+- Tân Hội's catalogue is final. The Bang Rakam image of 31 October uses per-image thresholds. Both sites retain the post-hoc reference limitation. See [final data status](../docs/provenance/h7-data-status.md).
 - Sync validates required real inputs before rebuilding public/data/. CI verifies committed input bytes and reconstructs the explicit illustration to check both public/data/ and dist/data/ exactly. The retained verify-public-data.mjs command without --output checks real inputs only; use verify-published-data.mjs for two-site outputs.
 - Pixel classification requires 75% water pixels and 70% jointly valid coverage, with the 50% temporal guard. Diagnostic block-average HH/HV are not the classification decision. Selection against DSWx-S1 is post-hoc; it is not independent validation or field accuracy. No comparison scores are displayed. See [provenance](../docs/provenance/tan-hoi-quan8-mask.md).
 - Homes, people, vegetation, water elevation, weather effects and architecture are illustrative. Source-backed OSM locations, the old CC BY optical background and original procedural model notices remain in public/ manifests. Bang Rakam does not invent an operational barrage or a Y.16 marker.
