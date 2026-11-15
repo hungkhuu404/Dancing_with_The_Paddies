@@ -1,6 +1,6 @@
 # Flood Calendar web
 
-The original two-site frontend was imported from the team's private preparation repository (Nasa_prep@cb6a2031615264b177c460fad19400b3c99557e8). See [migration review](../docs/plans/pixel-v2-two-sites.md). The source pull request there is not public; this repository records its reviewed head commit.
+
 
 ## Run locally
 
