@@ -45,7 +45,7 @@ Không phát hiện secret, dữ liệu riêng, output build hoặc cấu hình 
 
 ## Danh tính và cách tạo commit
 
-`gh api user` xác nhận tài khoản đang đăng nhập là `AIVIETNAM-AIO-QP09`, ID `214236901`. GitHub API của commit nguồn `f9a6528403d7a8979d45a5865f98a69daa364c54` liên kết author đó với email `quoc.phamilovebk@hcmut.edu.vn`. Đây là đối chiếu tài khoản/email qua GitHub, không phải tuyên bố commit có chữ ký GPG.
+`gh api user` xác nhận tài khoản đang đăng nhập là `AIVIETNAM-AIO-QP09`, ID `214236901`. GitHub API của commit nguồn `f9a6528403d7a8979d45a5865f98a69daa364c54` liên kết author đó với email đã xác minh của tài khoản. Đây là đối chiếu tài khoản/email qua GitHub, không phải tuyên bố commit có chữ ký GPG.
 
 Dùng danh tính đã đối chiếu qua cấu hình riêng của từng lệnh commit; không đổi Git global, không dùng danh tính coordinator hoặc agent. Không đặt `GIT_AUTHOR_DATE`/`GIT_COMMITTER_DATE`, không lùi ngày về thời gian source. Commit message ghi revision kế thừa và actor Codex riêng, không thêm agent vào author/committer hoặc Co-authored-by.
 
