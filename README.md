@@ -12,6 +12,8 @@ Team **Dancing with The Paddies** · NASA Space Apps Challenge 2026 · Challenge
 
 Every autumn, Tân Hội commune in An Giang, Vietnam, opens the dikes around its rice fields after the Autumn–Winter harvest and lets the Mekong flood in. This is deliberate: the flood brings silt and cleans the fields between crops. Then the water has to be pumped out again before Winter–Spring rice can be sown, and the province's sowing calendar for that crop closes on 31 December 2026. A field that still holds water cannot be sown.
 
+Last season showed what is at stake. The 2025 flood was high and receded slowly, so sowing in An Giang bunched together, the provincial Department of Agriculture and Environment said. Bunched sowing became a bunched harvest: in April 2026, in An Giang communes such as Hòn Đất and Giồng Riềng, combine harvesters ran short, lodged rice waited in the fields, and some farmers lost 500–700 VND per kilogram on price as traders withdrew deposits (Báo Tin tức / Vietnam News Agency, 9 April 2026). Knowing early where water still stands, block by block, is how a commune sees that backlog coming.
+
 The commune's own plan sets out who has to make this work (Plan 122/KH-UBND, 12 May 2026, following provincial Letter 3767/SNNMT-KH). It covers 24 hamlets and 9,622 ha of diked fields:
 
 - The **Commune People's Committee** sets the sowing window and the flood-release timing, and must update the flood level to adjust the sowing calendar.
@@ -205,6 +207,8 @@ Literature and plans:
 - CH4Rice project, Space Applications for Environment (SAFE) initiative led by the Vietnam National Space Center. https://www.eorc.jaxa.jp/SAFE/project/ch4rice
 - Tân Hội Commune People's Committee, Plan 122/KH-UBND (12 May 2026).
 - An Giang Department of Agriculture and Environment, Official Letter 3767/SNNMT-KH (16 April 2026).
+- Báo Tin tức (Vietnam News Agency) (9 April 2026). Thiếu máy cắt, lúa đổ sập nằm khô ngoài đồng. https://baotintuc.vn/kinh-te/thieu-may-cat-lua-do-sap-nam-kho-ngoai-dong-20260409170938328.htm
+- An Giang Department of Agriculture and Environment, Official Letter 5395/SNNMT-CCTTBVTV (2025).
 
 Data: see [Data sources](#data-sources) for every dataset, provider, DOI and licence.
 
