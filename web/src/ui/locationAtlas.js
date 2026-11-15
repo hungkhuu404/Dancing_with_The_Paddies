@@ -1,6 +1,7 @@
 import {siteProfiles,checkSiteIndex,checkSiteMeta} from '../data/siteRules.js';
 import {entryKind} from './entryRules.js';
 import {atlasLayout,atlasPath} from './atlasLayout.js';
+import {atlasSweep} from './atlasSweep.js';
 import {escapeHTML as esc} from '../map/presentation.js';
 import {dateRange} from './blockSummary.js';
 
@@ -61,8 +62,9 @@ export async function createLocationAtlas({choose,back}){
       layout=atlasLayout(geography.bounds);const {width,height}=layout;
       plane.style.aspectRatio=`${width}/${height}`;
       const grid=[];for(let lon=95;lon<=120;lon+=5)grid.push([[lon,2],[lon,27]]);for(let lat=5;lat<=25;lat+=5)grid.push([[91,lat],[123,lat]]);
+      const land=atlasPath(geography.land.flat(),layout,true),coasts=atlasPath(geography.coasts,layout),rivers=atlasPath(geography.rivers,layout);
       const labels=geography.island_labels.map(l=>{const [x,y]=layout.point(...l.center);return `<g class="atlas-island-label" transform="translate(${x},${y})"><path d="M-10 0h-12m6-6v12"/><text x="0" y="4">${esc(l.name)}</text><text class="atlas-island-international" x="0" y="20">${esc(l.international_name)}</text></g>`;}).join('');
-      root.querySelector('.atlas-map-art').innerHTML=`<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Physical coastline of Southeast Asia, including Hoàng Sa and Trường Sa. Study locations are separate buttons."><defs><pattern id="atlas-dots" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".65" fill="#8ba89a" opacity=".25"/></pattern><pattern id="atlas-ocean" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M25 23v4m-2-2h4" stroke="#74958a" stroke-width=".65" opacity=".18"/></pattern></defs><rect width="100%" height="100%" fill="url(#atlas-ocean)"/><path class="atlas-graticule" d="${atlasPath(grid,layout)}"/><path class="atlas-land" fill-rule="evenodd" d="${atlasPath(geography.land.flat(),layout,true)}"/><path class="atlas-land-dots" fill="url(#atlas-dots)" fill-rule="evenodd" d="${atlasPath(geography.land.flat(),layout,true)}"/><path class="atlas-coasts" d="${atlasPath(geography.coasts,layout)}"/><path class="atlas-rivers" d="${atlasPath(geography.rivers,layout)}"/>${labels}</svg>`;
+      root.querySelector('.atlas-map-art').innerHTML=`<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Physical coastline of Southeast Asia, including Hoàng Sa and Trường Sa. Study locations are separate buttons."><defs><pattern id="atlas-dots" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".65" fill="#8ba89a" opacity=".25"/></pattern><pattern id="atlas-ocean" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M25 23v4m-2-2h4" stroke="#74958a" stroke-width=".65" opacity=".18"/></pattern></defs><rect width="100%" height="100%" fill="url(#atlas-ocean)"/><path class="atlas-graticule" d="${atlasPath(grid,layout)}"/><path class="atlas-land" fill-rule="evenodd" d="${land}"/><path class="atlas-land-dots" fill="url(#atlas-dots)" fill-rule="evenodd" d="${land}"/><path class="atlas-coasts" d="${coasts}"/><path class="atlas-rivers" d="${rivers}"/>${atlasSweep({width,height,land,coasts,rivers})}${labels}</svg>`;
     }else{root.querySelector('.atlas-map-art').innerHTML='<p class="atlas-geography-error">Geographic overview unavailable. Choose a landscape below.</p>';}
     locations.forEach(l=>{
       const card=cards.querySelector(`[data-location="${l.id}"]`);
@@ -76,7 +78,7 @@ export async function createLocationAtlas({choose,back}){
     });
     if(locations.length)highlight(locations.find(l=>!l.fixture&&l.available)||locations[0]);
   }catch(error){cards.innerHTML=`<p class="atlas-error" role="alert">${esc(error.message)}. No substitute observations are available.</p><a class="atlas-location" href="${BASE}map/">Open observation map</a>`;}
-  // Motion is compositor-only. No continuous WebGL context or animation loop on the chooser.
+  // Flight stays compositor-only; the decorative SVG scan adds no JS loop or WebGL pass.
   async function fly(location){
     if(cancelled)return false;
     root.classList.add('is-flying');root.querySelector('.atlas-cancel').hidden=true;

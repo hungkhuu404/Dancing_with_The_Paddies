@@ -1,5 +1,13 @@
 # Product module map
 
+## Landing-map scan illumination (WEB-ATLAS-SWEEP-014)
+
+- `web/src/ui/atlasSweep.js` and `atlasSweep.css`: decorative SVG mask, synchronized scan/trail, land/coast/river illumination and motion/colour preference handling.
+- `web/src/ui/locationAtlas.js`: shares base geographic paths with the light layer; site entry actions and labels remain separate.
+- `web/src/ui/atlas.css`: chooser layout with the superseded pseudo-element scan removed.
+
+[Scope, provenance and local verification](../plans/atlas-sweep.md).
+
 The exported interface remains defined by [CONTRACT-001](../data-contract.md). Earlier migration/review documents are revision-specific evidence, not a second interface definition.
 
 | Path | Responsibility |

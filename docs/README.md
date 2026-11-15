@@ -45,3 +45,5 @@ Các tài liệu đợt migration là snapshot lịch sử. Web cài từ lockfi
 [Focused tour refinement](plans/tour-refinement.md) records compact playback, stronger data audio and the session-scoped arrival invitation with reversible tour focus.
 
 [Observatory landing](plans/observatory-landing.md) documents the redesigned geographic entrance, physical island sources, lighter rendering and both-site entry verification.
+
+[Landing-map radar illumination](plans/atlas-sweep.md) records the geography-following scan, motion preferences, selected-file provenance and pre-release checks. Product PR/commit history records its current release state.
