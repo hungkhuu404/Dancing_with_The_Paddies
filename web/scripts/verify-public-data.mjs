@@ -20,7 +20,7 @@ const names = JSON.parse(readFileSync(join(WEB, 'scripts/public-data-files.json'
 if (!Array.isArray(names) || names.length === 0 || new Set(names).size !== names.length) throw new Error('Invalid public data allowlist');
 const digests = new Map();
 for (const name of names) {
-  if (typeof name !== 'string' || !/^(sites\.json|tan_hoi\/(?:[a-z_]+\.(?:json|geojson)|backdrop\/[0-9a-z_]+\.webp))$/.test(name)) throw new Error('Unsafe public data name');
+  if (typeof name !== 'string' || !/^(sites\.json|(?:tan_hoi|bang_rakam)\/(?:[a-z_]+\.(?:json|geojson)|backdrop\/[0-9a-z_]+\.webp))$/.test(name)) throw new Error('Unsafe public data name');
   const file = resolve(ROOT, 'data', name), repoPath = `data/${name}`;
   noLinks(file, ROOT);
   const entry = git('ls-tree', 'HEAD', '--', repoPath);
