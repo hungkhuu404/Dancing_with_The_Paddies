@@ -189,9 +189,55 @@
         1852250
       ],
       "tour": {
-        "enabled": false,
-        "audio": null,
-        "legacy_audio": null
+        "enabled": true,
+        "audio": "audio/tour-bang-rakam/",
+        "legacy_audio": null,
+        "script": "bang_rakam",
+        "route": [
+          {
+            "target": [
+              -176,
+              -672.6
+            ],
+            "r": 900,
+            "polar": 1.05,
+            "az": -0.5
+          },
+          {
+            "target": [
+              219.9,
+              -1310.1
+            ],
+            "r": 650,
+            "polar": 1.05,
+            "az": 0.3
+          },
+          {
+            "target": [
+              0,
+              0
+            ],
+            "r": 6200,
+            "polar": 0.35,
+            "az": 0.7
+          },
+          {
+            "target": "record",
+            "r": 55,
+            "polar": 1.05,
+            "az": 1.5
+          },
+          {
+            "target": [
+              0,
+              0
+            ],
+            "r": 12500,
+            "polar": 0.28,
+            "az": 1.8
+          }
+        ],
+        "route_source": "Illustrative camera targets near OSM place node/1068830365 and mapped bridge; record target comes from real parcel/cell data."
       },
       "fields": {
         "pattern": "blocks",

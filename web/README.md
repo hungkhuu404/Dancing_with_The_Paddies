@@ -14,7 +14,7 @@ node scripts/verify-published-data.mjs
 node node_modules/vite/bin/vite.js preview --host 127.0.0.1
 ```
 
-The regional entrance opens a selected landscape. Map opens inside the same page; /map/ remains a standalone route. /calendar/ and /method/ accept published observations only. The calendar groups the 2,344 blocks by their nearest one of 24 hamlet points, not administrative hamlet boundaries. Captions and optional ElevenLabs narration accompany the Tân Hội tour; ambient audio is illustrative, while the separate data sound follows observed water area.
+The regional entrance opens a selected landscape. Map opens inside the same page; /map/ remains a standalone route. /calendar/ and /method/ accept published observations only. The calendar groups the 2,344 blocks by their nearest one of 24 hamlet points, not administrative hamlet boundaries. Captions and optional ElevenLabs narration accompany both site tours; ambient audio is illustrative, while the separate data sound follows observed water area.
 
 ## Data and illustrations
 
@@ -30,3 +30,10 @@ The regional entrance opens a selected landscape. Map opens inside the same page
 The high-tier Tân Hội profile uses four detailed streamed tiles and limited distant simulation/mirrors; farfield retains coverage. Intel low still has occasional streaming stalls. The large map/scene chunks remain a known build warning. Generator source is in tools/ with explicit local input/output options; source recovery does not prove every historic asset is fully reproducible. No raw imagery, tokens, source cache or heldout are included. Some generators require Blender and separate Python/model-compression dependencies; npm ci alone does not install these.
 
 The product package scripts and lockfile are retained. No deploy script, Cloudflare project configuration or hosting workflow is imported. Merging this branch updates product main, not the existing Nasa-hosted production site.
+
+
+## Historical weather and narrated tours
+
+Both sites have static Open-Meteo/ERA5 weather for every published acquisition: Tân Hội 22/22 and Bang Rakam 11/11. Weather is an approximately 25 km reanalysis estimate at the acquisition UTC, not a measurement per field. Missing values are never converted to dry/clear conditions in the archive.
+
+Bang Rakam now has a site-specific 60-second route, invitation, captions and Jon narration, with the existing scene score and focused-tour controls. Its calendar shows the actual four mapped groups and eleven visits. Tân Hội retains its original script/audio. [Sources, reproduction and review](../docs/plans/history-bang-tour.md).

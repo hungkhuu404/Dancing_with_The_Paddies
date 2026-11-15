@@ -8,3 +8,9 @@
 #calendar-table{border-spacing:2px}#calendar-table thead th{height:40px}#calendar-table tbody th{padding:1px 8px;line-height:1.2}.calendar-cell{min-height:22px;line-height:1.2;padding:4px 2px}@media(pointer:coarse){.calendar-cell{min-height:36px}}
 
 .is-preview #hamlet-note{display:block;font-size:9px;margin:5px 0}
+
+/* Compact evidence inside the guided tour; the full calendar keeps its normal controls and targets. */
+.is-preview .release-notice{display:none!important}.is-preview .reference-heading{margin-bottom:6px}.is-preview h1{font-size:22px;margin-bottom:3px}.is-preview #calendar-summary{font-size:9px}.is-preview #hamlet-note{font-size:8px;margin:4px 0}.is-preview .calendar-key{font-size:8px;margin-bottom:4px;gap:6px}.is-preview .calendar-ramp{width:70px;height:8px}.is-preview .coverage-chip{height:9px;margin-left:4px}.is-preview #calendar-table{min-width:calc(100px + var(--calendar-pass-count,22)*28px);table-layout:fixed;padding:2px;border-spacing:2px}.is-preview #calendar-table th:first-child{width:100px;min-width:0;padding-left:4px}.is-preview #calendar-table td{min-width:0}.is-preview #calendar-table thead th{height:28px;font-size:9px}.is-preview #calendar-table th small{font-size:7px}.is-preview #calendar-table tbody th{font-size:9px;padding:1px 4px}.is-preview .calendar-cell{min-height:18px;font-size:9px;line-height:1.2;padding:2px 1px}
+@media(max-width:500px){.is-preview #calendar-table{min-width:calc(100px + var(--calendar-pass-count,22)*22px)}.is-preview #calendar-table thead th{font-size:7px}.is-preview #calendar-table tbody th{font-size:8px}.is-preview .calendar-cell{font-size:8px}.is-preview .calendar-main{padding:8px}.is-preview .calendar-key{gap:4px}}
+
+@media(max-width:500px){.is-preview #calendar-summary{display:none}}

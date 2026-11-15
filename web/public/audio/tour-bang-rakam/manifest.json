@@ -1,0 +1,77 @@
+{
+  "site": "bang_rakam",
+  "provider": "ElevenLabs",
+  "voice_id": "MFZUKuGQUsGJPQjTS4wC",
+  "voice_name": "Jon - Warm & Grounded Storyteller",
+  "model": "eleven_multilingual_v2",
+  "created_at": "2026-11-15T09:47:52.309Z",
+  "source": "https://elevenlabs.io/voice-library",
+  "licence": "Generated with a paid ElevenLabs subscription; use subject to https://elevenlabs.io/terms-of-use",
+  "voice_settings": {
+    "stability": 0.65,
+    "similarity_boost": 0.75,
+    "style": 0.1,
+    "use_speaker_boost": true,
+    "speed": 0.94
+  },
+  "script_sha256": "55f694310ede3774c46d0adb7767fee2e1d910557cfe4964525ccf473a5cd609",
+  "clips": [
+    {
+      "file": "tour-1.mp3",
+      "text": "After harvest in Bang Rakam. Fields make room for the Yom flood. This landscape is an illustration.",
+      "duration_seconds": 6.084,
+      "cue_starts": [
+        0,
+        1.962,
+        4.11
+      ],
+      "sha256": "1c5eaffd8f326691f3f842d168952f875dc97ec57567369be801ae401bed07ae"
+    },
+    {
+      "file": "tour-2.mp3",
+      "text": "Life follows the river and raised roads. Homes and boats are illustrated. Radar supplies the water record.",
+      "duration_seconds": 6.548,
+      "cue_starts": [
+        0,
+        2.589,
+        4.447
+      ],
+      "sha256": "5246448a68143ff965cd9e1f2f9a7af6dfdd97a3bb40aa7c8fa4f33f0ca3c855"
+    },
+    {
+      "file": "tour-3.mp3",
+      "text": "Smooth water often appears dark. Buildings and plants scatter differently. These responses are illustrated here.",
+      "duration_seconds": 6.455,
+      "cue_starts": [
+        0,
+        2.194,
+        4.342
+      ],
+      "sha256": "ef1c28642f99539b492efbb0b1e33fb02dcd2af57fd2d79cf94f3501033cae76",
+      "reused_from": "tour-3.mp3"
+    },
+    {
+      "file": "tour-4.mp3",
+      "text": "Select a block to read its record. See when water arrived and how long it stayed. Dates are ranges between observations.",
+      "duration_seconds": 6.78,
+      "cue_starts": [
+        0,
+        1.939,
+        4.54
+      ],
+      "sha256": "e51775032e1ce301379aa3519a9424c9ba36603b92f82b871f5800c356df9ebd",
+      "reused_from": "tour-4.mp3"
+    },
+    {
+      "file": "tour-5.mp3",
+      "text": "Compare four mapped hamlet groups. Each column is one satellite visit. Gaps remain visible in the water calendar.",
+      "duration_seconds": 7.012,
+      "cue_starts": [
+        0,
+        2.148,
+        4.54
+      ],
+      "sha256": "28a0cc9e432c7ea79c8b3d5507dc035b30300e9b23e9e16b29553292835be10f"
+    }
+  ]
+}
