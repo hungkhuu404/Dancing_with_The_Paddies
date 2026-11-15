@@ -1,3 +1,4 @@
+import {tapForRecording} from '../audio/recordMix.js';
 // Procedural ambient soundscape (Web Audio, no files): frogs + crickets at night, birds + roosters at dawn,
 // distant boat engines, rain, thunder. Created on the first user click of the Sound toggle (no autoplay).
 export function createSound() {
@@ -11,7 +12,7 @@ export function createSound() {
     master = ac.createGain(); master.gain.value = 0;
     duck=ac.createGain();duck.gain.value=narrating?.24:1;
     const limiter=ac.createDynamicsCompressor();limiter.threshold.value=-18;limiter.knee.value=12;limiter.ratio.value=4;limiter.attack.value=.01;limiter.release.value=.3;
-    master.connect(duck).connect(limiter).connect(ac.destination);
+    master.connect(duck).connect(limiter).connect(ac.destination);tapForRecording(ac,limiter);
     // 2 s of white noise, looped, feeds rain and wind
     const buf = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate), d = buf.getChannelData(0);
     for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
