@@ -21,3 +21,14 @@
 @media(forced-colors:active){.location-atlas{background:Canvas;color:CanvasText}.atlas-location,.atlas-pin,.atlas-resume,.entrance-skip,.atlas-wordmark,.atlas-copy h1,.atlas-copy h1 em,.atlas-lede,.atlas-eyebrow,.atlas-credit{color:CanvasText}.atlas-locations,.atlas-pin-label{background:Canvas;border:1px solid CanvasText}.atlas-location-arrow{border-color:ButtonText}.atlas-land{fill:Canvas}.atlas-coasts{stroke:CanvasText}.atlas-island-label{fill:CanvasText}}
 @media(min-width:901px) and (min-height:651px) and (max-height:800px){.atlas-copy{top:14vh}.atlas-copy h1{font-size:clamp(68px,7vw,100px)}.atlas-radar{margin-top:18px;min-height:64px}.atlas-radar-image{width:88px;height:64px}.atlas-selection{bottom:8vh}.atlas-location{min-height:116px;padding-top:16px;padding-bottom:16px}}
 @media(min-width:901px) and (min-height:501px) and (max-height:650px){.atlas-copy{top:16vh}.atlas-copy h1{font-size:72px}.atlas-radar{display:none}.atlas-selection{bottom:8vh}.atlas-location{min-height:110px;padding-top:12px;padding-bottom:12px}}
+
+/* Entry affordance and preparation feedback stay separate from location labels. */
+.atlas-location:not(.is-pending) .atlas-location-arrow{animation:atlas-entry-hint 3s ease-in-out infinite}
+.atlas-location:hover .atlas-location-arrow,.atlas-location:focus-visible .atlas-location-arrow{animation:none;opacity:1}
+.location-atlas.is-preparing .atlas-location-arrow,.location-atlas.is-flying .atlas-location-arrow{animation:none}
+@keyframes atlas-entry-hint{0%,100%{opacity:1}50%{opacity:.62}}
+.atlas-flight-status{left:50%;top:50%;right:auto;bottom:auto;transform:translate(-50%,-50%);width:max-content;max-width:calc(100% - 48px);box-sizing:border-box;justify-content:center;text-align:center;gap:12px;padding:16px 20px;border:1px solid #eef0ec30;border-radius:20px;background:#111e1ae8;backdrop-filter:blur(16px);box-shadow:0 12px 40px #0003;font-size:13px}
+.atlas-status-text{min-width:0;overflow-wrap:anywhere}
+@media(prefers-reduced-motion:reduce){.atlas-location .atlas-location-arrow{animation:none}}
+@media(prefers-reduced-transparency:reduce),(prefers-contrast:more){.atlas-flight-status{background:#111e1a;backdrop-filter:none}}
+@media(forced-colors:active){.atlas-flight-status{background:Canvas;color:CanvasText;border-color:CanvasText}.atlas-location .atlas-location-arrow{animation:none}}
