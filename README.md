@@ -135,7 +135,7 @@ Limits:
 - The 75% pixel method and 50% temporal guard were selected after examining OPERA DSWx-S1. Agreement with DSWx-S1 is post-hoc, not an independent test, and DSWx-S1 is not ground truth. The web does not report agreement scores; `validation.json` keeps them for inspection.
 - On the latest radar passes the flooded area was still at its largest. The record does not yet include the pumping-out phase that the tool is meant to follow; the next passes will show it.
 - Sparse observations do not prove continuous flooding. One track revisits every 12 days, so water arrival, days under water and water leaving are ranges between two radar passes.
-- The ">30 days" layer flags blocks, not verified continuous flooding. In Tân Hội it marks 8,093.75 ha as "yes"; in a post-hoc check on 13 November the same rule applied to DSWx-S1 gave about 2,731 ha, so treat the layer as an upper bound.
+- The ">30 days" layer flags blocks, not verified continuous flooding. In Tân Hội it marks 8,093.75 ha as "yes"; in a post-hoc check the same rule applied to DSWx-S1 gave about 2,731 ha, so treat the layer as an upper bound.
 - Trees and buildings can hide water from the radar; dry, flat fields can look like water, so water arrival may be dated early.
 - Track 148 D misses about 14% of Tân Hội's blocks; the map uses each block's latest valid image.
 - The repository's comparison runner (S6) currently supports the Tân Hội comparison; the Bang Rakam comparison (8 NISAR–DSWx-S1 pairs) was replayed from supplied inputs.
