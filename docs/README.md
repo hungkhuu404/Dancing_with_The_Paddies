@@ -22,7 +22,3 @@ Design notes, checks and limits for each part of the web app:
 - [Guided-tour audio](plans/tour-audio.md), [tour refinement](plans/tour-refinement.md), [acquisition weather and Bang Rakam tour](plans/history-bang-tour.md)
 - [Season playback, sound and guidance](plans/season-sound-guidance.md), [interface polish](plans/interface-polish.md)
 - [Deployment](plans/dancing-production.md)
-
-## Provenance (`provenance/`)
-
-Where imported files and published data came from, with per-file hashes and the final data status. These files are historical records and are kept as written.

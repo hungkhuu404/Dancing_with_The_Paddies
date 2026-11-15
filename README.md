@@ -163,7 +163,7 @@ Video:
 
 **Web app:** https://floodcalendar.pages.dev — built and deployed from this repository's `main` after the automated tests pass ([deployment setup](docs/plans/dancing-production.md)). On 15 November 2026 it served the same Tân Hội and Bang Rakam data as `data/` in this repository (matching `generated_utc` in each `meta.json`).
 
-**Data status:** The web reads the final Tân Hội and Bang Rakam radar exports (data contract 2.0.0, published 15 November 2026). The repository includes pipeline stages S1–S5, an offline comparison runner (S6) and the exporter (S7). Agreement with the reference product is post-hoc, not independent accuracy evidence; the interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md), [comparison instructions](docs/s6-comparison.md) and [final data status](docs/provenance/h7-data-status.md).
+**Data status:** The web reads the final Tân Hội and Bang Rakam radar exports (data contract 2.0.0, published 15 November 2026). The repository includes pipeline stages S1–S5, an offline comparison runner (S6) and the exporter (S7). Agreement with the reference product is post-hoc, not independent accuracy evidence; the interface does not report agreement scores. See [web instructions](web/README.md), [method](docs/pixel-dual-method.md), [comparison instructions](docs/s6-comparison.md).
 
 ## Repository layout
 
