@@ -315,7 +315,7 @@ Giới hạn cứng của host: Cloudflare Pages cho mỗi file tối đa 25 MiB
 
 ## 8. Phiên bản, thiếu dữ liệu
 
-- **Phiên bản:** `contract_version` là `2.0.0` do thay nghĩa `s_raw`, `s` và các chỉ số từ phương pháp trung bình ô sang pixel. Bộ S6 đi kèm là so sánh hậu kiểm; nguồn và hai mốc khóa được mô tả tại [tan-hoi-v2.md](provenance/tan-hoi-v2.md). Sửa file này và `schema/` cùng nhau khi thay đổi hợp đồng.
+- **Phiên bản:** `contract_version` là `2.0.0` do thay nghĩa `s_raw`, `s` và các chỉ số từ phương pháp trung bình ô sang pixel. Bộ S6 đi kèm là so sánh hậu kiểm. Sửa file này và `schema/` cùng nhau khi thay đổi hợp đồng.
 - **Lần chụp đọc lỗi:** không đưa vào `acquisitions`; ghi vào `skipped` trong `meta.json` kèm lý do.
 - **Ô không có dữ liệu ở một lần chụp:** ký tự `-` trong `s`, `null` trong `hh` và `hv`.
 - **Không có bộ mẫu giả trong `data/`.** Số trên video, slide và trang Project chỉ lấy từ bản dữ liệu cuối đã khóa.

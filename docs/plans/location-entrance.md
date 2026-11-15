@@ -1,6 +1,6 @@
 # MIG-WEB-ENTRANCE-003: Location entrance and current controls
 
-Human owner: Quoc (frontend). Actor: Codex. Consumer: product visitors and reviewers. Branch: migration/location-entrance, based on f25b47d of the existing ui/integrated-map branch. Source is the final head 5efd783 of Nasa_prep PR #17, now merged as 2ff0da2. [Per-file provenance](../provenance/location-entrance.md) records the selected files and one product adaptation.
+Human owner: Quoc (frontend). Actor: Codex. Consumer: product visitors and reviewers. Branch: migration/location-entrance, based on f25b47d of the existing ui/integrated-map branch. Source is the final head 5efd783 of Nasa_prep PR #17, now merged as 2ff0da2. Per-file provenance records the selected files and one product adaptation.
 
 ## Scope
 

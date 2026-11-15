@@ -12,7 +12,7 @@ The light does not intercept pointer events. Existing site selection, keyboard f
 
 ## Selected import and parity
 
-The user clarified the primary product repository after the effect was first prepared locally against the secondary Nasa preview. Only four UI files are transferred. The two existing files had matching source/target baseline contents apart from line endings; feature source content is frozen in a separate read-only snapshot. [Source paths and hashes](../provenance/atlas-sweep.md) distinguish this uncommitted feature from its pinned baseline. No workspace, history, environment, node_modules, workflow, deployment commands or data exports are copied.
+The user clarified the primary product repository after the effect was first prepared locally against the secondary Nasa preview. Only four UI files are transferred. The two existing files had matching source/target baseline contents apart from line endings; feature source content is frozen in a separate read-only snapshot. Source paths and hashes distinguish this uncommitted feature from its pinned baseline. No workspace, history, environment, node_modules, workflow, deployment commands or data exports are copied.
 
 The isolated primary and preview feature working trees hold identical versions of these four files. The release scope is the product PR and merge after green CI, followed by its existing production deployment. The secondary preview implementation remains staged locally; publishing or merging that separate repository is outside this release. Each repository keeps its own hosting configuration and coordination documents. GitHub PR/commit history is authoritative for the current product merge/deployment state.
 

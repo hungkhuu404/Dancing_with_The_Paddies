@@ -1,6 +1,6 @@
 # MIG-TOUR-AUDIO-004
 
-Human owner: Quoc. Actor: Codex. Branch: migration/tour-audio, based on destination origin/main e0849a9. Consumer: the product frontend. Source: Nasa_prep main 2cc00f4783f5d6b6bf256b432b6916ee75049a95, merged PR #19. [Per-file provenance](../provenance/tour-audio.md).
+Human owner: Quoc. Actor: Codex. Branch: migration/tour-audio, based on destination origin/main e0849a9. Consumer: the product frontend. Source: Nasa_prep main 2cc00f4783f5d6b6bf256b432b6916ee75049a95, merged PR #19. Per-file provenance.
 
 ## Scope and modules
 
